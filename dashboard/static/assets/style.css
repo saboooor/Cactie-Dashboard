@@ -27,7 +27,6 @@
 body {
   animation: fadeIn 1s;
   position: relative;
-  background-color: #38331d;
   color: white;
   text-shadow: 0 0 20px #00000040;
 }
