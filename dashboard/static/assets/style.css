@@ -16,8 +16,7 @@
   background: none;
   border: none;
   color: #ffffff9f;
-  margin-left: 4%;
-  margin-right: 4%;
+  margin: 30px 4% 30px 4%;
 }
 
 .disabled {
@@ -121,4 +120,26 @@ input[type=range][orient=vertical] {
   width: 8px;
   background: #ffffff;
   border-radius: 14px;
+}
+
+.musiccontainer {
+  width: 100%;
+  height: calc(100% - 400px);
+}
+
+.item {
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.musicsegment {
+  display: grid;
+  align-items: center;
+}
+
+@media screen and ( orientation:landscape ) {
+  .musiccontainer {
+      display: flex;
+  }
 }
