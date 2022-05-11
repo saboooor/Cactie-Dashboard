@@ -8,7 +8,7 @@ module.exports = client => {
 		format: format.combine(
 			format.colorize(),
 			format.timestamp(),
-			format.printf(log => `[${log.timestamp.split('T')[1].split('.')[0]} ${client.type.color}${client.type.name} ${log.level}]: ${log.message}`),
+			format.printf(log => `[${log.timestamp.split('T')[1].split('.')[0]} ${log.level}]: ${log.message}`),
 		),
 		transports: [
 			new transports.Console(),
