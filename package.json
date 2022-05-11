@@ -1,0 +1,28 @@
+{
+  "name": "cactie-dashboard",
+  "version": "2.0.0",
+  "description": "Cactie dashboard go brr",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saboooor/Cactie-Dashboard.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "saboooor",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "discord.js": "^14.0.0-dev.1651493371-4ba0f56",
+    "ejs": "^3.1.7",
+    "eslint": "^8.15.0",
+    "express": "^4.18.1",
+    "express-session": "^1.17.2",
+    "mariadb": "^2.5.6",
+    "memorystore": "^1.6.7",
+    "passport": "^0.4.1",
+    "passport-discord": "^0.1.4",
+    "winston": "^3.7.2"
+  }
+}
