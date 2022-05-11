@@ -42,13 +42,14 @@ module.exports = async (client) => {
 		throw new TypeError('Invalid domain specific in the client.config file.');
 	}
 
+	const root = client.config.suffix ? client.config.suffix : '/';
 	if (client.config.usingCustomDomain) {
-		callbackUrl = `${domain.protocol}//${domain.host}/${client.config.callbackRoute}`;
+		callbackUrl = `${domain.protocol}//${domain.host}${root}callback`;
 	}
 	else {
 		callbackUrl = `${domain.protocol}//${domain.host}${
 			client.config.port == 80 ? '' : `:${client.config.port}`
-		}/${client.config.callbackRoute}`;
+		}${root}callback`;
 	}
 
 	// This line is to inform users where the system will begin redirecting the users.
@@ -57,7 +58,7 @@ module.exports = async (client) => {
 
 	// set the passport to use a new discord strategy, we pass in client id, secret, callback url and the scopes.
 	/** Scopes:
-	 *  - Identify: Avatar's url, username and discriminator.
+	 *  - Identify: Avatar`s url, username and discriminator.
 	 *  - Guilds: A list of partial guilds.
 	 */
 	passport.use(
@@ -105,7 +106,7 @@ module.exports = async (client) => {
 	);
 
 	// host all of the files in the assets using their name in the root address.
-	app.use('/', express.static(path.resolve(`${dataDir}${path.sep}static`), {
+	app.use(root, express.static(path.resolve(`${dataDir}${path.sep}static`), {
 		extensions: ['html'],
 	}));
 
@@ -131,12 +132,12 @@ module.exports = async (client) => {
 		// If not authenticated, we set the url the user is redirected to into the memory.
 		req.session.backURL = req.url;
 		// redirect user to login endpoint/route.
-		res.redirect('/login');
+		res.redirect(`${root}login`);
 	};
 
 	// Login endpoint.
 	app.get(
-		'/login',
+		`${root}login`,
 		(req, res, next) => {
 			// determine the returning url.
 			if (req.headers.referer) {
@@ -146,7 +147,7 @@ module.exports = async (client) => {
 				}
 			}
 			else {
-				req.session.backURL = '/';
+				req.session.backURL = root;
 			}
 			// Forward the request to the passport middleware.
 			next();
@@ -156,8 +157,8 @@ module.exports = async (client) => {
 
 	// Callback endpoint.
 	app.get(
-		`/${client.config.callbackRoute}`,
-		passport.authenticate('discord', { failureRedirect: '/' }),
+		`${root}callback`,
+		passport.authenticate('discord', { failureRedirect: root }),
 		(
 			req,
 			res,
@@ -177,7 +178,7 @@ module.exports = async (client) => {
 	);
 
 	// Logout endpoint.
-	app.get('/logout', function(req, res) {
+	app.get(`${root}logout`, function(req, res) {
 		// destroy the session.
 		req.session.destroy(() => {
 			// logout the user.
@@ -188,26 +189,26 @@ module.exports = async (client) => {
 	});
 
 	// Index endpoint.
-	app.get('/', (req, res) => renderTemplate(res, req, 'index.ejs'));
+	app.get(root, (req, res) => renderTemplate(res, req, 'index.ejs'));
 
-	app.get('/tos', (req, res) => renderTemplate(res, req, 'terms.ejs'));
+	app.get(`${root}tos`, (req, res) => renderTemplate(res, req, 'terms.ejs'));
 
 	// Invite
-	app.get('/invite', (req, res) => renderTemplate(res, req, 'invite.ejs'));
-	app.get('/invite/discord', (req, res) => renderTemplate(res, req, 'invite/discord.ejs'));
-	app.get('/invite/guilded', (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
+	app.get(`${root}invite`, (req, res) => renderTemplate(res, req, 'invite.ejs'));
+	app.get(`${root}invite/discord`, (req, res) => renderTemplate(res, req, 'invite/discord.ejs'));
+	app.get(`${root}invite/guilded`, (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
 
 	// Dashboard endpoint.
-	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { perms: Permissions }));
+	app.get(`${root}dashboard`, checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { perms: Permissions }));
 
 	const wsurl = client.config.wsurl;
-	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl, perms: Permissions }));
+	app.get(`${root}music`, checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl, perms: Permissions }));
 
 	// Settings endpoint.
-	app.get('/dashboard/:guildID', checkAuth, async (req, res) => {
+	app.get(`${root}dashboard/:guildID`, checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildID);
-		if (!guild) return res.redirect('/dashboard');
+		if (!guild) return res.redirect(`${root}dashboard`);
 		let member = guild.members.cache.get(req.user.id);
 		if (!member) {
 			try {
@@ -218,9 +219,9 @@ module.exports = async (client) => {
 				client.logger.error(`Couldn't fetch the members of ${guild.id}: ${err}`);
 			}
 		}
-		if (!member) return res.redirect('/dashboard');
+		if (!member) return res.redirect(`${root}dashboard`);
 		if (!member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
-			return res.redirect('/dashboard');
+			return res.redirect(`${root}dashboard`);
 		}
 
 		// retrive the settings stored for this guild.
@@ -234,15 +235,15 @@ module.exports = async (client) => {
 	});
 
 	// Settings endpoint.
-	app.post('/dashboard/:guildID', checkAuth, async (req, res) => {
+	app.post(`${root}dashboard/:guildID`, checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildID);
 		const setting = req.body;
-		if (!guild) return res.redirect('/dashboard');
+		if (!guild) return res.redirect(`${root}dashboard`);
 		const member = guild.members.cache.get(req.user.id);
-		if (!member) return res.redirect('/dashboard');
+		if (!member) return res.redirect(`${root}dashboard`);
 		if (!member.permissions.has('MANAGE_GUILD')) {
-			return res.redirect('/dashboard');
+			return res.redirect(`${root}dashboard`);
 		}
 
 		// save the settings.
