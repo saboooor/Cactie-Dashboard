@@ -43,12 +43,12 @@ module.exports = async (client) => {
 	}
 
 	if (client.config.usingCustomDomain) {
-		callbackUrl = `${domain.protocol}//${domain.host}/callback`;
+		callbackUrl = `${domain.protocol}//${domain.host}/${client.config.callbackRoute}`;
 	}
 	else {
 		callbackUrl = `${domain.protocol}//${domain.host}${
 			client.config.port == 80 ? '' : `:${client.config.port}`
-		}/callback`;
+		}/${client.config.callbackRoute}`;
 	}
 
 	// This line is to inform users where the system will begin redirecting the users.
@@ -156,7 +156,7 @@ module.exports = async (client) => {
 
 	// Callback endpoint.
 	app.get(
-		'/callback',
+		`/${client.config.callbackRoute}`,
 		passport.authenticate('discord', { failureRedirect: '/' }),
 		(
 			req,
