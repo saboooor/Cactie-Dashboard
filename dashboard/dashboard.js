@@ -43,12 +43,12 @@ module.exports = async (client) => {
 	}
 
 	if (client.config.usingCustomDomain) {
-		callbackUrl = `${domain.protocol}//${domain.host}/${client.config.callbackRoute}`;
+		callbackUrl = `${domain.protocol}//${domain.host}/callback`;
 	}
 	else {
 		callbackUrl = `${domain.protocol}//${domain.host}${
 			client.config.port == 80 ? '' : `:${client.config.port}`
-		}/${client.config.callbackRoute}`;
+		}/callback`;
 	}
 
 	// This line is to inform users where the system will begin redirecting the users.
@@ -156,14 +156,14 @@ module.exports = async (client) => {
 
 	// Callback endpoint.
 	app.get(
-		`/${client.config.callbackRoute}`,
+		'/callback',
 		passport.authenticate('discord', { failureRedirect: '/' }),
 		(
 			req,
 			res,
 		) => {
 			// log when a user logs in
-			client.logger.info(`User logged in: ${req.user.username + '#' + req.user.discriminator}`);
+			client.logger.info(`User logged in: ${req.user.tag}`);
 			// If user had set a returning url, we redirect him there, otherwise we redirect him to index.
 			if (req.session.backURL) {
 				const backURL = req.session.backURL;
