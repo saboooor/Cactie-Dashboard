@@ -163,7 +163,7 @@ module.exports = async (client) => {
 			res,
 		) => {
 			// log when a user logs in
-			client.logger.info(`User logged in: ${req.user.tag}`);
+			client.logger.info(`User logged in: ${req.user.username}#${req.user.discriminator}`);
 			// If user had set a returning url, we redirect him there, otherwise we redirect him to index.
 			if (req.session.backURL) {
 				const backURL = req.session.backURL;
