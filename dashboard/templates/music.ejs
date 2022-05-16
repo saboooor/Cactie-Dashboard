@@ -9,7 +9,7 @@
 <div class="musiccontainer">
   <div class="item musicsegment">
     <div class="item">
-      <img src="/assets/images/musicplaceholder.png" width="55%" id="cover">
+      <img src="/assets/images/musicplaceholder.png" width="55%" style="border-radius: 10px; filter: drop-shadow(0 0 10rem rgba(0, 0, 0, 0.7));" id="cover">
     </div>
   </div>
   <div class="item musicsegment">
@@ -88,6 +88,14 @@
       document.getElementById('title').innerText = json.current.title.split('\n')[0];
       document.getElementById('author').innerText = json.current.title.split('\n')[1];
       document.getElementById('cover').src = json.current.img;
+      for (const i in json.current.colors) {
+        let num = json.current.colors[i];
+        num = num.toString(16);
+        if (num.length == 5) num = '0' + num;
+        json.current.colors[i] = '#' + num;
+      }
+      document.getElementsByTagName('body')[0].style.backgroundColor = json.current.colors[0];
+      document.getElementsByTagName('body')[0].style.backgroundImage = `linear-gradient(315deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
     }
 
     if (json.type == 'progress') {
