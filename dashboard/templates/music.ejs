@@ -20,7 +20,7 @@
       <br>
       <div class="centered disabled" id="progresscontainer">
         <h5 id="pos" style="padding:15px; margin:0;">0:00</h5>
-          <input type="range" disabled id="progress" oninput="progress(event);" value="0" style="width: 50%;">
+          <input type="range" disabled id="progress" oninput="progress();" value="0" style="width: 50%;">
         <h5 id="total" style="padding:15px; margin:0;">0:00</h5>
       </div>
       <div class="centered">
@@ -31,7 +31,7 @@
       </div>      
       <div class="centered disabled" id="volumecontainer">
         <img style="padding:15px; margin:0;" src="/assets/icons/volume-x.svg">
-          <input type="range" disabled id="volume" oninput="vol(event);" style="width:40%;" max=1000>
+          <input type="range" disabled id="volume" oninput="vol();" style="width:40%;" max=150>
         <img style="padding:15px; margin:0;" src="/assets/icons/volume-2.svg">
       </div>
       <h5 class="centered disabled" id="dj">Users without the DJ role have limited access.</h5>
@@ -40,6 +40,64 @@
 </div>
 
 <script>
+
+  function convert(duration) {
+    let seconds = parseInt((duration / 1000) % 60);
+    let minutes = parseInt((duration / (1000 * 60)) % 60);
+    const hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+    seconds = (seconds < 10) ? '0' + seconds : seconds;
+    if (duration < 3600000) {
+      return minutes + ':' + seconds;
+    }
+    else {
+      minutes = (minutes < 10) ? '0' + minutes : minutes;
+      return hours + ':' + minutes + ':' + seconds;
+    }
+  }
+
+  function progress() {
+    document.getElementById('pos').innerText = convert(document.getElementById('progress').value);
+    document.getElementById('total').innerText = convert(document.getElementById('progress').max - document.getElementById('progress').value);
+  }
+
+  const ws = new WebSocket('<%= wsurl %>?id=<%= user.id %>');
+
+  ws.onmessage = function(data) {
+    const json = JSON.parse(data.data);
+    if (json.type == 'error') return alert(json.message);
+    
+    if (json.type == 'info') {
+      const { player } = json;
+      document.getElementById('vcname').innerText = player.voiceChannel;
+      document.getElementById('volume').value = player.volume;
+      if (!player.paused) play.src = '/assets/icons/pause.svg';
+      else play.src = '/assets/icons/play.svg';
+      if (player.hasdj) {
+        document.getElementById('dj').style.display = 'none';
+        document.getElementById('volume').disabled = false;
+        document.getElementById('volumecontainer').classList.remove('disabled');
+        document.getElementById('progress').disabled = false;
+        document.getElementById('progresscontainer').classList.remove('disabled');
+        document.getElementById('shuffle').classList.remove('disabled');
+        document.getElementById('playbtn').classList.remove('disabled');
+        document.getElementById('skip').classList.remove('disabled');
+      }
+    }
+
+    if (json.type == 'track') {
+      document.getElementById('title').innerText = json.current.title.split('\n')[0];
+      document.getElementById('author').innerText = json.current.title.split('\n')[1];
+      document.getElementById('cover').src = json.current.img;
+    }
+
+    if (json.type == 'progress') {
+      document.getElementById('progress').max = json.max;
+      document.getElementById('progress').value = json.pos;
+      document.getElementById('pos').innerText = convert(document.getElementById('progress').value);
+      document.getElementById('total').innerText = convert(document.getElementById('progress').max - document.getElementById('progress').value);
+    }
+  }
+
 </script>
 
 <%- include("partials/footer") %>
