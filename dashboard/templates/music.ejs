@@ -6,7 +6,9 @@
   <h4 id="vcname">#Voice Channel</h4>  
 </div>
 
-<div class="musiccontainer">
+<div id="queue" class="sidebar"></div>
+
+<div id="musiccontainer">
   <div class="item musicsegment">
     <div class="item">
       <img src="/assets/images/musicplaceholder.png" width="55%" style="border-radius: 10px; filter: drop-shadow(0 0 10rem rgba(0, 0, 0, 0.7));" id="cover">
@@ -27,7 +29,8 @@
         <a href="/music/filters" class="mediacontrols" id="filters"><img src="/assets/icons/sliders.svg"></a>
         <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><img src="/assets/icons/shuffle.svg"></a>
         <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><img id="play" src="/assets/icons/play.svg"></a>
-        <a href="javascript:skip();" class="mediacontrols disabled" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
+        <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
+        <a href="javascript:togglenav();" class="mediacontrols" id="queue"><img src="/assets/icons/list.svg"></a>
       </div>      
       <div class="centered disabled" id="volumecontainer">
         <img style="padding:15px; margin:0;" src="/assets/icons/volume-x.svg">
@@ -40,6 +43,23 @@
 </div>
 
 <script>
+
+  function togglenav() {
+    if (document.getElementById("queue").style.width != '300px') {
+      document.getElementById("queue").style.width = "300px";
+      if (window.innerWidth > window.innerHeight) {
+        document.getElementById("musiccontainer").style.marginRight = "300px";
+        document.getElementById("musiccontainer").style.width = "calc(100% - 300px)";
+      }
+    }
+    else {
+      document.getElementById("queue").style.width = "0";
+      if (window.innerWidth > window.innerHeight) {
+        document.getElementById("musiccontainer").style.marginRight= "0";
+        document.getElementById("musiccontainer").style.width = "100%";
+      }
+    }
+  }
 
   function convert(duration) {
     let seconds = parseInt((duration / 1000) % 60);
@@ -96,6 +116,17 @@
       }
       document.getElementsByTagName('body')[0].style.backgroundColor = json.current.colors[0];
       document.getElementsByTagName('body')[0].style.backgroundImage = `linear-gradient(315deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
+      document.getElementById('queue').innerHTML = '<a href="javascript:togglenav();"><img src="/assets/icons/x.svg"></a>'
+      json.queue.forEach(track => {
+        for (const i in track.colors) {
+          let num = track.colors[i];
+          num = num.toString(16);
+          if (num.length == 5) num = '0' + num;
+          track.colors[i] = '#' + num;
+        }
+        if (!track.color) track.color = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
+        document.getElementById('queue').innerHTML += `<a href="javascript:skip(${json.queue.indexOf(track)});" style="background-image: linear-gradient(90deg, ${track.colors[0]}, ${track.colors[1]});" class="queueitem"><img src="${track.img}">${track.title}</a>`;
+      });
     }
 
     if (json.type == 'progress') {

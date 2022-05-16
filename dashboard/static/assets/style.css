@@ -30,16 +30,6 @@ body {
   text-shadow: 0 0 20px #00000040;
 }
 
-.queueitem {
-  border-radius:5px;
-  text-decoration:none;
-  color:#fff;
-  width:80%;
-  height:70px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
 a:hover {
   transform: scale(0.95);
   transition: 0.2s ease-in-out;
@@ -122,9 +112,10 @@ input[type=range][orient=vertical] {
   border-radius: 14px;
 }
 
-.musiccontainer {
+#musiccontainer {
   width: 100%;
   height: calc(100% - 400px);
+  transition: 0.5s;
 }
 
 .item {
@@ -139,7 +130,45 @@ input[type=range][orient=vertical] {
 }
 
 @media screen and ( orientation:landscape ) {
-  .musiccontainer {
-      display: flex;
+  #musiccontainer {
+    display: flex;
   }
+}
+
+.sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: #000;
+  overflow-x: hidden;
+  padding-top: 100px;
+  transition: 0.2s;
+}
+
+.sidebar a {
+  font-size: 18px;
+  line-height: 26px;
+  text-decoration: none;
+  margin: 10px;
+  padding: 10px;
+  width: 280px;
+  height: 75px;
+}
+
+.sidebar .queueitem {
+  color: #fff;
+  background-color: #000;
+  display: flex;
+  overflow: scroll;
+  border-radius: 5px;
+  white-space: pre-line
+}
+
+.sidebar .queueitem img {
+  width: 55px;
+  border-radius: 6px;
+  margin-right: 10px;
 }
