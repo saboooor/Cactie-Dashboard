@@ -218,19 +218,11 @@ module.exports = async (client) => {
 				client.logger.error(`Couldn't fetch the members of ${guild.id}: ${err}`);
 			}
 		}
-		if (!member) return res.redirect('/dashboard');
-		if (member.id != '249638347306303499' && !member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-			return res.redirect('/dashboard');
-		}
+		if (!member || !member.permissions.has(PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
 
 		// retrive the settings stored for this guild.
-		const storedSettings = await client.getData('settings', 'guildId', req.params.guildID);
-
-		renderTemplate(res, req, 'settings.ejs', {
-			guild,
-			settings: storedSettings,
-			alert: null,
-		});
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: null });
 	});
 
 	// Settings endpoint.
@@ -240,40 +232,15 @@ module.exports = async (client) => {
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member) return res.redirect('/dashboard');
-		if (!member.permissions.has('MANAGE_GUILD')) {
-			return res.redirect('/dashboard');
-		}
-
-		// save the settings.
-		await client.query(`UPDATE settings SET 
-    prefix="${setting.prefix ? setting.prefix : '-'}",
-    leavemessage="${setting.leavemessage ? setting.leavemessage : 'false'}",
-    joinmessage="${setting.joinmessage ? setting.joinmessage : 'false'}",
-    maxppsize="${setting.maxppsize ? setting.maxppsize : '35'}",
-    tickets="${setting.tickets ? setting.tickets : 'buttons'}",
-    bonercmd="${setting.bonercmd ? setting.bonercmd : 'true'}",
-    suggestionchannel="${setting.suggestionchannel ? setting.suggestionchannel : 'false'}",
-    suggestthreads="${setting.suggestthreads ? setting.suggestthreads : 'true'}",
-    pollchannel="${setting.pollchannel ? setting.pollchannel : 'false'}",
-    logchannel="${setting.logchannel ? setting.logchannel : 'false'}",
-    ticketcategory="${setting.ticketcategory ? setting.ticketcategory : 'false'}",
-    supportrole="${setting.supportrole ? setting.supportrole : 'false'}",
-    ticketmention="${setting.ticketmention ? setting.ticketmention : 'here'}",
-    mutecmd="${setting.mutecmd ? setting.mutecmd : 'timeout'}",
-    reactions="${setting.reactions ? setting.reactions : 'true'}",
-    adminrole="${setting.adminrole ? setting.adminrole : 'permission'}",
-    msgshortener="${setting.msgshortener ? setting.msgshortener : '30'}",
-    djrole="${setting.djrole ? setting.djrole : 'false'}"
-    WHERE guildId = "${req.params.guildID}"`).catch((e) => client.logger.error(e));
+		if (!member || !member.permissions.has(PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
+		for (const key in setting) await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
 
 		// retrive the settings stored for this guild.
-		const storedSettings = await client.getData('settings', 'guildId', req.params.guildID);
+		const settings = await client.getData('settings', 'guildId', guild.id);
 
 		// render the template with an alert text which confirms that settings have been saved.
 		renderTemplate(res, req, 'settings.ejs', {
-			guild,
-			settings: storedSettings,
+			guild, settings,
 			alert: 'Your settings have been saved.',
 		});
 	});

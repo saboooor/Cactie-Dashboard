@@ -53,11 +53,15 @@ a {
 }
 
 .darktextboxes, option {
-  background:#121212;
-  background-color:#121212;
-  border-color:#121212;
-  color:white;
+  background: #121212;
+  background-color: #121212;
+  border-color: #121212;
+  color: white;
   border-radius: 10px;
+}
+
+.darktextboxes:focus {
+  background-color: #333;
 }
 
 .darkselectboxes {
