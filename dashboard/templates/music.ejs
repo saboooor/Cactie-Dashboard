@@ -22,14 +22,14 @@
       <br>
       <div class="centered disabled" id="progresscontainer">
         <h5 id="pos" style="padding:15px; margin:0;">0:00</h5>
-          <input type="range" disabled id="progress" oninput="progress();" value="0" style="width: 50%;">
+          <input type="range" disabled id="progress" oninput="seek();" value="0" style="width: 50%;">
         <h5 id="total" style="padding:15px; margin:0;">0:00</h5>
       </div>
       <div class="centered">
         <a href="/music/filters" class="mediacontrols" id="filters"><img src="/assets/icons/sliders.svg"></a>
         <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><img src="/assets/icons/shuffle.svg"></a>
         <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><img id="play" src="/assets/icons/play.svg"></a>
-        <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
+        <a href="javascript:skip();" class="mediacontrols disabled" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
         <a href="javascript:togglenav();" class="mediacontrols" id="queue"><img src="/assets/icons/list.svg"></a>
       </div>      
       <div class="centered disabled" id="volumecontainer">
@@ -43,6 +43,39 @@
 </div>
 
 <script>
+
+  function shuffle() {
+    ws.send(JSON.stringify({
+			req: 'shuffle',
+		}));
+  }
+
+  function toggleplay() {
+    ws.send(JSON.stringify({
+			req: 'toggleplay',
+		}));
+  }
+
+  function skip(amount) {
+    ws.send(JSON.stringify({
+			req: 'skip',
+      amount
+		}));
+  }
+
+  function vol() {
+    ws.send(JSON.stringify({
+      req: 'volume',
+      volume: document.getElementById('volume').value
+    }));
+  }
+  
+  function seek() {
+    ws.send(JSON.stringify({
+      req: 'seek',
+      time: document.getElementById('progress').value
+    }));
+  }
 
   function togglenav() {
     if (document.getElementById("queue").style.width != '300px') {
@@ -99,9 +132,6 @@
     if (json.type == 'info') {
       const { player } = json;
       document.getElementById('vcname').innerText = player.voiceChannel;
-      document.getElementById('volume').value = player.volume;
-      if (!player.paused) play.src = '/assets/icons/pause.svg';
-      else play.src = '/assets/icons/play.svg';
       if (player.hasdj) {
         document.getElementById('dj').style.display = 'none';
         document.getElementById('volume').disabled = false;
@@ -112,6 +142,11 @@
         document.getElementById('playbtn').classList.remove('disabled');
         document.getElementById('skip').classList.remove('disabled');
       }
+    }
+    
+    if (json.type == 'playing') {
+      if (!json.paused) play.src = '/assets/icons/pause.svg';
+      else play.src = '/assets/icons/play.svg';
     }
 
     if (json.type == 'track') {
@@ -146,6 +181,8 @@
       document.getElementById('pos').innerText = convert(document.getElementById('progress').value);
       document.getElementById('total').innerText = convert(document.getElementById('progress').max - document.getElementById('progress').value);
     }
+
+    if (json.type == 'volume') document.getElementById('volume').value = json.volume;
   }
 
 </script>
