@@ -27,16 +27,15 @@ body {
   animation: fadeIn 1s;
   position: relative;
   color: white;
-  text-shadow: 0 0 20px #00000040;
+  filter: drop-shadow(0 0 5rem rgba(0, 0, 0, 0.6));
 }
 
 a:hover {
   transform: scale(0.95);
-  transition: 0.2s ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 }
 
 a {
-  transform: scale(1);
   transition: 0.2s ease-in-out;
 }
 
