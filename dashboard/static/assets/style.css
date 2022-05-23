@@ -28,14 +28,10 @@ body {
   animation: fadeIn 1s;
   position: relative;
   color: white;
-  filter: drop-shadow(0 0 5rem rgba(0, 0, 0, 0.6));
-  -webkit-filter: drop-shadow(0 0 5rem rgba(0, 0, 0, 0.6));
 }
 
 a:hover {
   transform: scale(0.95);
-  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-  -webkit-filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 }
 
 a {
