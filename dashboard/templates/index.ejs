@@ -1,22 +1,26 @@
 <%- include("partials/header", { bot, user, path, title: "Home" }) %>
 
-<div style="height: calc(100% - 69px); display: flex; align-items: center;">
-  <div class="d-grid gap-2" style="width: 100%;">
-    <div class="centered">
-      <img src="/assets/images/CactieEmpty.png" style="max-width: 18rem; max-height: 18rem;" class="centered">
-    </div>
-    <p></p>
-    <h2 style="text-align: center;"><%= bot.user.username %></h2>
-    <h3 style="text-align: center;">A bot that does stuff ig</h3>
-    <h4 style="text-align: center;">Admin, Fun, Music, Tickets, Utilities, NSFW, Animals, and Actions!</h4>
-    <p></p>
-    <div class="centered">
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="/dashboard">Discord Dashboard</a>
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="/support/discord">Discord Support</a>
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="/support/guilded">Guilded Support</a>
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="/invite">Invite <%= bot.user.username %>!</a>
+<section class="hero is-fullheight-with-navbar is-dark">
+  <div class="hero-body" style="background-color: <%= bot.config.color %>">
+    <div class="container has-text-centered">
+      <img src="/assets/images/CactieEmpty.png" style="max-width: 18rem; max-height: 18rem;">
+      <p class="title">
+        <%= bot.user.username %>
+      </p>
+      <br>
+      <p class="subtitle">
+        A bot that does stuff ig<br><br>
+        Admin, Fun, Music, Tickets, Utilities, NSFW, Animals, and Actions!
+      </p>
+      <p>
+      </p>
+      <br>
+      <a class="button is-info" href="./dashboard">Discord Dashboard</a>
+      <a class="button is-info" href="./support/discord">Discord Support</a>
+      <a class="button is-info" href="./support/guilded">Guilded Support</a>
+      <a class="button is-info" href="./invite">Invite <%= bot.user.username %>!</a>
     </div>
   </div>
-</div>
+</section>
 
 <%- include("partials/footer") %>

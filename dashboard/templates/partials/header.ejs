@@ -1,61 +1,63 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/style.css">
-    <link rel="shortcut icon" id="favicon" href="/assets/images/CactieEmpty.png" type="image/x-icon">
-    <meta content="<%= title %>" property="og:title" />
-    <meta content="<%= bot.user.username %>, A bot that does stuff ig" property="og:description" />
-    <meta content="https://cactie.smhsmh.club" property="og:url" />
-    <meta content="/assets/images/CactieEmpty.png" property="og:image" />
-    <meta content="#000000" data-react-helmet="true" name="theme-color" />
-</head>
-<body style="background-color: <%= bot.config.color %>">
-  <nav style="background-color: #00000060" class="navbar sticky-top navbar-expand-lg navbar-dark">
-    <div class="container">
-      <a class="navbar-brand" href="/">
-        <img src="/assets/images/CactieEmpty.png" alt="Cactie" width="30" class="d-inline-block align-text-top">
-        <%= bot.user.username %> Dashboard
-      </a>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title><%= title %></title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+      <link rel="stylesheet" type="text/css" href="https://unpkg.com/bulma-prefers-dark" />
+      <link rel="shortcut icon" id="favicon" href="/assets/images/CactieEmpty.png" type="image/x-icon">
+      <meta content="<%= title %>" property="og:title" />
+      <meta content="<%= bot.user.username %>, A bot that does stuff ig" property="og:description" />
+      <meta content="https://cactie.smhsmh.club" property="og:url" />
+      <meta content="/assets/images/CactieEmpty.png" property="og:image" />
+      <meta content="#000000" data-react-helmet="true" name="theme-color" />
+  </head>
+  <body class="has-navbar-fixed-top" style="scroll-behavior: smooth;">
+    <nav class="navbar is-spaced is-fixed-top is-dark" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img src="/assets/images/CactieEmpty.png">
+          <%= bot.user.username %> Dashboard
+        </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarText">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="/dashboard">Settings</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/music">Music [WIP]</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/support/discord">Discord Support</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/support/guilded">Guilded Support</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/tos">Legal</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/invite">Invite <%= bot.user.username %></a>
-          </li>
-          <% if (user) { %>
-            <li class="nav-item">
-              <a class="nav-link" href="/logout" id="navbarScrollingDropdown" role="button">
-                <img style="width: 21px; height: 21px; border-radius:50%;" src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>">
-                <%= user.username %>#<%= user.discriminator %>
-              </a>
-            </li>
-          <% } else { %>
-            <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
-          <% } %>
-        </ul>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
       </div>
-    </div>
-  </nav>
+      <div id="navbar" class="navbar-menu is-dark">
+        <div class="navbar-start">
+          <a class="navbar-item" href="/dashboard">
+            Settings
+          </a>
+          <a class="navbar-item" href="/music">
+            Music [WIP]
+          </a>
+          <a class="navbar-item" href="/support/discord">
+            Discord Support
+          </a>
+          <a class="navbar-item" href="/support/guilded">
+            Guilded Support
+          </a>
+          <a class="navbar-item" href="/tos">
+            Legal
+          </a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item" href="/invite">
+            Invite <%= bot.user.username %>
+          </a>
+          <% if (user) { %>
+            <a class="navbar-item" href="/logout">
+              <img style="width: 21px; height: 21px; border-radius:50%;" src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>">
+              <%= user.username %>#<%= user.discriminator %>
+            </a>
+          <% } else { %>
+            <a class="navbar-item" href="/login">
+              Login
+            </a>
+          <% } %>
+        </div>
+      </div>
+    </nav>

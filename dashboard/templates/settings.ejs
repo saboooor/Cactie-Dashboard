@@ -45,7 +45,7 @@
       <select class="darktextboxes darkselectboxes" name="suggestionchannel" value="<%= settings.suggestionchannel %>" placeholder="The suggestion channel">
         <option value="false" <% if (settings.suggestionchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
         <% guild.channels.cache.forEach(channel => { %>
-          <% if (!channel.isText()) return %>
+          <% if (channel.type != Djs.ChannelType.GuildText) return %>
           <option value="<%= channel.id %>" <% if (channel.id === settings.suggestionchannel) {%> selected <%} else {%> <% } %> > <%= `#${channel.name}` %></option>
         <% }) %>
       </select>
@@ -55,7 +55,7 @@
       <select class="darktextboxes darkselectboxes" name="pollchannel" value="<%= settings.pollchannel %>" placeholder="The poll channel">
         <option value="false" <% if (settings.pollchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
         <% guild.channels.cache.forEach(channel => { %>
-          <% if (!channel.isText()) return %>
+          <% if (channel.type != Djs.ChannelType.GuildText) return %>
           <option value="<%= channel.id %>" <% if (channel.id === settings.pollchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
         <% }) %>
       </select>
@@ -65,7 +65,7 @@
       <select class="darktextboxes darkselectboxes" name="logchannel" value="<%= settings.logchannel %>" placeholder="The log channel">
         <option value="false" <% if (settings.logchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
         <% guild.channels.cache.forEach(channel => { %>
-          <% if (!channel.isText()) return %>
+          <% if (channel.type != Djs.ChannelType.GuildText) return %>
           <option value="<%= channel.id %>" <% if (channel.id === settings.logchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
         <% }) %>
       </select>
@@ -75,7 +75,7 @@
       <select class="darktextboxes darkselectboxes" name="ticketcategory" value="<%= settings.ticketcategory %>" placeholder="The category">
         <option value="false" <% if (settings.ticketcategory === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
         <% guild.channels.cache.forEach(channel => { %>
-          <% if (!channel.isCategory()) return %>
+          <% if (channel.type != Djs.ChannelType.GuildCategory) return %>
           <option value="<%= channel.id %>" <% if (channel.id === settings.ticketcategory) {%> selected <%} else {%> <% } %> > <%= `📂 ${channel.name}` %></option>
         <% }) %>
       </select>

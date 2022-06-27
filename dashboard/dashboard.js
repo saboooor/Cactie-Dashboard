@@ -6,7 +6,7 @@ const express = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const { PermissionsBitField } = require('discord.js');
+const Djs = require('discord.js');
 const Strategy = require('passport-discord').Strategy;
 
 // instantiate express app and the session store.
@@ -116,6 +116,7 @@ module.exports = async (client) => {
 			bot: client,
 			path: req.path,
 			user: req.isAuthenticated() ? req.user : null,
+			Djs,
 		};
 		// render template using the absolute path of the template and the merged default data with the additional data provided.
 		res.render(
@@ -198,10 +199,10 @@ module.exports = async (client) => {
 	app.get('/invite/guilded', (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
 
 	// Dashboard endpoint.
-	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { perms: PermissionsBitField }));
+	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs'));
 
 	const wsurl = client.config.wsurl;
-	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl, perms: PermissionsBitField }));
+	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl }));
 
 	// Settings endpoint.
 	app.get('/dashboard/:guildID', checkAuth, async (req, res) => {
@@ -218,7 +219,7 @@ module.exports = async (client) => {
 				client.logger.error(`Couldn't fetch the members of ${guild.id}: ${err}`);
 			}
 		}
-		if (!member || !member.permissions.has(PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -232,7 +233,7 @@ module.exports = async (client) => {
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
 		for (const key in setting) await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
 
 		// retrive the settings stored for this guild.
