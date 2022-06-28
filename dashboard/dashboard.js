@@ -182,9 +182,10 @@ module.exports = async (client) => {
 		// destroy the session.
 		req.session.destroy(() => {
 			// logout the user.
-			req.logout();
-			// redirect user to index.
-			res.redirect('/');
+			req.logout(() => {
+				// redirect user to index.
+				res.redirect('/');
+			});
 		});
 	});
 
