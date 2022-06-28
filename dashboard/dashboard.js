@@ -172,7 +172,7 @@ module.exports = async (client) => {
 				res.redirect(backURL);
 			}
 			else {
-				res.redirect('/');
+				res.redirect('/dashboard');
 			}
 		},
 	);
@@ -200,7 +200,7 @@ module.exports = async (client) => {
 	app.get('/invite/guilded', (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
 
 	// Dashboard endpoint.
-	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs'));
+	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { alert: null }));
 
 	const wsurl = client.config.wsurl;
 	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl }));
@@ -220,7 +220,7 @@ module.exports = async (client) => {
 				client.logger.error(`Couldn't fetch the members of ${guild.id}: ${err}`);
 			}
 		}
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this guild\'s settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -234,7 +234,7 @@ module.exports = async (client) => {
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this guild\'s settings!' });
 		for (const key in setting) {
 			let value = setting[key];
 			if (Array.isArray(value)) value = value.join(',');
