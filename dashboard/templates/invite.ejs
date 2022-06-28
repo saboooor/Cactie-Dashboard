@@ -1,22 +1,31 @@
-<%- include("partials/header", { bot, user, path, title: "Invite Cactie Bot!" }) %>
+<%- include("partials/header", { bot, user, path, title: "Home" }) %>
 
-<div style="height: calc(100% - 69px); display: flex; align-items: center;">
-  <div class="d-grid gap-2" style="width: 100%;">
-    <h2 style="text-align: center;">Invite Cactie Bot!</h2>
-    <h3 style="text-align: center;">The main stable Cactie Bot</h3>
-    <br>
-    <div class="centered">
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="https://cactie.smhsmh.club/invite/discord">Discord Invite</a>
-    </div>
-    <br>
-    <h2 style="text-align: center;">Invite Cactie Dev!</h2>
-    <h3 style="text-align: center;">The secondary latest Cactie Bot</h3>
-    <br>
-    <div class="centered">
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="https://cactiedev.smhsmh.club/invite/discord">Discord Invite</a>
-      <a class="btn btn-primary text-white" style="text-align: center; margin: 5px;" href="https://cactiedev.smhsmh.club/invite/guilded">Guilded Invite</a>
+<section class="hero is-fullheight-with-navbar is-dark">
+  <div class="hero-body" style="background-color: <%= bot.config.color %>">
+    <div class="container has-text-centered">
+      <p class="title">
+        Invite Cactie Bot!
+      </p>
+      <br>
+      <p class="subtitle">
+        The main stable Cactie Bot
+      </p>
+      <br>
+      <a class="button is-info" href="https://cactie.smhsmh.club/invite/discord">Discord Invite</a>
+      <br>
+      <br>
+      <p class="title">
+        Invite Cactie Dev!
+      </p>
+      <br>
+      <p class="subtitle">
+        The secondary latest Cactie Bot
+      </p>
+      <br>
+      <a class="button is-info" href="https://cactiedev.smhsmh.club/invite/discord">Discord Invite</a>
+      <a class="button is-info" href="https://cactiedev.smhsmh.club/invite/guilded">Guilded Invite</a>
     </div>
   </div>
-</div>
+</section>
 
 <%- include("partials/footer") %>
