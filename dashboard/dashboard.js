@@ -235,7 +235,12 @@ module.exports = async (client) => {
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
 		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.Administrator)) return res.redirect('/dashboard');
-		for (const key in setting) await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
+		for (const key in setting) {
+			let value = setting[key];
+			if (Array.isArray(value)) value = value.join(',');
+			console.log(value);
+			await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
+		}
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);

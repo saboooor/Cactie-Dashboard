@@ -28,7 +28,7 @@
               <div class="control">
                 <button type="submit" class="button is-success">Save Settings</button>
               </div>
-            </div>          
+            </div>
           </div>
         </div>
         <hr>
@@ -105,7 +105,7 @@
           <label class="label">Suggestion Threads</label>
           <label class="label">Creates a thread for discussion when a suggestion is created</label>
           <div class="select" style="width: 100%;">
-            <select name="suggestionchannel" value="<%= settings.suggestthreads %>" placeholder="The value" style="width: 100%;">
+            <select name="suggestthreads" value="<%= settings.suggestthreads %>" placeholder="The value" style="width: 100%;">
               <option value="false" <% if (settings.suggestthreads === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
               <option value="true" <% if (settings.suggestthreads === 'true') {%> selected <%} else {%> <%} %>>Enabled</option>
             </select>
@@ -136,6 +136,27 @@
               <% }) %>
             </select>
           </div>
+        </div>
+        <div class="field">
+          <label class="label">Audit Logs</label>
+          <label class="label">Logs certain events in the guild</label>
+          <div class="control">
+            <select name="auditlogs" multiple data-type="tags" data-placeholder="The logs to enable">
+              <option value="member" <% if (settings.auditlogs.split(',').includes('member')) {%> selected <%} else {%> <%} %>>All Member-Related Logs</option>
+              <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) {%> selected <%} else {%> <%} %>>Member Joined</option>
+              <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) {%> selected <%} else {%> <%} %>>Member Left</option>
+              <option value="channel" <% if (settings.auditlogs.split(',').includes('channel')) {%> selected <%} else {%> <%} %>>All Channel-Related Logs</option>
+              <option value="channelcreate" <% if (settings.auditlogs.split(',').includes('channelcreate')) {%> selected <%} else {%> <%} %>>Channel Created</option>
+              <option value="channeldelete" <% if (settings.auditlogs.split(',').includes('channeldelete')) {%> selected <%} else {%> <%} %>>Channel Deleted</option>
+              <option value="voice" <% if (settings.auditlogs.split(',').includes('voice')) {%> selected <%} else {%> <%} %>>All Voice-Related Logs</option>
+              <option value="voicejoin" <% if (settings.auditlogs.split(',').includes('voicejoin')) {%> selected <%} else {%> <%} %>>Joined Voice Channel</option>
+              <option value="voiceleave" <% if (settings.auditlogs.split(',').includes('voiceleave')) {%> selected <%} else {%> <%} %>>Left Voice Channel</option>
+              <option value="voicemove" <% if (settings.auditlogs.split(',').includes('voicemove')) {%> selected <%} else {%> <%} %>>Moved Voice Channels</option>
+              <option value="voicedeafen" <% if (settings.auditlogs.split(',').includes('voicedeafen')) {%> selected <%} else {%> <%} %>>Voice Deafened</option>
+              <option value="voicemute" <% if (settings.auditlogs.split(',').includes('voicemute')) {%> selected <%} else {%> <%} %>>Voice Muted</option>
+              <option value="all" <% if (settings.auditlogs.split(',').includes('all')) {%> selected <%} else {%> <%} %>>All Logs</option>
+            </select>
+          </div>        
         </div>
         <div class="field">
           <label class="label">Ticket Log Channel</label>
