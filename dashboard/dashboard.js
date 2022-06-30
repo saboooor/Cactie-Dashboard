@@ -75,15 +75,13 @@ module.exports = async (client) => {
 		),
 	);
 
-	// initialize the memorystore middleware with our express app.
-	app.use(
-		session({
-			store: new MemoryStore({ checkPeriod: 86400000 }),
-			secret: client.config.secret,
-			resave: false,
-			saveUninitialized: false,
-		}),
-	);
+	// initialize the memorystore middleware with the express app.
+	app.use(session({
+		store: new MemoryStore({ checkPeriod: 86400000 }),
+		secret: client.config.secret,
+		resave: false,
+		saveUninitialized: false,
+	}));
 
 	// initialize passport middleware.
 	app.use(passport.initialize());
@@ -125,57 +123,40 @@ module.exports = async (client) => {
 		);
 	};
 
-	// declare a checkAuth function middleware to check if an user is logged in or not, and if not redirect him.
-	const checkAuth = (req, res, next) => {
+	// declare a checkAuth function middleware to check if an user is logged in or not, and if not redirect them.
+	const checkAuth = async (req, res, next) => {
 		// If authenticated we forward the request further in the route.
 		if (req.isAuthenticated()) return next();
 		// If not authenticated, we set the url the user is redirected to into the memory.
 		req.session.backURL = req.url;
+		await req.session.save();
 		// redirect user to login endpoint/route.
 		res.redirect('/login');
 	};
 
 	// Login endpoint.
-	app.get(
-		'/login',
-		(req, res, next) => {
-			// determine the returning url.
-			if (req.headers.referer) {
-				const parsed = url.parse(req.headers.referer);
-				if (parsed.hostname === app.locals.domain) {
-					req.session.backURL = parsed.path;
-				}
+	app.get('/login', (req, res, next) => {
+		// determine the returning url.
+		if (req.headers.referer) {
+			const parsed = url.parse(req.headers.referer);
+			if (parsed.hostname === app.locals.domain) {
+				req.session.backURL = parsed.path;
 			}
-			else {
-				req.session.backURL = '/';
-			}
-			// Forward the request to the passport middleware.
-			next();
-		},
-		passport.authenticate('discord'),
-	);
+		}
+		else {
+			req.session.backURL = '/';
+		}
+		// Forward the request to the passport middleware.
+		next();
+	}, passport.authenticate('discord'));
 
 	// Callback endpoint.
-	app.get(
-		'/callback',
-		passport.authenticate('discord', { failureRedirect: '/' }),
-		(
-			req,
-			res,
-		) => {
-			// log when a user logs in
-			client.logger.info(`User logged in: ${req.user.username}#${req.user.discriminator}`);
-			// If user had set a returning url, we redirect him there, otherwise we redirect him to index.
-			if (req.session.backURL) {
-				const backURL = req.session.backURL;
-				req.session.backURL = null;
-				res.redirect(backURL);
-			}
-			else {
-				res.redirect('/dashboard');
-			}
-		},
-	);
+	app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => {
+		// log when a user logs in
+		client.logger.info(`User logged in: ${req.user.username}#${req.user.discriminator}`);
+		// If user had set a returning url, we redirect them there, otherwise we redirect them to index.
+		res.redirect(req.session.backURL ?? '/');
+	});
 
 	// Logout endpoint.
 	app.get('/logout', function(req, res) {
