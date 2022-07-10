@@ -124,12 +124,11 @@ module.exports = async (client) => {
 	};
 
 	// declare a checkAuth function middleware to check if an user is logged in or not, and if not redirect them.
-	const checkAuth = async (req, res, next) => {
+	const checkAuth = (req, res, next) => {
 		// If authenticated we forward the request further in the route.
 		if (req.isAuthenticated()) return next();
 		// If not authenticated, we set the url the user is redirected to into the memory.
 		req.session.backURL = req.url;
-		await req.session.save();
 		// redirect user to login endpoint/route.
 		res.redirect('/login');
 	};
