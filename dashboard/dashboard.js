@@ -6,7 +6,7 @@ const express = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const { PermissionsBitField } = require('discord.js');
+const Djs = require('discord.js');
 const Strategy = require('passport-discord').Strategy;
 
 // instantiate express app and the session store.
@@ -75,15 +75,13 @@ module.exports = async (client) => {
 		),
 	);
 
-	// initialize the memorystore middleware with our express app.
-	app.use(
-		session({
-			store: new MemoryStore({ checkPeriod: 86400000 }),
-			secret: client.config.secret,
-			resave: false,
-			saveUninitialized: false,
-		}),
-	);
+	// initialize the memorystore middleware with the express app.
+	app.use(session({
+		store: new MemoryStore({ checkPeriod: 86400000 }),
+		secret: client.config.secret,
+		resave: false,
+		saveUninitialized: false,
+	}));
 
 	// initialize passport middleware.
 	app.use(passport.initialize());
@@ -116,6 +114,7 @@ module.exports = async (client) => {
 			bot: client,
 			path: req.path,
 			user: req.isAuthenticated() ? req.user : null,
+			Djs,
 		};
 		// render template using the absolute path of the template and the merged default data with the additional data provided.
 		res.render(
@@ -124,7 +123,7 @@ module.exports = async (client) => {
 		);
 	};
 
-	// declare a checkAuth function middleware to check if an user is logged in or not, and if not redirect him.
+	// declare a checkAuth function middleware to check if an user is logged in or not, and if not redirect them.
 	const checkAuth = (req, res, next) => {
 		// If authenticated we forward the request further in the route.
 		if (req.isAuthenticated()) return next();
@@ -135,55 +134,38 @@ module.exports = async (client) => {
 	};
 
 	// Login endpoint.
-	app.get(
-		'/login',
-		(req, res, next) => {
-			// determine the returning url.
-			if (req.headers.referer) {
-				const parsed = url.parse(req.headers.referer);
-				if (parsed.hostname === app.locals.domain) {
-					req.session.backURL = parsed.path;
-				}
+	app.get('/login', (req, res, next) => {
+		// determine the returning url.
+		if (req.headers.referer) {
+			const parsed = url.parse(req.headers.referer);
+			if (parsed.hostname === app.locals.domain) {
+				req.session.backURL = parsed.path;
 			}
-			else {
-				req.session.backURL = '/';
-			}
-			// Forward the request to the passport middleware.
-			next();
-		},
-		passport.authenticate('discord'),
-	);
+		}
+		else {
+			req.session.backURL = '/';
+		}
+		// Forward the request to the passport middleware.
+		next();
+	}, passport.authenticate('discord'));
 
 	// Callback endpoint.
-	app.get(
-		'/callback',
-		passport.authenticate('discord', { failureRedirect: '/' }),
-		(
-			req,
-			res,
-		) => {
-			// log when a user logs in
-			client.logger.info(`User logged in: ${req.user.username}#${req.user.discriminator}`);
-			// If user had set a returning url, we redirect him there, otherwise we redirect him to index.
-			if (req.session.backURL) {
-				const backURL = req.session.backURL;
-				req.session.backURL = null;
-				res.redirect(backURL);
-			}
-			else {
-				res.redirect('/');
-			}
-		},
-	);
+	app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => {
+		// log when a user logs in
+		client.logger.info(`User logged in: ${req.user.username}#${req.user.discriminator}`);
+		// If user had set a returning url, we redirect them there, otherwise we redirect them to index.
+		res.redirect(req.session.backURL ?? '/');
+	});
 
 	// Logout endpoint.
 	app.get('/logout', function(req, res) {
 		// destroy the session.
 		req.session.destroy(() => {
 			// logout the user.
-			req.logout();
-			// redirect user to index.
-			res.redirect('/');
+			req.logout(() => {
+				// redirect user to index.
+				res.redirect('/');
+			});
 		});
 	});
 
@@ -198,82 +180,45 @@ module.exports = async (client) => {
 	app.get('/invite/guilded', (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
 
 	// Dashboard endpoint.
-	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { perms: PermissionsBitField }));
+	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { alert: null }));
 
 	const wsurl = client.config.wsurl;
-	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl, perms: PermissionsBitField }));
+	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl }));
 
 	// Settings endpoint.
-	app.get('/dashboard/:guildID', checkAuth, async (req, res) => {
+	app.get('/dashboard/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildID);
+		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
-		let member = guild.members.cache.get(req.user.id);
-		if (!member) {
-			try {
-				await guild.members.fetch();
-				member = guild.members.cache.get(req.user.id);
-			}
-			catch (err) {
-				client.logger.error(`Couldn't fetch the members of ${guild.id}: ${err}`);
-			}
-		}
-		if (!member) return res.redirect('/dashboard');
-		if (member.id != '249638347306303499' && !member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-			return res.redirect('/dashboard');
-		}
+		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this guild\'s settings!' });
 
 		// retrive the settings stored for this guild.
-		const storedSettings = await client.getData('settings', 'guildId', req.params.guildID);
-
-		renderTemplate(res, req, 'settings.ejs', {
-			guild,
-			settings: storedSettings,
-			alert: null,
-		});
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: null });
 	});
 
 	// Settings endpoint.
-	app.post('/dashboard/:guildID', checkAuth, async (req, res) => {
+	app.post('/dashboard/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildID);
+		const guild = client.guilds.cache.get(req.params.guildId);
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member) return res.redirect('/dashboard');
-		if (!member.permissions.has('MANAGE_GUILD')) {
-			return res.redirect('/dashboard');
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this guild\'s settings!' });
+		for (const key in setting) {
+			let value = setting[key];
+			if (Array.isArray(value)) value = value.join(',');
+			console.log(value);
+			await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
 		}
 
-		// save the settings.
-		await client.query(`UPDATE settings SET 
-    prefix="${setting.prefix ? setting.prefix : '-'}",
-    leavemessage="${setting.leavemessage ? setting.leavemessage : 'false'}",
-    joinmessage="${setting.joinmessage ? setting.joinmessage : 'false'}",
-    maxppsize="${setting.maxppsize ? setting.maxppsize : '35'}",
-    tickets="${setting.tickets ? setting.tickets : 'buttons'}",
-    bonercmd="${setting.bonercmd ? setting.bonercmd : 'true'}",
-    suggestionchannel="${setting.suggestionchannel ? setting.suggestionchannel : 'false'}",
-    suggestthreads="${setting.suggestthreads ? setting.suggestthreads : 'true'}",
-    pollchannel="${setting.pollchannel ? setting.pollchannel : 'false'}",
-    logchannel="${setting.logchannel ? setting.logchannel : 'false'}",
-    ticketcategory="${setting.ticketcategory ? setting.ticketcategory : 'false'}",
-    supportrole="${setting.supportrole ? setting.supportrole : 'false'}",
-    ticketmention="${setting.ticketmention ? setting.ticketmention : 'here'}",
-    mutecmd="${setting.mutecmd ? setting.mutecmd : 'timeout'}",
-    reactions="${setting.reactions ? setting.reactions : 'true'}",
-    adminrole="${setting.adminrole ? setting.adminrole : 'permission'}",
-    msgshortener="${setting.msgshortener ? setting.msgshortener : '30'}",
-    djrole="${setting.djrole ? setting.djrole : 'false'}"
-    WHERE guildId = "${req.params.guildID}"`).catch((e) => client.logger.error(e));
-
 		// retrive the settings stored for this guild.
-		const storedSettings = await client.getData('settings', 'guildId', req.params.guildID);
+		const settings = await client.getData('settings', 'guildId', guild.id);
 
 		// render the template with an alert text which confirms that settings have been saved.
 		renderTemplate(res, req, 'settings.ejs', {
-			guild,
-			settings: storedSettings,
+			guild, settings,
 			alert: 'Your settings have been saved.',
 		});
 	});
