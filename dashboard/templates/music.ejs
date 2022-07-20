@@ -1,54 +1,44 @@
 <%- include("partials/header", { bot, user, path, title: "Cactie Music Player" }) %>
+<link rel="stylesheet" type="text/css" href="/assets/musicstyle.css" />
 
 <section class="hero is-fullheight-with-navbar is-dark">
-  <div class="hero-body" style="background-color: <%= bot.config.color %>">
+  <div class="hero-body" style="background-color: <%= bot.config.color %>">  
     <div class="container has-text-centered">
-      <p class="title">
-        Playing Now
-      </p>
-      <p class="subtitle" id="vcname">
-        #Voice Channel
-      </p>
-      <div class="tile is-ancestor">
-        <div class="tile is-vertical">
-          <div class="tile is-parent">
-            <div class="tile is-child notification is-danger">
-              <div class="content">
-                <img src="/assets/images/musicplaceholder.png" style="border-radius: 10px;" id="cover">
-              </div>
-            </div>
+      <p class="title">Playing Now</p>
+      <p class="subtitle" id="vcname">#Voice Channel</p>
+  
+      <div id="queue" class="sidebar"></div>
+      
+      <div id="musiccontainer">
+        <div class="item musicsegment">
+          <div class="item">
+            <img src="/assets/images/musicplaceholder.png" width="65%" style="border-radius: 10px;" id="cover">
           </div>
         </div>
-        <div class="tile is-parent">
-          <div class="tile is-child notification is-success">
-            <div class="content">
-              <p class="title" id="title">Music Title</p>
-              <p class="subtitle" id="author">Music Author</p>
-              <div class="content">
-                <h5 style="padding:15px; margin:0;">
-                  <span id="pos">0:00</span>
-                  <input type="range" disabled id="progress" oninput="seek();" value="0" style="width: 50%;">
-                  <span id="total">0:00</span>
-                </h5>
-              </div>
-              <div class="content">
-                <a href="/music/filters" id="filters"><img src="/assets/icons/sliders.svg"></a>
-                <a href="javascript:shuffle();" id="shuffle"><img src="/assets/icons/shuffle.svg"></a>
-                <a href="javascript:toggleplay();" id="playbtn"><img id="play" src="/assets/icons/play.svg"></a>
-                <a href="javascript:skip();" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
-                <a href="javascript:togglenav();" id="queue"><img src="/assets/icons/list.svg"></a>      
-              </div>
-              <div class="content">
-                <img src="/assets/icons/volume-x.svg">
-                  <input type="range" disabled id="volume" oninput="vol();" style="width:40%;" max=150>
-                <img src="/assets/icons/volume-2.svg">
-              </div>
-              <h5 id="dj">Users without the DJ role have limited access.</h5>
+        <div class="item musicsegment">
+          <div class="item">
+            <p class="title" id="title">Music Title</p>
+            <br>
+            <p class="subtitle" id="author">Music Author</p>
+            <br>
+            <div class="centered disabled" id="progresscontainer">
+              <h5 id="pos" style="padding:15px; margin:0;">0:00</h5>
+                <input type="range" disabled id="progress" oninput="seek();" value="0" style="width: 50%;">
+              <h5 id="total" style="padding:15px; margin:0;">0:00</h5>
             </div>
-          </div>
-        </div>
-        <div class="tile is-parent" style="display: none;">
-          <div class="tile is-child notification is-success">
+            <div class="centered">
+              <a href="/music/filters" class="mediacontrols" id="filters"><img src="/assets/icons/sliders.svg"></a>
+              <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><img src="/assets/icons/shuffle.svg"></a>
+              <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><img id="play" src="/assets/icons/play.svg"></a>
+              <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
+              <a href="javascript:togglenav();" class="mediacontrols" id="queue"><img src="/assets/icons/list.svg"></a>
+            </div>      
+            <div class="centered disabled" id="volumecontainer">
+              <img style="padding:15px; margin:0;" src="/assets/icons/volume-x.svg">
+                <input type="range" disabled id="volume" oninput="vol();" style="width:40%;" max=150>
+              <img style="padding:15px; margin:0;" src="/assets/icons/volume-2.svg">
+            </div>
+            <h5 class="centered disabled" id="dj">Users without the DJ role have limited access.</h5>
           </div>
         </div>
       </div>
@@ -120,11 +110,6 @@
       minutes = (minutes < 10) ? '0' + minutes : minutes;
       return hours + ':' + minutes + ':' + seconds;
     }
-  }
-
-  function progress() {
-    document.getElementById('pos').innerText = convert(document.getElementById('progress').value);
-    document.getElementById('total').innerText = convert(document.getElementById('progress').max - document.getElementById('progress').value);
   }
 
   function changeFavicon(src) {
