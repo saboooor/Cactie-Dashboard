@@ -190,35 +190,72 @@ module.exports = async (client) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
-		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
 		renderTemplate(res, req, 'category.ejs', { guild, settings, alert: null });
 	});
 
-	// Settings endpoint.
-	app.get('/dashboard/:guildId/settings', checkAuth, async (req, res) => {
+	// General endpoint.
+	app.get('/dashboard/:guildId/general', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s general settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: null });
+		renderTemplate(res, req, 'general.ejs', { guild, settings, alert: null });
 	});
 
-	// Settings endpoint.
-	app.post('/dashboard/:guildId/settings', checkAuth, async (req, res) => {
+	// Tickets endpoint.
+	app.get('/dashboard/:guildId/tickets', checkAuth, async (req, res) => {
+		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+		const guild = client.guilds.cache.get(req.params.guildId);
+		if (!guild) return res.redirect('/dashboard');
+		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s ticket settings!' });
+
+		// retrive the settings stored for this guild.
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'tickets.ejs', { guild, settings, alert: null });
+	});
+
+	// Logs endpoint.
+	app.get('/dashboard/:guildId/logs', checkAuth, async (req, res) => {
+		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+		const guild = client.guilds.cache.get(req.params.guildId);
+		if (!guild) return res.redirect('/dashboard');
+		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s log settings!' });
+
+		// retrive the settings stored for this guild.
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'logs.ejs', { guild, settings, alert: null });
+	});
+
+	// Admin endpoint.
+	app.get('/dashboard/:guildId/admin', checkAuth, async (req, res) => {
+		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+		const guild = client.guilds.cache.get(req.params.guildId);
+		if (!guild) return res.redirect('/dashboard');
+		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s admin settings!' });
+
+		// retrive the settings stored for this guild.
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'admin.ejs', { guild, settings, alert: null });
+	});
+
+	// General endpoint.
+	app.post('/settings/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 		for (const key in setting) {
 			let value = setting[key];
 			if (Array.isArray(value)) value = value.join(',');
@@ -230,9 +267,9 @@ module.exports = async (client) => {
 		const settings = await client.getData('settings', 'guildId', guild.id);
 
 		// render the template with an alert text which confirms that settings have been saved.
-		renderTemplate(res, req, 'settings.ejs', {
+		renderTemplate(res, req, 'category.ejs', {
 			guild, settings,
-			alert: 'Your settings have been saved.',
+			alert: 'Your options have been saved.',
 		});
 	});
 

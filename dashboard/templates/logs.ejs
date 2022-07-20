@@ -1,0 +1,119 @@
+<%- include("partials/header", { bot, user, path, title: `Logs | ${guild.name}` }) %>
+
+<section class="hero is-fullheight-with-navbar is-dark">
+  <div class="hero-body" style="background-color: <%= bot.config.color %>">
+    <div class="container">
+      <% if (alert) { %>
+        <div class="notification is-success">
+          <%= alert %>
+        </div>
+      <% } %>
+      <form action="/settings/<%= guild.id %>" method="POST">
+        <div class="level">
+          <div class="level-item">
+            <figure class="image is-128x128" style="margin-right: px;">
+              <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
+            </figure>
+          </div>
+          <div class="level-item">
+            <p class="title">
+              <%= guild.name %>
+            </p>
+          </div>
+          <div class="level-item">
+            <div class="field is-grouped">
+              <div class="control">
+                <a href="/dashboard" class="button is-dark">Go Back</a>
+              </div>
+              <div class="control">
+                <button type="submit" class="button is-success">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs is-toggle is-toggle-rounded is-fullwidth is-large">
+          <ul>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/general'>
+                General
+              </a>
+            </li>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/tickets'>
+                Tickets
+              </a>
+            </li>
+            <li class="is-active">
+              <a>
+                Logs
+              </a>
+            </li>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/reactionroles'>
+                Reaction Roles
+              </a>
+            </li>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/admin'>
+                Admin
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="field">
+          <label class="label">Join Message</label>
+          <label class="label">The message when someone joins the server</label>
+          <label class="label">Variables: {USER MENTION} {USER TAG}</label>
+          <div class="control">
+            <textarea class="textarea" type="text" name="joinmessage" value="<%= settings.joinmessage %>" placeholder="The join message, or just 'false'"></textarea>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Leave Message</label>
+          <label class="label">The message when someone leaves the server</label>
+          <label class="label">Variables: {USER MENTION} {USER TAG}</label>
+          <div class="control">
+            <textarea class="textarea" type="text" name="leavemessage" value="<%= settings.leavemessage %>" placeholder="The leave message, or just 'false'"></textarea>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Log Channel</label>
+          <label class="label">The channel where the bot puts various logs in</label>
+          <div class="select" style="width: 100%;">
+            <select name="logchannel" value="<%= settings.logchannel %>" placeholder="The log channel" style="width: 100%;">
+              <option value="false" <% if (settings.logchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+              <% guild.channels.cache.forEach(channel => { %>
+                <% if (channel.type != Djs.ChannelType.GuildText) return %>
+                <option value="<%= channel.id %>" <% if (channel.id === settings.logchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Audit Logs</label>
+          <label class="label">Logs certain events in the guild</label>
+          <div class="control">
+            <select name="auditlogs" multiple data-type="tags" data-placeholder="The logs to enable">
+              <option value="member" <% if (settings.auditlogs.split(',').includes('member')) {%> selected <%} else {%> <%} %>>All Member-Related Logs</option>
+              <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) {%> selected <%} else {%> <%} %>>Member Joined</option>
+              <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) {%> selected <%} else {%> <%} %>>Member Left</option>
+              <option value="channel" <% if (settings.auditlogs.split(',').includes('channel')) {%> selected <%} else {%> <%} %>>All Channel-Related Logs</option>
+              <option value="channelcreate" <% if (settings.auditlogs.split(',').includes('channelcreate')) {%> selected <%} else {%> <%} %>>Channel Created</option>
+              <option value="channeldelete" <% if (settings.auditlogs.split(',').includes('channeldelete')) {%> selected <%} else {%> <%} %>>Channel Deleted</option>
+              <option value="voice" <% if (settings.auditlogs.split(',').includes('voice')) {%> selected <%} else {%> <%} %>>All Voice-Related Logs</option>
+              <option value="voicejoin" <% if (settings.auditlogs.split(',').includes('voicejoin')) {%> selected <%} else {%> <%} %>>Joined Voice Channel</option>
+              <option value="voiceleave" <% if (settings.auditlogs.split(',').includes('voiceleave')) {%> selected <%} else {%> <%} %>>Left Voice Channel</option>
+              <option value="voicemove" <% if (settings.auditlogs.split(',').includes('voicemove')) {%> selected <%} else {%> <%} %>>Moved Voice Channels</option>
+              <option value="voicedeafen" <% if (settings.auditlogs.split(',').includes('voicedeafen')) {%> selected <%} else {%> <%} %>>Voice Deafened</option>
+              <option value="voicemute" <% if (settings.auditlogs.split(',').includes('voicemute')) {%> selected <%} else {%> <%} %>>Voice Muted</option>
+              <option value="all" <% if (settings.auditlogs.split(',').includes('all')) {%> selected <%} else {%> <%} %>>All Logs</option>
+            </select>
+          </div>        
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include("partials/footer") %>

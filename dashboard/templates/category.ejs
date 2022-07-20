@@ -1,4 +1,4 @@
-<%- include("partials/header", { bot, user, path, title: `Settings | ${guild.name}` }) %>
+<%- include("partials/header", { bot, user, path, title: `Dashboard | ${guild.name}` }) %>
 
 <section class="hero is-fullheight-with-navbar is-dark">
   <div class="hero-body" style="background-color: <%= bot.config.color %>">
@@ -33,11 +33,31 @@
 
       </div>
 
-      <div class="tabs is-toggle is-fullwidth is-large">
+      <div class="tabs is-toggle is-toggle-rounded is-fullwidth is-large">
         <ul>
           <li>
-            <a href='/dashboard/<%= guild.id %>/settings'>
-              Settings
+            <a href='/dashboard/<%= guild.id %>/general'>
+              General
+            </a>
+          </li>
+          <li>
+            <a href='/dashboard/<%= guild.id %>/tickets'>
+              Tickets
+            </a>
+          </li>
+          <li>
+            <a href='/dashboard/<%= guild.id %>/logs'>
+              Logs
+            </a>
+          </li>
+          <li>
+            <a href='/dashboard/<%= guild.id %>/'>
+              Reaction Roles (coming soon)
+            </a>
+          </li>
+          <li>
+            <a href='/dashboard/<%= guild.id %>/admin'>
+              Admin
             </a>
           </li>
         </ul>

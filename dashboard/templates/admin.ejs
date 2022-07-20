@@ -1,0 +1,119 @@
+<%- include("partials/header", { bot, user, path, title: `Admin | ${guild.name}` }) %>
+
+<section class="hero is-fullheight-with-navbar is-dark">
+  <div class="hero-body" style="background-color: <%= bot.config.color %>">
+    <div class="container">
+      <% if (alert) { %>
+        <div class="notification is-success">
+          <%= alert %>
+        </div>
+      <% } %>
+      <form action="/settings/<%= guild.id %>" method="POST">
+        <div class="level">
+          <div class="level-item">
+            <figure class="image is-128x128" style="margin-right: px;">
+              <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
+            </figure>
+          </div>
+          <div class="level-item">
+            <p class="title">
+              <%= guild.name %>
+            </p>
+          </div>
+          <div class="level-item">
+            <div class="field is-grouped">
+              <div class="control">
+                <a href="/dashboard" class="button is-dark">Go Back</a>
+              </div>
+              <div class="control">
+                <button type="submit" class="button is-success">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs is-toggle is-toggle-rounded is-fullwidth is-large">
+          <ul>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/general'>
+                General
+              </a>
+            </li>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/tickets'>
+                Tickets
+              </a>
+            </li>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/logs'>
+                Logs
+              </a>
+            </li>
+            <li>
+              <a href='/dashboard/<%= guild.id %>/reactionroles'>
+                Reaction Roles
+              </a>
+            </li>
+            <li class="is-active">
+              <a>
+                Admin
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="field">
+          <label class="label">Message Shortener</label>
+          <label class="label">The amount of lines in a message to delete and send to a bin link (Setting this to 0 disables it)</label>
+          <div class="control">
+            <input class="input" type="number" name="msgshortener" value="<%= settings.msgshortener %>" placeholder="The message shortener value">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Disabled commands</label>
+          <label class="label">Disable certain commands from the bot</label>
+          <div class="control">
+            <input class="input" type="text" name="disabledcmds" value="<%= settings.disabledcmds %>" placeholder="All the commands to disable separated by commas (,)">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">DJ Role</label>
+          <label class="label">The DJ feature of the bot that limits the skip/etc commands</label>
+          <div class="select" style="width: 100%;">
+            <select name="djrole" value="<%= settings.djrole %>" placeholder="The DJ Role" style="width: 100%;">
+              <option value="false" <% if (settings.djrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+              <% guild.roles.cache.forEach(role => { %>
+                <option value="<%= role.id %>" <% if (role.id === settings.djrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Admin Role</label>
+          <label class="label">The role to replace the 'Administrator' permission</label>
+          <div class="select" style="width: 100%;">
+            <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
+              <option value="false" <% if (settings.adminrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+              <% guild.roles.cache.forEach(role => { %>
+                <option value="<%= role.id %>" <% if (role.id === settings.adminrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Mute Command Mode</label>
+          <label class="label">Toggles the mute/timeout command / use a mute role</label>
+          <div class="select" style="width: 100%;">
+            <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
+              <option value="timeout" <% if (settings.mutecmd === 'timeout') {%> selected <%} else {%> <%} %>>Use Discord's timeout feature</option>
+              <% guild.roles.cache.forEach(role => { %>
+                <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include("partials/footer") %>
