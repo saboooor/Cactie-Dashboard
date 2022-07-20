@@ -159,8 +159,8 @@
         if (num.length == 5) num = '0' + num;
         json.current.colors[i] = '#' + num;
       }
-      document.getElementsByTagName('body')[0].style.backgroundColor = json.current.colors[0];
-      document.getElementsByTagName('body')[0].style.backgroundImage = `linear-gradient(315deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
+      document.getElementsByClassName('hero-body')[0].style.backgroundColor = json.current.colors[0];
+      document.getElementsByClassName('hero-body')[0].style.backgroundImage = `linear-gradient(315deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
       document.getElementById('queue').innerHTML = '<a href="javascript:togglenav();"><img src="/assets/icons/x.svg"></a>'
       json.queue.forEach(track => {
         for (const i in track.colors) {
