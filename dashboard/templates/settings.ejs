@@ -23,15 +23,23 @@
           <div class="level-item">
             <div class="field is-grouped">
               <div class="control">
-                <a href="/dashboard" class="button is-danger is-light">Cancel</a>
+                <a href="/dashboard" class="button is-dark">Go Back</a>
               </div>
               <div class="control">
-                <button type="submit" class="button is-success">Save Settings</button>
+                <button type="submit" class="button is-success">Save</button>
               </div>
             </div>
           </div>
         </div>
-        <hr>
+        <div class="tabs is-toggle is-fullwidth is-large">
+          <ul>
+            <li class="is-active">
+              <a href='/dashboard/<%= guild.id %>/settings'>
+                Settings
+              </a>
+            </li>
+          </ul>
+        </div>
 
         <div class="field">
           <label class="label">Prefix</label>
@@ -271,10 +279,10 @@
         </div>
         <div class="field is-grouped">
           <div class="control">
-            <button type="submit" class="button is-success">Save Settings</button>
+            <a href="/dashboard" class="button is-dark">Go Back</a>
           </div>
           <div class="control">
-            <a href="/dashboard" class="button is-danger is-light">Cancel</a>
+            <button type="submit" class="button is-success">Save</button>
           </div>
         </div>
       </form>

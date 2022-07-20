@@ -185,13 +185,26 @@ module.exports = async (client) => {
 	const wsurl = client.config.wsurl;
 	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl }));
 
-	// Settings endpoint.
+	// Dashboard category endpoint.
 	app.get('/dashboard/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this guild\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
+
+		// retrive the settings stored for this guild.
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'category.ejs', { guild, settings, alert: null });
+	});
+
+	// Settings endpoint.
+	app.get('/dashboard/:guildId/settings', checkAuth, async (req, res) => {
+		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+		const guild = client.guilds.cache.get(req.params.guildId);
+		if (!guild) return res.redirect('/dashboard');
+		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -199,13 +212,13 @@ module.exports = async (client) => {
 	});
 
 	// Settings endpoint.
-	app.post('/dashboard/:guildId', checkAuth, async (req, res) => {
+	app.post('/dashboard/:guildId/settings', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this guild\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 		for (const key in setting) {
 			let value = setting[key];
 			if (Array.isArray(value)) value = value.join(',');

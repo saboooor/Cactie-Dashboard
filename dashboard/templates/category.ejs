@@ -1,0 +1,50 @@
+<%- include("partials/header", { bot, user, path, title: `Settings | ${guild.name}` }) %>
+
+<section class="hero is-fullheight-with-navbar is-dark">
+  <div class="hero-body" style="background-color: <%= bot.config.color %>">
+    <div class="container">
+      <% if (alert) { %>
+        <div class="notification is-success">
+          <%= alert %>
+        </div>
+      <% } %>
+
+      <div class="level">
+
+        <div class="level-item">
+          <figure class="image is-128x128" style="margin-right: px;">
+            <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
+          </figure>
+        </div>
+
+        <div class="level-item">
+          <p class="title">
+            <%= guild.name %> - Select a category
+          </p>
+        </div>
+
+        <div class="level-item">
+          <div class="field is-grouped">
+            <div class="control">
+              <a href="/dashboard" class="button is-dark">Go Back</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="tabs is-toggle is-fullwidth is-large">
+        <ul>
+          <li>
+            <a href='/dashboard/<%= guild.id %>/settings'>
+              Settings
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<%- include("partials/footer") %>
