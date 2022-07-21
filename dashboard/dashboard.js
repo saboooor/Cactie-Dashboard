@@ -267,8 +267,7 @@ module.exports = async (client) => {
 		// delete the reaction role.
 		let settings = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
 		const rr = settings[req.body.id];
-		if (!rr) return renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'That reaction role doesn\'t exist.' });
-		console.log(rr);
+		if (!rr || !rr.messageId || !rr.emojiId) return renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'That reaction role doesn\'t exist.' });
 		await client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' emojiId = '${rr.emojiId}'`);
 
 		// retrive the settings stored for this guild.

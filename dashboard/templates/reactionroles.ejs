@@ -77,7 +77,7 @@ settings.forEach(async reactionrole => {
             </figure>
             <div class="media-content">
               <div class="content">
-                <p style="white-space: pre-line">
+                <p>
                   <strong>@ <%= reactionrole.roleName %> (<%= reactionrole.type %>)</strong>
                   <br>
                   <% if (!reactionrole.message) { %>
@@ -85,7 +85,9 @@ settings.forEach(async reactionrole => {
                   <% } else { %>
                     <strong>Message by <%= reactionrole.message.author.tag %>:</strong>
                     <br>
-                    <%= reactionrole.message.content %>
+                    <p style="white-space: pre-line">
+                      <%= reactionrole.message.content %>
+                    </p>
                   <% } %>
                 </p>
               </div>
@@ -109,7 +111,7 @@ settings.forEach(async reactionrole => {
               </div>
             <% } %>
             <div class="media-right">
-              <form action="/reactionroles/delete/<%= reactionrole.guildId %>/<%= count %>" method="post">
+              <form action="/reactionroles/delete/<%= reactionrole.guildId %>" method="post">
                 <button type="submit" name="id" value="<%= settings.indexOf(reactionrole) %>" class="button is-danger">Delete</button>
               </form>
             </div>
