@@ -61,7 +61,9 @@ settings.forEach(async reactionrole => {
             </li>
           </ul>
         </div>
-        
+
+        <br>
+        <p class="subtitle">Current Reaction Roles</p> 
         <% settings.forEach(reactionrole => { %>
           <article class="media">
             <figure class="media-left">
@@ -117,8 +119,76 @@ settings.forEach(async reactionrole => {
             </div>
           </article>
         <% }) %>
+      
+      <br>
+      <p class="subtitle">Create a new Reaction Role</p>
+      <form name="add" onsubmit="return validateForm()" method="post">
+        <div class="field">
+          <label class="label">The role to use</label>
+          <div class="select">
+            <select name="role" placeholder="The role to use for the reaction role">
+              <option value="0" selected>Select the role</option>
+              <% guild.roles.cache.forEach(role => { %>
+                <option value="<%= role.id %>"> <%= `@ ${role.name}` %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">The channel of the reaction role message</label>
+          <div class="select">
+            <select name="channel" placeholder="The channel to use for the reaction role">
+              <option value="0" selected>Select the channel</option>
+              <% guild.channels.cache.forEach(channel => { %>
+                <% if (channel.type != Djs.ChannelType.GuildText && channel.type != Djs.ChannelType.GuildVoice) return %>
+                <option value="<%= channel.id %>" <% if (channel.id === settings.suggestionchannel) {%> selected <%} else {%> <% } %> > <%= `${channel.type == Djs.ChannelType.GuildVoice ? '🔊' : '#'} ${channel.name}` %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">The reaction role's message Id <a style="color: #5ea3e4; text-decoration: underline;" href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">What's this?</a></label>
+          <div class="control">
+            <input class="input" name="message" value="" placeholder="Put the Id here" style="width: 200px;">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">The reaction's emoji</label>
+          <div class="control">
+            <input class="input" name="emoji" value="😀" readonly style="width: 200px;" onclick="togglePicker()">
+          </div>
+        </div>
+        <div class="field is-grouped">
+          <div class="control">
+            <a href="/dashboard" class="button is-success">Add Reaction Role</a>
+          </div>
+        </div>
+      </form>
+      <emoji-picker style="display: none;"></emoji-picker>
     </div>
   </div>
 </section>
-
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+<script>
+  const picker = document.querySelector('emoji-picker');
+  fetch('/emojis/<%= guild.id %>').then(res => res.json()).then(emojis => {
+    picker.customEmoji = emojis;
+  });
+  function togglePicker() {
+    picker.style.display = picker.style.display == 'none' ? 'block' : 'none';
+  }
+  picker.addEventListener('emoji-click', event => {
+    document.getElementsByName('emoji')[0].value = event.detail.unicode ?? event.detail.emoji.name;
+  });
+  function validateForm() {
+    console.log('a')
+    let i1 = document.forms["add"]["role"].value;
+    let i2 = document.forms["add"]["channel"].value;
+    let i3 = document.forms["add"]["message"].value;
+  if (!i1 || !i2 || !i3) {
+      alert("You must fill out every field!");
+      return false;
+    }
+  }
+</script>
 <%- include("partials/footer") %>

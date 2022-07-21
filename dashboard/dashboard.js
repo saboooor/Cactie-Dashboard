@@ -194,6 +194,15 @@ module.exports = async (client) => {
 		renderTemplate(res, req, 'category.ejs', { guild, alert: null });
 	});
 
+	// Get emojis
+	app.get('/emojis/:guildId', async (req, res) => {
+		const guild = client.guilds.cache.get(req.params.guildId);
+		if (!guild) return res.json([]);
+		const emojis = await guild.emojis.fetch();
+		const customEmoji = emojis.map(e => { return { name: e.id, shortcodes: [e.name], url: `https://cdn.discordapp.com/emojis/${e.id}.${e.animated ? 'gif' : 'png'}` }; });
+		res.json([ ...customEmoji ]);
+	});
+
 	// General endpoint.
 	app.get('/dashboard/:guildId/:dashboardCategory', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
