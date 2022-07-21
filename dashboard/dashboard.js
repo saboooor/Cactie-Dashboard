@@ -257,7 +257,7 @@ module.exports = async (client) => {
 	});
 
 	// Reaction Roles deletion endpoint.
-	app.post('/reactionroles/delete/:guildId/:id', checkAuth, async (req, res) => {
+	app.post('/reactionroles/delete/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
@@ -266,7 +266,7 @@ module.exports = async (client) => {
 
 		// delete the reaction role.
 		let settings = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
-		const rr = settings[req.params.id];
+		const rr = settings[req.body.id];
 		if (!rr) return renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'That reaction role doesn\'t exist.' });
 		console.log(rr);
 		await client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' emojiId = '${rr.emojiId}'`);

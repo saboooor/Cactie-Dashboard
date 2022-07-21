@@ -62,11 +62,7 @@ settings.forEach(async reactionrole => {
           </ul>
         </div>
         
-        <% 
-        let count = -1
-        settings.forEach(reactionrole => {
-          count++;
-        %>
+        <% settings.forEach(reactionrole => { %>
           <article class="media">
             <figure class="media-left">
               <% if (!isNaN(reactionrole.emojiId)) { %>
@@ -114,7 +110,7 @@ settings.forEach(async reactionrole => {
             <% } %>
             <div class="media-right">
               <form action="/reactionroles/delete/<%= reactionrole.guildId %>/<%= count %>" method="post">
-                <button type="submit" class="button is-danger">Delete</button>
+                <button type="submit" name="id" value="<%= settings.indexOf(reactionrole) %>" class="button is-danger">Delete</button>
               </form>
             </div>
           </article>
