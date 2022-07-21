@@ -257,7 +257,7 @@ module.exports = async (client) => {
 	});
 
 	// Reaction Roles deletion endpoint.
-	app.post('/reactionroles/delete/:guildId', checkAuth, async (req, res) => {
+	app.post('/reactionroles/:guildId/delete', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');

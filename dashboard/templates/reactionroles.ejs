@@ -111,7 +111,7 @@ settings.forEach(async reactionrole => {
               </div>
             <% } %>
             <div class="media-right">
-              <form action="/reactionroles/delete/<%= reactionrole.guildId %>" method="post">
+              <form action="/reactionroles/<%= reactionrole.guildId %>/delete" method="post">
                 <button type="submit" name="id" value="<%= settings.indexOf(reactionrole) %>" class="button is-danger">Delete</button>
               </form>
             </div>
