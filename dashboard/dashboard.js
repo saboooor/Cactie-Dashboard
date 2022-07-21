@@ -176,8 +176,7 @@ module.exports = async (client) => {
 
 	// Invite
 	app.get('/invite', (req, res) => renderTemplate(res, req, 'invite.ejs'));
-	app.get('/invite/discord', (req, res) => renderTemplate(res, req, 'invite/discord.ejs'));
-	app.get('/invite/guilded', (req, res) => renderTemplate(res, req, 'invite/guilded.ejs'));
+	app.get('/invite/:type', (req, res) => renderTemplate(res, req, `invite/${req.params.type}.ejs`));
 
 	// Dashboard endpoint.
 	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { alert: null }));
@@ -196,55 +195,23 @@ module.exports = async (client) => {
 	});
 
 	// General endpoint.
-	app.get('/dashboard/:guildId/general', checkAuth, async (req, res) => {
+	app.get('/dashboard/:guildId/:dashboardCategory', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s general settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, `${req.params.dashboardCategory}.ejs`, guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
 
 		// retrive the settings stored for this guild.
-		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'general.ejs', { guild, settings, alert: null });
-	});
-
-	// Tickets endpoint.
-	app.get('/dashboard/:guildId/tickets', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
-		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s ticket settings!' });
-
-		// retrive the settings stored for this guild.
-		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'tickets.ejs', { guild, settings, alert: null });
-	});
-
-	// Logs endpoint.
-	app.get('/dashboard/:guildId/logs', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
-		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s log settings!' });
-
-		// retrive the settings stored for this guild.
-		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'logs.ejs', { guild, settings, alert: null });
-	});
-
-	// Admin endpoint.
-	app.get('/dashboard/:guildId/admin', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
-		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s admin settings!' });
-
-		// retrive the settings stored for this guild.
-		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'admin.ejs', { guild, settings, alert: null });
+		const settings = req.params.dashboardCategory == 'reactionroles' ? await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`) : await client.getData('settings', 'guildId', guild.id);
+		if (req.params.dashboardCategory == 'reactionroles') {
+			for (const reactionrole of settings) {
+				const channel = guild.channels.cache.get(reactionrole.channelId);
+				if (!channel) continue;
+				reactionrole.message = await channel.messages.fetch(reactionrole.messageId);
+			}
+		}
+		renderTemplate(res, req, `${req.params.dashboardCategory}.ejs`, { guild, settings, alert: null });
 	});
 
 	// General endpoint.
@@ -266,6 +233,54 @@ module.exports = async (client) => {
 		renderTemplate(res, req, 'category.ejs', {
 			guild, alert: 'Your options have been saved.',
 		});
+	});
+
+	// Reaction Roles endpoint.
+	app.post('/reactionroles/:guildId', checkAuth, async (req, res) => {
+		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+		const guild = client.guilds.cache.get(req.params.guildId);
+		const setting = req.body;
+		if (!guild) return res.redirect('/dashboard');
+		const member = guild.members.cache.get(req.user.id);
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		for (const key in setting) {
+			let value = setting[key];
+			if (Array.isArray(value)) value = value.join(',');
+			console.log(value);
+			await client.setData('reactionroles', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
+		}
+
+		// render the template with an alert text which confirms that settings have been saved.
+		renderTemplate(res, req, 'reactionroles.ejs', {
+			guild, alert: 'Your reaction roles have been saved.',
+		});
+	});
+
+	// Reaction Roles deletion endpoint.
+	app.post('/reactionroles/delete/:guildId/:id', checkAuth, async (req, res) => {
+		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+		const guild = client.guilds.cache.get(req.params.guildId);
+		if (!guild) return res.redirect('/dashboard');
+		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'reactionroles.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
+
+		// delete the reaction role.
+		let settings = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
+		const rr = settings[req.params.id];
+		if (!rr) return renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'That reaction role doesn\'t exist.' });
+		console.log(rr);
+		await client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' emojiId = '${rr.emojiId}'`);
+
+		// retrive the settings stored for this guild.
+		settings = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
+		for (const reactionrole of settings) {
+			const channel = guild.channels.cache.get(reactionrole.channelId);
+			if (!channel) continue;
+			reactionrole.message = await channel.messages.fetch(reactionrole.messageId);
+		}
+
+		// Response
+		renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'The reaction role has been deleted.' });
 	});
 
 	app.listen(client.config.port, null, null, () => {
