@@ -191,9 +191,8 @@ module.exports = async (client) => {
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 
-		// retrive the settings stored for this guild.
-		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'category.ejs', { guild, settings, alert: null });
+		// Render the dashboard for the server
+		renderTemplate(res, req, 'category.ejs', { guild, alert: null });
 	});
 
 	// General endpoint.
@@ -202,7 +201,7 @@ module.exports = async (client) => {
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s general settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s general settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -215,7 +214,7 @@ module.exports = async (client) => {
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s ticket settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s ticket settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -228,7 +227,7 @@ module.exports = async (client) => {
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s log settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s log settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -241,7 +240,7 @@ module.exports = async (client) => {
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s admin settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s admin settings!' });
 
 		// retrive the settings stored for this guild.
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -255,7 +254,7 @@ module.exports = async (client) => {
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
 		for (const key in setting) {
 			let value = setting[key];
 			if (Array.isArray(value)) value = value.join(',');
@@ -263,13 +262,9 @@ module.exports = async (client) => {
 			await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
 		}
 
-		// retrive the settings stored for this guild.
-		const settings = await client.getData('settings', 'guildId', guild.id);
-
 		// render the template with an alert text which confirms that settings have been saved.
 		renderTemplate(res, req, 'category.ejs', {
-			guild, settings,
-			alert: 'Your options have been saved.',
+			guild, alert: 'Your options have been saved.',
 		});
 	});
 
