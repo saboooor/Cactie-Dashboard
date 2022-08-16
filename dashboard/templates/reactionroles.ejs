@@ -86,10 +86,6 @@ settings.forEach(async reactionrole => {
                     Message deleted. Delete this reaction role and create another.
                   <% } else { %>
                     <strong>Message by <%= reactionrole.message.author.tag %>:</strong>
-                    <br>
-                    <p style="white-space: pre-line">
-                      <%= reactionrole.message.content %>
-                    </p>
                   <% } %>
                 </p>
               </div>
