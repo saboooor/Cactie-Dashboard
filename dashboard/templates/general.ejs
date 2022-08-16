@@ -1,6 +1,6 @@
 <%- include("partials/header", { bot, user, path, title: `General | ${guild.name}` }) %>
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">
     <div class="container">
       <% if (alert) { %>
@@ -62,22 +62,22 @@
         </div>
 
         <div class="field">
-          <label class="label">Prefix</label>
-          <label class="label">The bot's text command prefix</label>
+          <label class="subtitle">Prefix</label>
+          <label class="label subtitle">The bot's text command prefix</label>
           <div class="control">
             <input class="input" type="text" name="prefix" value="<%= settings.prefix %>" placeholder="Your prefix">
           </div>
         </div>
         <div class="field">
-          <label class="label">Max PP Size</label>
-          <label class="label">Maximum pp size in boner and instaboner commands</label>
+          <label class="subtitle">Max PP Size</label>
+          <label class="label subtitle">Maximum pp size in boner and instaboner commands</label>
           <div class="control">
             <input class="input" type="number" name="maxppsize" value="<%= settings.maxppsize %>" placeholder="The maximum PP size to set">
           </div>
         </div>
         <div class="field">
-          <label class="label">Suggestion Channel</label>
-          <label class="label">The channel where the bot puts suggestions in</label>
+          <label class="subtitle">Suggestion Channel</label>
+          <label class="label subtitle">The channel where the bot puts suggestions in</label>
           <div class="select" style="width: 100%;">
             <select name="suggestionchannel" value="<%= settings.suggestionchannel %>" placeholder="The suggestion channel" style="width: 100%;">
               <option value="false" <% if (settings.suggestionchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -89,8 +89,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Suggestion Threads</label>
-          <label class="label">Creates a thread for discussion when a suggestion is created</label>
+          <label class="subtitle">Suggestion Threads</label>
+          <label class="label subtitle">Creates a thread for discussion when a suggestion is created</label>
           <div class="select" style="width: 100%;">
             <select name="suggestthreads" value="<%= settings.suggestthreads %>" placeholder="The value" style="width: 100%;">
               <option value="false" <% if (settings.suggestthreads === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -99,8 +99,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Poll Channel</label>
-          <label class="label">The channel where the bot puts polls in</label>
+          <label class="subtitle">Poll Channel</label>
+          <label class="label subtitle">The channel where the bot puts polls in</label>
           <div class="select" style="width: 100%;">
             <select name="pollchannel" value="<%= settings.pollchannel %>" placeholder="The poll channel" style="width: 100%;">
               <option value="false" <% if (settings.pollchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -112,8 +112,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Reactions</label>
-          <label class="label">Reacts with various reactions on some words</label>
+          <label class="subtitle">Reactions</label>
+          <label class="label subtitle">Reacts with various reactions on some words</label>
           <div class="select" style="width: 100%;">
             <select name="reactions" value="<%= settings.reactions %>" placeholder="The value" style="width: 100%;">
               <option value="false" <% if (settings.reactions === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -122,8 +122,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Language</label>
-          <label class="label">The language Cactie will use (overrides the server language)</label>
+          <label class="subtitle">Language</label>
+          <label class="label subtitle">The language Cactie will use (overrides the server language)</label>
           <div class="select" style="width: 100%;">
             <select name="language" value="<%= settings.language %>" placeholder="The value" style="width: 100%;">
               <option value="false" <% if (settings.language === 'false') {%> selected <%} else {%> <%} %>>Use the server default</option>

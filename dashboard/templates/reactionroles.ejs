@@ -5,7 +5,7 @@ settings.forEach(async reactionrole => {
 })
 %>
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">
     <div class="container">
       <% if (alert) { %>
@@ -121,50 +121,7 @@ settings.forEach(async reactionrole => {
         <% }) %>
       
       <br>
-      <p class="subtitle">Create a new Reaction Role</p>
-      <form name="add" onsubmit="return validateForm()" method="post">
-        <div class="field">
-          <label class="label">The role to use</label>
-          <div class="select">
-            <select name="role" placeholder="The role to use for the reaction role">
-              <option value="0" selected>Select the role</option>
-              <% guild.roles.cache.forEach(role => { %>
-                <option value="<%= role.id %>"> <%= `@ ${role.name}` %></option>
-              <% }) %>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">The channel of the reaction role message</label>
-          <div class="select">
-            <select name="channel" placeholder="The channel to use for the reaction role">
-              <option value="0" selected>Select the channel</option>
-              <% guild.channels.cache.forEach(channel => { %>
-                <% if (channel.type != Djs.ChannelType.GuildText && channel.type != Djs.ChannelType.GuildVoice) return %>
-                <option value="<%= channel.id %>" <% if (channel.id === settings.suggestionchannel) {%> selected <%} else {%> <% } %> > <%= `${channel.type == Djs.ChannelType.GuildVoice ? '🔊' : '#'} ${channel.name}` %></option>
-              <% }) %>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">The reaction role's message Id <a style="color: #5ea3e4; text-decoration: underline;" href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">What's this?</a></label>
-          <div class="control">
-            <input class="input" name="message" value="" placeholder="Put the Id here" style="width: 200px;">
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">The reaction's emoji</label>
-          <div class="control">
-            <input class="input" name="emoji" value="😀" readonly style="width: 200px;" onclick="togglePicker()">
-          </div>
-        </div>
-        <div class="field is-grouped">
-          <div class="control">
-            <a href="/dashboard" class="button is-success">Add Reaction Role</a>
-          </div>
-        </div>
-      </form>
-      <emoji-picker style="display: none;"></emoji-picker>
+      <p class="subtitle">Create a new Reaction Role by doing the '/reactionrole add' command on discord, creation on dashboard is a WIP</p>
     </div>
   </div>
 </section>

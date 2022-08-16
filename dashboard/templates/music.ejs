@@ -1,7 +1,7 @@
 <%- include("partials/header", { bot, user, path, title: `${bot.user.username} Music Player` }) %>
 <link rel="stylesheet" type="text/css" href="/assets/musicstyle.css" />
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">  
     <div class="container has-text-centered">
       <p class="title">Playing Now</p>
@@ -11,7 +11,7 @@
       
       <div id="musiccontainer">
         <div class="item musicsegment">
-          <div class="item">
+          <div class="item floating">
             <img src="/assets/images/musicplaceholder.png" width="65%" style="border-radius: 10px;" id="cover">
           </div>
         </div>

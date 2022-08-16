@@ -1,9 +1,9 @@
 <%- include("partials/header", { bot, user, path, title: `${bot.user.username}` }) %>
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <img src="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp" style="max-width: 18rem; max-height: 18rem;">
+      <img class="floating" src="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp" style="max-width: 18rem; max-height: 18rem;">
       <p class="title">
         <%= bot.user.username %>
       </p>

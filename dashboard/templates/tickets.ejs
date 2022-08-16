@@ -1,6 +1,6 @@
 <%- include("partials/header", { bot, user, path, title: `Tickets | ${guild.name}` }) %>
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">
     <div class="container">
       <% if (alert) { %>
@@ -62,8 +62,8 @@
         </div>
 
         <div class="field">
-          <label class="label">Tickets</label>
-          <label class="label">Toggles the ticket system</label>
+          <label class="subtitle">Tickets</label>
+          <label class="label subtitle">Toggles the ticket system</label>
           <div class="select" style="width: 100%;">
             <select name="tickets" value="<%= settings.tickets %>" placeholder="The ticket option" style="width: 100%;">
               <option value="false" <% if (settings.tickets === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -73,8 +73,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Log Channel</label>
-          <label class="label">The channel where the bot puts ticket logs in</label>
+          <label class="subtitle">Log Channel</label>
+          <label class="label subtitle">The channel where the bot puts ticket logs in</label>
           <div class="select" style="width: 100%;">
             <select name="ticketlogchannel" value="<%= settings.ticketlogchannel %>" placeholder="The ticket log channel" style="width: 100%;">
               <option value="false" <% if (settings.ticketlogchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -86,8 +86,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Category</label>
-          <label class="label">The category where the bot creates tickets in</label>
+          <label class="subtitle">Category</label>
+          <label class="label subtitle">The category where the bot creates tickets in</label>
           <div class="select" style="width: 100%;">
             <select name="ticketcategory" value="<%= settings.ticketcategory %>" placeholder="The ticket category" style="width: 100%;">
               <option value="false" <% if (settings.ticketcategory === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -99,8 +99,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Mention</label>
-          <label class="label">Pings the specified role every time a new ticket is created</label>
+          <label class="subtitle">Mention</label>
+          <label class="label subtitle">Pings the specified role every time a new ticket is created</label>
           <div class="select" style="width: 100%;">
             <select name="ticketmention" value="<%= settings.ticketmention %>" placeholder="The Role to mention" style="width: 100%;">
               <option value="false" <% if (settings.ticketmention === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -113,8 +113,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Access Role</label>
-          <label class="label">The role that can access tickets</label>
+          <label class="subtitle">Access Role</label>
+          <label class="label subtitle">The role that can access tickets</label>
           <div class="select" style="width: 100%;">
             <select name="supportrole" value="<%= settings.supportrole %>" placeholder="The Support Role" style="width: 100%;">
               <option value="false" <% if (settings.supportrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>

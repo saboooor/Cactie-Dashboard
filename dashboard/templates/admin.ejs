@@ -1,7 +1,7 @@
 <%- include("partials/header", { bot, user, path, title: `Admin | ${guild.name}` }) %>
 <% const commands = ['awooga', 'bite', 'bonk', 'giggle', 'hug', 'kill', 'kiss', 'lick', 'mad', 'nuzzle', 'stare', 'approve', 'ban', 'clear', 'deny', 'implement', 'kick', 'mute', 'react', 'reactionroles', 'settings', 'unban', 'unmute', 'duck', 'goose', 'kitty', 'lizard', 'meerkat', 'monkey', 'puppy', 'raccoon', 'redpanda', 'snake', 'Ban Member', 'Get Raw Embed JSON', 'Get Raw Message', 'Kick Member', 'Do action on user', 'User Info', '21questions', '8ball', 'animal', 'boner', 'buttons', 'coinflip', 'instaboner', 'meme', 'rate', 'rockpaperscissors', 'tictactoe', '247', 'cleareffects', 'clearqueue', 'effect', 'eq', 'forceskip', 'join', 'leave', 'loop', 'loopqueue', 'move', 'nowplaying', 'pause', 'play', 'playtop', 'queue', 'removesong', 'resume', 'reverse', 'search', 'seek', 'shuffle', 'skip', 'sponsorblock', 'stats', 'stop', 'volume', 'blowjob', 'confused', 'cum', 'dick', 'dilf', 'femdom', 'furryporn', 'futanari', 'gay', 'hentai', 'jackoff', 'lesbian', 'milf', 'nsfwgifs', 'nudes', 'oppai', 'petite', 'pussy', 'r34', 'thick', 'thighs', 'tits', 'trap', 'yuri', 'crash', 'dm', 'eval', 'psa', 'reload', 'reloadcmds', 'reloadcontext', 'transcript', 'add', 'close', 'delete', 'forcedelete', 'open', 'remove', 'resolved', 'subticket', 'ticket', 'voiceticket', 'avatar', 'color', 'help', 'invite', 'language', 'mcstats', 'ping', 'poll', 'reactions', 'server', 'serverjar', 'suggest', 'timings', 'userinfo', 'wallpaper']; %>
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">
     <div class="container">
       <% if (alert) { %>
@@ -63,15 +63,15 @@
         </div>
 
         <div class="field">
-          <label class="label">Message Shortener</label>
-          <label class="label">The amount of lines in a message to delete and send to a bin link (Setting this to 0 disables it)</label>
+          <label class="subtitle">Message Shortener</label>
+          <label class="label subtitle">The amount of lines in a message to delete and send to a bin link (Setting this to 0 disables it)</label>
           <div class="control">
             <input class="input" type="number" name="msgshortener" value="<%= settings.msgshortener %>" placeholder="The message shortener value">
           </div>
         </div>
         <div class="field">
-          <label class="label">Disabled commands</label>
-          <label class="label">Disable certain commands from the bot</label>
+          <label class="subtitle">Disabled commands</label>
+          <label class="label subtitle">Disable certain commands from the bot</label>
           <div class="control">
             <select name="disabledcmds" multiple data-type="tags" data-placeholder="The commands to disable">
               <% commands.forEach(command => { %>
@@ -81,8 +81,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">DJ Role</label>
-          <label class="label">The DJ feature of the bot that limits the skip/etc commands</label>
+          <label class="subtitle">DJ Role</label>
+          <label class="label subtitle">The DJ feature of the bot that limits the skip/etc commands</label>
           <div class="select" style="width: 100%;">
             <select name="djrole" value="<%= settings.djrole %>" placeholder="The DJ Role" style="width: 100%;">
               <option value="false" <% if (settings.djrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -93,8 +93,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Admin Role</label>
-          <label class="label">The role to replace the 'Administrator' permission</label>
+          <label class="subtitle">Admin Role</label>
+          <label class="label subtitle">The role to replace the 'Administrator' permission</label>
           <div class="select" style="width: 100%;">
             <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
               <option value="false" <% if (settings.adminrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -105,8 +105,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Mute Command Mode</label>
-          <label class="label">Toggles the mute/timeout command / use a mute role</label>
+          <label class="subtitle">Mute Command Mode</label>
+          <label class="label subtitle">Toggles the mute/timeout command / use a mute role</label>
           <div class="select" style="width: 100%;">
             <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
               <option value="timeout" <% if (settings.mutecmd === 'timeout') {%> selected <%} else {%> <%} %>>Use Discord's timeout feature</option>

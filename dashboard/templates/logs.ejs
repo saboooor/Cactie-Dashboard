@@ -1,6 +1,6 @@
 <%- include("partials/header", { bot, user, path, title: `Logs | ${guild.name}` }) %>
 
-<section class="hero is-fullheight-with-navbar is-dark">
+<section class="hero is-fullheight-with-navbar is-black">
   <div class="hero-body">
     <div class="container">
       <% if (alert) { %>
@@ -62,24 +62,24 @@
         </div>
 
         <div class="field">
-          <label class="label">Join Message</label>
-          <label class="label">The message when someone joins the server</label>
-          <label class="label">Variables: {USER MENTION} {USER TAG}</label>
+          <label class="subtitle">Join Message</label>
+          <label class="label subtitle">The message when someone joins the server</label>
+          <label class="label subtitle">Variables: {USER MENTION} {USER TAG}</label>
           <div class="control">
             <textarea class="textarea" type="text" name="joinmessage" value="<%= settings.joinmessage %>" placeholder="The join message, or just 'false'"></textarea>
           </div>
         </div>
         <div class="field">
-          <label class="label">Leave Message</label>
-          <label class="label">The message when someone leaves the server</label>
-          <label class="label">Variables: {USER MENTION} {USER TAG}</label>
+          <label class="subtitle">Leave Message</label>
+          <label class="label subtitle">The message when someone leaves the server</label>
+          <label class="label subtitle">Variables: {USER MENTION} {USER TAG}</label>
           <div class="control">
             <textarea class="textarea" type="text" name="leavemessage" value="<%= settings.leavemessage %>" placeholder="The leave message, or just 'false'"></textarea>
           </div>
         </div>
         <div class="field">
-          <label class="label">Log Channel</label>
-          <label class="label">The channel where the bot puts various logs in</label>
+          <label class="subtitle">Log Channel</label>
+          <label class="label subtitle">The channel where the bot puts various logs in</label>
           <div class="select" style="width: 100%;">
             <select name="logchannel" value="<%= settings.logchannel %>" placeholder="The log channel" style="width: 100%;">
               <option value="false" <% if (settings.logchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
@@ -91,8 +91,8 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Audit Logs</label>
-          <label class="label">Logs certain events in the guild</label>
+          <label class="subtitle">Audit Logs</label>
+          <label class="label subtitle">Logs certain events in the guild</label>
           <div class="control">
             <select name="auditlogs" multiple data-type="tags" data-placeholder="The logs to enable">
               <option value="member" <% if (settings.auditlogs.split(',').includes('member')) {%> selected <%} else {%> <%} %>>All Member-Related Logs</option>
