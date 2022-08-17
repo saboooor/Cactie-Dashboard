@@ -27,16 +27,15 @@
               <h5 id="total" style="padding:15px; margin:0;">0:00</h5>
             </div>
             <div class="centered">
-              <a href="/music/filters" class="mediacontrols" id="filters"><img src="/assets/icons/sliders.svg"></a>
-              <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><img src="/assets/icons/shuffle.svg"></a>
-              <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><img id="play" src="/assets/icons/play.svg"></a>
-              <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><img src="/assets/icons/skip-forward.svg"></a>
-              <a href="javascript:togglenav();" class="mediacontrols" id="queue"><img src="/assets/icons/list.svg"></a>
+              <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><i data-feather="shuffle"></i></a>
+              <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><i data-feather="play"></i></a>
+              <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><i data-feather="skip-forward"></i></a>
+              <a href="javascript:togglenav();" class="mediacontrols" id="queue"><i data-feather="list"></i></a>
             </div>      
             <div class="centered disabled" id="volumecontainer">
-              <img style="padding:15px; margin:0;" src="/assets/icons/volume-x.svg">
+              <i style="margin:15px;" data-feather="volume-x"></i>
                 <input type="range" disabled id="volume" oninput="vol();" style="width:40%;" max=150>
-              <img style="padding:15px; margin:0;" src="/assets/icons/volume-2.svg">
+              <i style="margin:15px;" data-feather="volume-2"></i>
             </div>
             <h5 class="centered disabled" id="dj">Users without the DJ role have limited access.</h5>
           </div>

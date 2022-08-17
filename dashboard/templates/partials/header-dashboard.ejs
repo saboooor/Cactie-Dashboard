@@ -21,11 +21,17 @@
             <div class="level-item">
               <div class="field is-grouped">
                 <div class="control">
-                  <a href="/dashboard" class="button is-dark">Go Back</a>
+                  <a href="/dashboard" class="button is-danger is-outlined is-rounded">
+                    <i data-feather="arrow-left" style="margin-right:10px"></i>
+                    Go Back
+                  </a>
                 </div>
                 <% if (selected) { %>
                   <div class="control">
-                    <button type="submit" class="button is-success">Save</button>
+                    <button type="submit" class="button is-success is-outlined is-rounded">
+                      <i data-feather="save" style="margin-right:10px"></i>
+                      Save
+                    </button>
                   </div>
                 <% } %>
               </div>

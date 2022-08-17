@@ -19,7 +19,7 @@
     <nav class="navbar is-spaced is-fixed-top is-black" style="background-color: #00000000" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="/">
-          <img src="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp">
+          <img src="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp" style="margin-right: 10px">
           <%= bot.user.username %>
         </a>
 
@@ -32,21 +32,26 @@
       <div id="navbar" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" href="/dashboard">
+            <i data-feather="tool" style="margin-right: 10px"></i>
             Dashboard
           </a>
           <a class="navbar-item has-tooltip-bottom" data-tooltip="Currently Unstable" href="/music">
+            <i data-feather="music" style="margin-right: 10px"></i>
             Music
           </a>
           <a class="navbar-item" href="/support/discord">
+            <i data-feather="help-circle" style="margin-right: 10px"></i>
             Support
           </a>
           <a class="navbar-item has-tooltip-bottom" data-tooltip="Privacy Policy / Terms of Use" href="/tos">
+            <i data-feather="align-justify" style="margin-right: 10px"></i>
             Legal
           </a>
         </div>
         <div class="navbar-end">
           <a class="navbar-item" href="/invite">
-            Invite <%= bot.user.username %>
+            <i data-feather="plus" style="margin-right: 10px"></i>
+            Invite
           </a>
           <% if (user) { %>
             <a class="navbar-item has-tooltip-bottom" data-tooltip="Click to log out" href="/logout">
@@ -57,6 +62,7 @@
             </a>
           <% } else { %>
             <a class="navbar-item" href="/login">
+              <i data-feather="log-in" style="margin-right: 10px"></i>
               Login
             </a>
           <% } %>
@@ -71,10 +77,10 @@
             <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
           </defs>
           <g class="parallax">
-            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(10, 10, 10, 0.7)" style="filter: blur(1px)" />
-            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(10, 10, 10, 0.5)" style="filter: blur(1px)" />
-            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(10, 10, 10, 0.3)" style="filter: blur(1px)" />
-            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(10, 10, 10, 1)" style="filter: blur(1px)" />
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(10, 10, 10, 0.7)" />
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(10, 10, 10, 0.5)" />
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(10, 10, 10, 0.3)" />
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(10, 10, 10, 1)" />
           </g>
         </svg>
       </div>

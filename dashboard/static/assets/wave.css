@@ -1,8 +1,25 @@
+
+  html {
+    overflow: overlay;
+  }
+
+  a, button {
+    transition: 300ms;
+  }
+
+  .is-parent {
+    transition: 600ms;
+  }
+
+  .is-parent:hover {
+    transform: translateY(-10px);
+  }
+
   .header {
     position: absolute;
     width: 100%;
   }
-  
+
   .waves {
     position: relative;
     width: 100%;
@@ -74,8 +91,4 @@
 
   .floating {
     animation: float 6s ease-in-out infinite;
-  }
-
-  html {
-    overflow: overlay;
   }
