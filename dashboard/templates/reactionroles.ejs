@@ -4,63 +4,7 @@ settings.forEach(async reactionrole => {
   reactionrole.roleName = guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Could not get role.';
 })
 %>
-
-<section class="hero is-fullheight-with-navbar is-black">
-  <div class="hero-body">
-    <div class="container">
-      <% if (alert) { %>
-        <div class="notification is-success">
-          <%= alert %>
-        </div>
-      <% } %>
-        <div class="level">
-          <div class="level-item">
-            <figure class="image is-128x128" style="margin-right: px;">
-              <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
-            </figure>
-          </div>
-          <div class="level-item">
-            <p class="title">
-              <%= guild.name %>
-            </p>
-          </div>
-          <div class="level-item">
-            <div class="field is-grouped">
-              <div class="control">
-                <a href="/dashboard" class="button is-dark">Go Back</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tabs is-toggle is-toggle-rounded is-fullwidth is-large">
-          <ul>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/general'>
-                General
-              </a>
-            </li>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/tickets'>
-                Tickets
-              </a>
-            </li>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/logs'>
-                Logs
-              </a>
-            </li>
-            <li class="is-active">
-              <a>
-                Reaction Roles
-              </a>
-            </li>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/admin'>
-                Admin
-              </a>
-            </li>
-          </ul>
-        </div>
+<%- include("partials/header-dashboard", { alert, guild, selected: 'reactionroles' }) %>
 
         <br>
         <p class="subtitle">Current Reaction Roles</p> 

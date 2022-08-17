@@ -1,66 +1,6 @@
 <%- include("partials/header", { bot, user, path, title: `Admin | ${guild.name}` }) %>
+<%- include("partials/header-dashboard", { alert, guild, selected: 'admin' }) %>
 <% const commands = ['awooga', 'bite', 'bonk', 'giggle', 'hug', 'kill', 'kiss', 'lick', 'mad', 'nuzzle', 'stare', 'approve', 'ban', 'clear', 'deny', 'implement', 'kick', 'mute', 'react', 'reactionroles', 'settings', 'unban', 'unmute', 'duck', 'goose', 'kitty', 'lizard', 'meerkat', 'monkey', 'puppy', 'raccoon', 'redpanda', 'snake', 'Ban Member', 'Get Raw Embed JSON', 'Get Raw Message', 'Kick Member', 'Do action on user', 'User Info', '21questions', '8ball', 'animal', 'boner', 'buttons', 'coinflip', 'instaboner', 'meme', 'rate', 'rockpaperscissors', 'tictactoe', '247', 'cleareffects', 'clearqueue', 'effect', 'eq', 'forceskip', 'join', 'leave', 'loop', 'loopqueue', 'move', 'nowplaying', 'pause', 'play', 'playtop', 'queue', 'removesong', 'resume', 'reverse', 'search', 'seek', 'shuffle', 'skip', 'sponsorblock', 'stats', 'stop', 'volume', 'blowjob', 'confused', 'cum', 'dick', 'dilf', 'femdom', 'furryporn', 'futanari', 'gay', 'hentai', 'jackoff', 'lesbian', 'milf', 'nsfwgifs', 'nudes', 'oppai', 'petite', 'pussy', 'r34', 'thick', 'thighs', 'tits', 'trap', 'yuri', 'crash', 'dm', 'eval', 'psa', 'reload', 'reloadcmds', 'reloadcontext', 'transcript', 'add', 'close', 'delete', 'forcedelete', 'open', 'remove', 'resolved', 'subticket', 'ticket', 'voiceticket', 'avatar', 'color', 'help', 'invite', 'language', 'mcstats', 'ping', 'poll', 'reactions', 'server', 'serverjar', 'suggest', 'timings', 'userinfo', 'wallpaper']; %>
-
-<section class="hero is-fullheight-with-navbar is-black">
-  <div class="hero-body">
-    <div class="container">
-      <% if (alert) { %>
-        <div class="notification is-success">
-          <%= alert %>
-        </div>
-      <% } %>
-      <form action="/settings/<%= guild.id %>" method="POST">
-        <div class="level">
-          <div class="level-item">
-            <figure class="image is-128x128" style="margin-right: px;">
-              <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
-            </figure>
-          </div>
-          <div class="level-item">
-            <p class="title">
-              <%= guild.name %>
-            </p>
-          </div>
-          <div class="level-item">
-            <div class="field is-grouped">
-              <div class="control">
-                <a href="/dashboard" class="button is-dark">Go Back</a>
-              </div>
-              <div class="control">
-                <button type="submit" class="button is-success">Save</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tabs is-toggle is-toggle-rounded is-fullwidth is-large">
-          <ul>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/general'>
-                General
-              </a>
-            </li>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/tickets'>
-                Tickets
-              </a>
-            </li>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/logs'>
-                Logs
-              </a>
-            </li>
-            <li>
-              <a href='/dashboard/<%= guild.id %>/reactionroles'>
-                Reaction Roles
-              </a>
-            </li>
-            <li class="is-active">
-              <a>
-                Admin
-              </a>
-            </li>
-          </ul>
-        </div>
 
         <div class="field">
           <label class="subtitle">Message Shortener</label>

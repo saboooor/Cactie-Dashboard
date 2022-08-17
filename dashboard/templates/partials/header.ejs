@@ -5,6 +5,7 @@
       <title><%= title %></title>
       <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
       <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput@1.0.3/dist/css/bulma-tagsinput.min.css" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.min.css" />
       <link rel="stylesheet" type="text/css" href="/assets/wave.css" />
       <style> .colored { background: linear-gradient(60deg, <%= bot.config.colors[0] %>, <%= bot.config.colors[1] %>); } </style>
       <link rel="shortcut icon" id="favicon" href="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp" type="image/x-icon">
@@ -33,13 +34,13 @@
           <a class="navbar-item" href="/dashboard">
             Dashboard
           </a>
-          <a class="navbar-item" href="/music">
-            Music [WIP]
+          <a class="navbar-item has-tooltip-bottom" data-tooltip="Currently Unstable" href="/music">
+            Music
           </a>
           <a class="navbar-item" href="/support/discord">
             Support
           </a>
-          <a class="navbar-item" href="/tos">
+          <a class="navbar-item has-tooltip-bottom" data-tooltip="Privacy Policy / Terms of Use" href="/tos">
             Legal
           </a>
         </div>
@@ -48,8 +49,10 @@
             Invite <%= bot.user.username %>
           </a>
           <% if (user) { %>
-            <a class="navbar-item" href="/logout">
-              <img style="width: 21px; height: 21px; border-radius:50%;" src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>">
+            <a class="navbar-item has-tooltip-bottom" data-tooltip="Click to log out" href="/logout">
+              <figure class="image" style="margin-right: 10px;">
+                <img class="is-rounded" src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>">
+              </figure>
               <%= user.username %>#<%= user.discriminator %>
             </a>
           <% } else { %>
@@ -68,10 +71,10 @@
             <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
           </defs>
           <g class="parallax">
-            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(10, 10, 10, 0.7)" />
-            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(10, 10, 10, 0.5)" />
-            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(10, 10, 10, 0.3)" />
-            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(10, 10, 10, 1)" />
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(10, 10, 10, 0.7)" style="filter: blur(1px)" />
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(10, 10, 10, 0.5)" style="filter: blur(1px)" />
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(10, 10, 10, 0.3)" style="filter: blur(1px)" />
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(10, 10, 10, 1)" style="filter: blur(1px)" />
           </g>
         </svg>
       </div>
