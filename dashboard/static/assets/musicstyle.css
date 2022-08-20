@@ -70,6 +70,11 @@ input[type=range][orient=vertical] {
   transition: 0.5s;
 }
 
+.cover {
+  border-radius: 20px;
+  filter: drop-shadow(0 0 80px #000000aa);
+}
+
 .item {
   width: 100%;
   text-align: center;
@@ -81,7 +86,7 @@ input[type=range][orient=vertical] {
   align-items: center;
 }
 
-@media screen and ( orientation:landscape ) {
+@media screen and ( orientation: landscape ) {
   #musiccontainer {
     display: flex;
   }
@@ -94,7 +99,8 @@ input[type=range][orient=vertical] {
   z-index: 1;
   top: 0;
   right: 0;
-  background-color: #1c1c1c;
+  background: #00000099;
+  backdrop-filter: blur(20px);
   overflow-x: hidden;
   padding-top: 100px;
   transition: 0.2s;

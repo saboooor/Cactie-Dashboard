@@ -7,12 +7,16 @@
       <p class="title">Playing Now</p>
       <p class="subtitle" id="vcname">#Voice Channel</p>
   
-      <div id="queue" class="sidebar"></div>
+      <div id="queue" class="sidebar">
+        <a href="javascript:togglenav();">
+          <i data-feather="x"></i>
+        </a>
+      </div>
       
       <div id="musiccontainer">
         <div class="item musicsegment">
           <div class="item floating">
-            <img src="/assets/images/musicplaceholder.png" width="65%" style="border-radius: 10px;" id="cover">
+            <img src="/assets/images/musicplaceholder.png" width="65%" id="cover" class="cover">
           </div>
         </div>
         <div class="item musicsegment">
@@ -30,7 +34,7 @@
               <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><i data-feather="shuffle"></i></a>
               <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><i data-feather="play"></i></a>
               <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><i data-feather="skip-forward"></i></a>
-              <a href="javascript:togglenav();" class="mediacontrols" id="queue"><i data-feather="list"></i></a>
+              <a href="javascript:togglenav();" class="mediacontrols" id="queuebtn"><i data-feather="list"></i></a>
             </div>      
             <div class="centered disabled" id="volumecontainer">
               <i style="margin:15px;" data-feather="volume-x"></i>
@@ -143,8 +147,21 @@
     }
     
     if (json.type == 'playing') {
-      if (!json.paused) play.src = '/assets/icons/pause.svg';
-      else play.src = '/assets/icons/play.svg';
+      const playbtn = document.getElementById('playbtn');
+      if (!json.paused && playbtn.childNodes[0].classList.contains('feather-play')) {
+        playbtn.childNodes[0].remove();
+        const pause = document.createElement('i');
+        pause.dataset.feather = 'pause';
+        playbtn.appendChild(pause);
+        feather.replace();
+      }
+      else if (playbtn.childNodes[0].classList.contains('feather-pause')) {
+        playbtn.childNodes[0].remove();
+        const play = document.createElement('i');
+        play.dataset.feather = 'play';
+        playbtn.appendChild(play);
+        feather.replace();
+      }
     }
 
     if (json.type == 'track') {
@@ -158,9 +175,11 @@
         if (num.length == 5) num = '0' + num;
         json.current.colors[i] = '#' + num;
       }
-      document.getElementsByClassName('hero-body')[0].style.backgroundColor = json.current.colors[0];
-      document.getElementsByClassName('hero-body')[0].style.backgroundImage = `linear-gradient(315deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
-      document.getElementById('queue').innerHTML = '<a href="javascript:togglenav();"><img src="/assets/icons/x.svg"></a>'
+      document.body.style.background = `linear-gradient(90deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
+      document.getElementById('waves').style.background = `linear-gradient(90deg, ${json.current.colors[0]}, ${json.current.colors[1]})`;
+      if (document.getElementById('queue').querySelector('.queueitem')) {
+        document.getElementById('queue').querySelectorAll('.queueitem').forEach(item => item.remove());
+      }
       json.queue.forEach(track => {
         for (const i in track.colors) {
           let num = track.colors[i];
@@ -169,8 +188,23 @@
           track.colors[i] = '#' + num;
         }
         if (!track.color) track.color = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
-        document.getElementById('queue').innerHTML += `<a href="javascript:skip(${json.queue.indexOf(track)});" style="background-image: linear-gradient(90deg, ${track.colors[0]}, ${track.colors[1]});" class="queueitem"><img src="${track.img}" style="filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));">${track.title}</a>`;
+        const queueItem = document.createElement('a');
+        queueItem.href = `javascript:skip(${json.queue.indexOf(track)});`;
+        queueItem.style.background = `linear-gradient(90deg, ${track.colors[0]}, ${track.colors[1]})`;
+        queueItem.classList.add('queueitem');
+        const queueItemImg = document.createElement('img');
+        queueItemImg.src = track.img;
+        queueItemImg.classList.add('cover');
+        queueItem.appendChild(queueItemImg);
+        document.getElementById('queue').appendChild(queueItem);
+        queueItem.innerHTML += track.title;
       });
+      if (!document.getElementById('queue').querySelector('.queueitem')) {
+        const noItems = document.createElement('a');
+        noItems.innerText = 'No more items in queue\nAdd a song with /play!';
+        noItems.classList.add('queueitem');
+        document.getElementById('queue').appendChild(noItems);
+      }
     }
 
     if (json.type == 'progress') {
