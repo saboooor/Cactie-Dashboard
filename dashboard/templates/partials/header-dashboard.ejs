@@ -9,7 +9,7 @@
           </div>
           <div class="level-item">
             <p class="menu-label">
-              <%= guild.name + (selected ? '' : ' - Select a category') %>
+              <%= guild.name %>
             </p>
           </div>
         </div>
@@ -30,27 +30,19 @@
           <li><a href='/dashboard/<%= guild.id %>/tickets' <% if (selected == 'tickets') { %> class="is-active" <% } %> >Ticket System</a></li>
           <li><a href='/dashboard/<%= guild.id %>/admin' <% if (selected == 'admin') { %> class="is-active" <% } %> >Moderation</a></li>
         </ul>
-      </aside>
-      <div class="container">
-        <% if (alert) { %>
-          <div class="notification is-success">
-            <%= alert %>
-          </div>
-        <% } %>
         <form action="/settings/<%= guild.id %>" method="POST">
-          <div class="field is-grouped">
-            <div class="control">
-              <a href="/dashboard" class="button is-danger is-outlined is-rounded">
-                <i data-feather="arrow-left" style="margin-right:10px"></i>
-                Go Back
-              </a>
-            </div>
-            <% if (selected) { %>
-              <div class="control">
-                <button type="submit" class="button is-success is-outlined is-rounded">
-                  <i data-feather="save" style="margin-right:10px"></i>
-                  Save
-                </button>
+          <% if (selected) { %>
+            <br>
+            <button type="submit" class="button is-success is-outlined is-rounded">
+              <i data-feather="save" style="margin-right:10px"></i>
+              Save
+            </button>
+          <% } %>
+      </aside>
+          <div class="container">
+            <% if (alert) { %>
+              <br>
+              <div class="notification is-success">
+                <%= alert %>
               </div>
             <% } %>
-          </div>
