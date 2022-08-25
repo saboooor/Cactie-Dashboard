@@ -49,12 +49,12 @@ settings.forEach(async reactionrole => {
             </div>
             <% if (reactionrole.message) { %>
               <div class="media-right">
-                <a class="button is-primary" href="<%= reactionrole.message.url %>">Go to message</a>
+                <a class="button is-primary is-outlined is-rounded" href="<%= reactionrole.message.url %>">Go to message</a>
               </div>
             <% } %>
             <div class="media-right">
               <form action="/reactionroles/<%= reactionrole.guildId %>/delete" method="post">
-                <button type="submit" name="id" value="<%= settings.indexOf(reactionrole) %>" class="button is-danger">Delete</button>
+                <button type="submit" name="id" value="<%= settings.indexOf(reactionrole) %>" class="button is-danger is-outlined is-rounded">Delete</button>
               </form>
             </div>
           </article>

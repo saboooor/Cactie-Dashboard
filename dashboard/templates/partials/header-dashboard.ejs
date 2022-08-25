@@ -1,5 +1,36 @@
 <section class="hero is-fullheight-with-navbar is-black">
     <div class="hero-body">
+      <aside class="menu">
+        <div class="level">
+          <div class="level-item">
+            <figure class="image is-32x32">
+              <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
+            </figure>
+          </div>
+          <div class="level-item">
+            <p class="menu-label">
+              <%= guild.name + (selected ? '' : ' - Select a category') %>
+            </p>
+          </div>
+        </div>
+        <p class="menu-label">
+          General
+        </p>
+        <ul class="menu-list">
+          <li><a href='/dashboard/<%= guild.id %>/general' <% if (selected == 'general') { %> class="is-active" <% } %> >General Settings</a></li>
+          <li><a href='/dashboard/<%= guild.id %>/general' <% if (selected == 'general') { %> class="is-active" <% } %> >Suggestions / Polls</a></li>
+          <li><a href='/dashboard/<%= guild.id %>/general' <% if (selected == 'general') { %> class="is-active" <% } %> >Boner Command</a></li>
+          <li><a href='/dashboard/<%= guild.id %>/reactionroles' <% if (selected == 'reactionroles') { %> class="is-active" <% } %> >Reaction Roles</a></li>
+        </ul>
+        <p class="menu-label">
+          Administration
+        </p>
+        <ul class="menu-list">
+          <li><a href='/dashboard/<%= guild.id %>/logs' <% if (selected == 'logs') { %> class="is-active" <% } %> >Logging</a></li>
+          <li><a href='/dashboard/<%= guild.id %>/tickets' <% if (selected == 'tickets') { %> class="is-active" <% } %> >Ticket System</a></li>
+          <li><a href='/dashboard/<%= guild.id %>/admin' <% if (selected == 'admin') { %> class="is-active" <% } %> >Moderation</a></li>
+        </ul>
+      </aside>
       <div class="container">
         <% if (alert) { %>
           <div class="notification is-success">
@@ -7,57 +38,19 @@
           </div>
         <% } %>
         <form action="/settings/<%= guild.id %>" method="POST">
-          <div class="level">
-            <div class="level-item">
-              <figure class="image is-128x128">
-                <img class="is-rounded" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
-              </figure>
+          <div class="field is-grouped">
+            <div class="control">
+              <a href="/dashboard" class="button is-danger is-outlined is-rounded">
+                <i data-feather="arrow-left" style="margin-right:10px"></i>
+                Go Back
+              </a>
             </div>
-            <div class="level-item">
-              <p class="title">
-                <%= guild.name + (selected ? '' : ' - Select a category') %>
-              </p>
-            </div>
-            <div class="level-item">
-              <div class="field is-grouped">
-                <div class="control">
-                  <a href="/dashboard" class="button is-danger is-outlined is-rounded">
-                    <i data-feather="arrow-left" style="margin-right:10px"></i>
-                    Go Back
-                  </a>
-                </div>
-                <% if (selected) { %>
-                  <div class="control">
-                    <button type="submit" class="button is-success is-outlined is-rounded">
-                      <i data-feather="save" style="margin-right:10px"></i>
-                      Save
-                    </button>
-                  </div>
-                <% } %>
+            <% if (selected) { %>
+              <div class="control">
+                <button type="submit" class="button is-success is-outlined is-rounded">
+                  <i data-feather="save" style="margin-right:10px"></i>
+                  Save
+                </button>
               </div>
-            </div>
-          </div>
-          <div class="tabs is-toggle is-toggle-rounded is-fullwidth is-large">
-            <ul>
-              <li <% if (selected == 'general') { %> class="is-active" <% } %> >
-                <a href='/dashboard/<%= guild.id %>/general'>
-                  General
-                </a>
-              </li>
-              <li <% if (selected == 'tickets') { %> class="is-active" <% } %> >
-                <a href='/dashboard/<%= guild.id %>/tickets'>
-                  Tickets
-                </a>
-              </li>
-              <li <% if (selected == 'logs') { %> class="is-active" <% } %> >
-                <a href='/dashboard/<%= guild.id %>/logs'>
-                  Logs
-                </a>
-              </li>
-              <li <% if (selected == 'admin') { %> class="is-active" <% } %> >
-                <a href='/dashboard/<%= guild.id %>/admin'>
-                  Admin
-                </a>
-              </li>
-            </ul>
+            <% } %>
           </div>
