@@ -93,8 +93,13 @@
     color: #dbdbdb;
   }
 
+  .portrait-button {
+    display: none;
+  }
+
   @media screen and ( orientation: portrait ) {
     .menu { position: static; }
+    .portrait-button { display: flex; }
   }
   
   @media (max-width: 768px) {
