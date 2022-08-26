@@ -2,47 +2,47 @@
 <link rel="stylesheet" type="text/css" href="/assets/musicstyle.css" />
 
 <section class="hero is-fullheight-with-navbar is-black">
-  <div class="hero-body">  
-    <div class="container has-text-centered">
-      <p class="title">Playing Now</p>
-      <p class="subtitle" id="vcname">#Voice Channel</p>
-  
-      <div id="queue" class="sidebar">
-        <a href="javascript:togglenav();">
-          <i data-feather="x"></i>
-        </a>
+  <div class="hero-body has-text-centered">
+    <div class="container">
+      <br><br><br><br>
+      <div id="err" class="notification is-danger" style="display: none;">
+        <br><p class="title">Error</p><br>
+        <p id="errtxt" class="subtitle"></p><br>
+        <a class="button is-primary is-rounded" href="./music">
+          <i data-feather="refresh-cw" style="padding-right: 5px; margin-right: 10px;"></i>
+          Refresh
+        </a><br><br>
       </div>
-      
-      <div id="musiccontainer">
-        <div class="item musicsegment">
-          <div class="item floating">
-            <img src="/assets/images/musicplaceholder.png" width="65%" id="cover" class="cover">
-          </div>
+      <div class="columns" id="main">
+        <div class="column floating">
+          <img src="/assets/images/musicplaceholder.png" id="cover" class="cover">
         </div>
-        <div class="item musicsegment">
-          <div class="item">
-            <p class="title" id="title">Music Title</p>
-            <br>
-            <p class="subtitle" id="author">Music Author</p>
-            <br>
-            <div class="centered disabled" id="progresscontainer">
-              <h5 id="pos" style="padding:15px; margin:0;">0:00</h5>
-                <input type="range" disabled id="progress" oninput="seek();" value="0" style="width: 50%;">
-              <h5 id="total" style="padding:15px; margin:0;">0:00</h5>
-            </div>
-            <div class="centered">
-              <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><i data-feather="shuffle"></i></a>
-              <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><i data-feather="play"></i></a>
-              <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><i data-feather="skip-forward"></i></a>
-              <a href="javascript:togglenav();" class="mediacontrols" id="queuebtn"><i data-feather="list"></i></a>
-            </div>      
-            <div class="centered disabled" id="volumecontainer">
-              <i style="margin:15px;" data-feather="volume-x"></i>
-                <input type="range" disabled id="volume" oninput="vol();" style="width:40%;" max=150>
-              <i style="margin:15px;" data-feather="volume-2"></i>
-            </div>
-            <h5 class="centered disabled" id="dj">Users without the DJ role have limited access.</h5>
+        <div class="column">
+          <p class="title" id="title">Music Title</p>
+          <p class="subtitle" id="author">Music Author</p>
+          <p class="menu-label" id="vcname">In #Voice Channel</p>
+          <div class="centered menu-label" id="progresscontainer">
+            <h5 id="pos" style="padding:15px; margin:0;">0:00</h5>
+              <input type="range" disabled id="progress" oninput="seek();" value="0" style="width: 50%;">
+            <h5 id="total" style="padding:15px; margin:0;">0:00</h5>
           </div>
+          <div class="centered">
+            <a href="javascript:shuffle();" class="mediacontrols disabled" id="shuffle"><i data-feather="shuffle"></i></a>
+            <a href="javascript:toggleplay();" class="mediacontrols disabled" id="playbtn"><i data-feather="play"></i></a>
+            <a href="javascript:skip(1);" class="mediacontrols disabled" id="skip"><i data-feather="skip-forward"></i></a>
+            <a href="javascript:togglenav();" class="mediacontrols" id="queuebtn"><i data-feather="list"></i></a>
+          </div>
+          <div class="centered disabled" id="volumecontainer">
+            <i style="margin:15px;" data-feather="volume-x"></i>
+              <input type="range" disabled id="volume" oninput="vol();" style="width:40%;" max=150>
+            <i style="margin:15px;" data-feather="volume-2"></i>
+          </div>
+          <h5 class="centered menu-label" id="dj">Users without the DJ role have limited access.</h5>
+        </div>
+        <div id="queue" class="sidebar">
+          <a href="javascript:togglenav();">
+            <i data-feather="x"></i>
+          </a>
         </div>
       </div>
     </div>
@@ -85,20 +85,7 @@
   }
 
   function togglenav() {
-    if (document.getElementById("queue").style.width != '300px') {
-      document.getElementById("queue").style.width = "300px";
-      if (window.innerWidth > window.innerHeight) {
-        document.getElementById("musiccontainer").style.marginRight = "300px";
-        document.getElementById("musiccontainer").style.width = "calc(100% - 300px)";
-      }
-    }
-    else {
-      document.getElementById("queue").style.width = "0";
-      if (window.innerWidth > window.innerHeight) {
-        document.getElementById("musiccontainer").style.marginRight= "0";
-        document.getElementById("musiccontainer").style.width = "100%";
-      }
-    }
+    document.getElementById("queue").style.width = document.getElementById("queue").style.width != '300px' ? "300px" : "0";
   }
 
   function convert(duration) {
@@ -129,11 +116,15 @@
 
   ws.onmessage = function(data) {
     const json = JSON.parse(data.data);
-    if (json.type == 'error') return alert(json.message);
+    if (json.type == 'error') {
+      document.getElementById('main').remove();
+      document.getElementById('err').style.display = 'block';
+      document.getElementById('errtxt').innerText = json.message;
+    }
     
     if (json.type == 'info') {
       const { player } = json;
-      document.getElementById('vcname').innerText = player.voiceChannel;
+      document.getElementById('vcname').innerText = `In #${player.voiceChannel}`;
       if (player.hasdj) {
         document.getElementById('dj').style.display = 'none';
         document.getElementById('volume').disabled = false;
