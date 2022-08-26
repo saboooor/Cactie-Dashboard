@@ -184,16 +184,6 @@ module.exports = async (client) => {
 	const wsurl = client.config.wsurl;
 	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl }));
 
-	// Dashboard category endpoint.
-	app.get('/dashboard/:guildId', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
-
-		// Render the dashboard for the server
-		renderTemplate(res, req, 'category.ejs', { guild, alert: null });
-	});
-
 	// Get emojis
 	app.get('/emojis/:guildId', async (req, res) => {
 		const guild = client.guilds.cache.get(req.params.guildId);
@@ -204,23 +194,16 @@ module.exports = async (client) => {
 	});
 
 	// General endpoint.
-	app.get('/dashboard/:guildId/:dashboardCategory', checkAuth, async (req, res) => {
+	app.get('/dashboard/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
 		if (!guild) return res.redirect('/dashboard');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, `${req.params.dashboardCategory}.ejs`, guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 
-		// retrive the settings stored for this guild.
-		const settings = req.params.dashboardCategory == 'reactionroles' ? await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`) : await client.getData('settings', 'guildId', guild.id);
-		if (req.params.dashboardCategory == 'reactionroles') {
-			for (const reactionrole of settings) {
-				const channel = guild.channels.cache.get(reactionrole.channelId);
-				if (!channel) continue;
-				reactionrole.message = await channel.messages.fetch(reactionrole.messageId);
-			}
-		}
-		renderTemplate(res, req, `${req.params.dashboardCategory}.ejs`, { guild, settings, alert: null });
+		// retrive the settings stored for this guild and load the page
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: null });
 	});
 
 	// General endpoint.
@@ -230,7 +213,7 @@ module.exports = async (client) => {
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 		for (const key in setting) {
 			let value = setting[key];
 			if (Array.isArray(value)) value = value.join(',');
@@ -238,10 +221,9 @@ module.exports = async (client) => {
 			await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
 		}
 
-		// render the template with an alert text which confirms that settings have been saved.
-		renderTemplate(res, req, 'category.ejs', {
-			guild, alert: 'Your options have been saved.',
-		});
+		// retrive the settings stored for this guild and load the page with the alert
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: 'Your settings have been saved successfully.' });
 	});
 
 	// Reaction Roles endpoint.
@@ -251,7 +233,7 @@ module.exports = async (client) => {
 		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'category.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
 		for (const key in setting) {
 			let value = setting[key];
 			if (Array.isArray(value)) value = value.join(',');
