@@ -8,7 +8,7 @@
       <div class="column is-one-fifth">
         <aside class="menu floating">
           <p class="menu-label">
-            <img width="32px" style="border-radius: 16px; vertical-align: middle; margin-right: 2px;" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
+            <img class="feather" width="32px" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
             <%= guild.name %>
           </p>
           <p class="menu-label">
@@ -27,10 +27,23 @@
             <li><a href="#tickets">Ticket System</a></li>
             <li><a href="#moderation">Moderation</a></li>
           </ul>
+          <p class="menu-label">
+            Reaction Roles
+          </p>
+          <ul class="menu-list">
+            <li><a>Reaction role channel 1</a></li>
+            <li><a>Reaction role channel 2</a></li>
+            <li><a>Reaction role channel 3</a></li>
+            <li><a>Reaction role channel 4</a></li>
+            <li><a>Reaction role channel 5</a></li>
+            <li><a>Reaction role channel 6</a></li>
+            <li><a>Reaction role channel 7</a></li>
+            <li><a onclick="openModal(document.getElementById('reactionrole-create'))">Create</a></li>
+          </ul>
           <br>
       <form action="/settings/<%= guild.id %>" method="POST">
             <button type="submit" class="button is-success is-outlined is-rounded">
-              <i data-feather="save" style="margin-right:10px"></i>
+              <i data-feather="save"></i>
               Save
             </button>
         </aside>    
@@ -42,7 +55,8 @@
             <%= alert %>
           </div>
         <% } %>
-        <br id="general">
+        <span class="anchor" id="general"></span>
+        <br>
         <a class="title">General</a>
         <br><br>
 
@@ -85,7 +99,8 @@
           </div>
         </div>
 
-        <br id="suggestions">
+        <span class="anchor" id="suggestions"></span>
+        <br>
         <a class="title">Suggestions / Polls</a>
         <br><br>
 
@@ -134,7 +149,8 @@
           </div>
         </div>
 
-        <br id="boner">
+        <span class="anchor" id="boner"></span>
+        <br>
         <a class="title">Boner Command</a>
         <br><br>
 
@@ -150,7 +166,8 @@
           </div>
         </div>
 
-        <br id="logging">
+        <span class="anchor" id="logging"></span>
+        <br>
         <a class="title">Logging</a>
         <br><br>
 
@@ -217,7 +234,8 @@
           </div>
         </div>
 
-        <br id="tickets">
+        <span class="anchor" id="tickets"></span>
+        <br>
         <a class="title">Tickets</a>
         <br><br>
 
@@ -299,7 +317,8 @@
           </div>
         </div>
 
-        <br id="moderation">
+        <span class="anchor" id="moderation"></span>
+        <br>
         <a class="title">Moderation</a>
         <br><br>
 
@@ -371,15 +390,55 @@
             </article>
           </div>
         </div>
-        <button type="submit" class="button is-success is-outlined is-rounded portrait-button">
-          <i data-feather="save" style="margin-right:10px"></i>
+
+        <button type="submit" class="button is-success is-outlined is-rounded portrait-only">
+          <i data-feather="save"></i>
           Save
         </button>
+
+        <br>
+        <a class="title">Reaction Roles</a>
+        <br><br>
+
       </form>
-        <br><br>
-        <br><br>
-        <br><br>
-        <br><br>
+
+          <div id="reactionrole-create" class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+              <header class="modal-card-head">
+                <p class="modal-card-title">Create a Reaction Role</p>
+                <button class="delete" aria-label="close"></button>
+              </header>
+              <form action="/settings/<%= guild.id %>" method="POST">
+                <section class="modal-card-body">
+                  <p class="subtitle">Channel</p>
+                  <div class="select" style="width: 100%;">
+                    <select name="channel" style="width: 100%;">
+                      <% guild.channels.cache.forEach(channel => { %>
+                        <% if (channel.type != Djs.ChannelType.GuildText) return %>
+                        <option value="<%= channel.id %>"> <%= `# ${channel.name}` %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                  <br><br>
+                  <p class="subtitle">Message Id <a style="color: #5ea3e47a;" href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">What's this?</a></label></p>
+                  <div class="control">
+                    <input class="input" type="text" name="message">
+                  </div>
+                  <br>
+                  <p class="subtitle">Emoji</p>
+                  <div class="control">
+                    <input class="input" type="text" name="message">
+                  </div>
+                </section>
+                <footer class="modal-card-foot">
+                  <button class="button is-success is-rounded">Create</button>
+                  <button class="button is-rounded">Cancel</button>
+                </footer>
+              </form>
+            </div>
+          </div>
+
       </div>
     </div>
   </div>

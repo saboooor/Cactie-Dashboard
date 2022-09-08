@@ -1,7 +1,7 @@
 <%- include("partials/header", { bot, user, path, title: `${bot.user.username} Music Player` }) %>
 <link rel="stylesheet" type="text/css" href="/assets/musicstyle.css" />
 
-<section class="hero is-fullheight-with-navbar is-black">
+<section class="hero is-fullheight is-black">
   <div class="hero-body has-text-centered">
     <div class="container">
       <br><br><br><br>
@@ -9,7 +9,7 @@
         <br><p class="title">Error</p><br>
         <p id="errtxt" class="subtitle"></p><br>
         <a class="button is-primary is-rounded" href="./music">
-          <i data-feather="refresh-cw" style="padding-right: 5px; margin-right: 10px;"></i>
+          <i data-feather="refresh-cw" style="padding-right: 5px;"></i>
           Refresh
         </a><br><br>
       </div>

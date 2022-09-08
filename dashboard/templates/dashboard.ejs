@@ -1,6 +1,6 @@
 <%- include("partials/header", { bot, user, path, title: `${bot.user.username} Dashboard` }) %>
 
-<section class="hero is-fullheight-with-navbar is-black">
+<section class="hero is-fullheight is-black">
   <div class="hero-body">
     <div class="container has-text-centered">
       <% if (alert) { %>
@@ -51,11 +51,18 @@
       <%
       }
       %>
-      <br>
-      <a class="button is-primary is-outlined is-rounded" href="./invite">
-        <i data-feather="plus" style="margin-right: 10px"></i>
-        Don't see your server here? Invite <%= bot.user.username %>!
-      </a>
+      <div class="tile is-ancestor">
+        <div class="tile is-parent">
+          <div class="tile is-child notification" style="background-color: #00000000;">
+            <a href="/invite" style="text-decoration: none;">
+              <i data-feather="plus-circle" width="128" height="128" style="color: darkgray"></i>
+              <br>
+              <br>
+              <p class="subtitle">Add your server!</p>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

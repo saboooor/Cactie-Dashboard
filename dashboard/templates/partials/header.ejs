@@ -3,7 +3,7 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title><%= title %></title>
-      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
       <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput@1.0.3/dist/css/bulma-tagsinput.min.css" />
       <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.min.css" />
       <link rel="stylesheet" type="text/css" href="/assets/style.css" />
@@ -15,11 +15,11 @@
       <meta content="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp" property="og:image" />
       <meta content="<%= bot.config.colors[0] %>" data-react-helmet="true" name="theme-color" />
   </head>
-  <body class="has-navbar-fixed-top colored" style="scroll-behavior: smooth;">
-    <nav class="navbar is-spaced is-fixed-top is-black" style="background-color: #00000000" role="navigation" aria-label="main navigation">
+  <body class="colored">
+    <nav class="navbar is-spaced is-fixed-top is-black" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="/">
-          <img src="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp" style="margin-right: 10px">
+          <img class="feather" src="/assets/images/<%= bot.user.username.replace(/ /g, '') %>.webp">
           <%= bot.user.username %>
         </a>
 
@@ -32,37 +32,35 @@
       <div id="navbar" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" href="/dashboard">
-            <i data-feather="tool" style="margin-right: 10px"></i>
+            <i data-feather="tool"></i>
             Dashboard
           </a>
           <a class="navbar-item has-tooltip-bottom" data-tooltip="Currently Unstable" href="/music">
-            <i data-feather="music" style="margin-right: 10px"></i>
+            <i data-feather="music"></i>
             Music
           </a>
           <a class="navbar-item" href="/support/discord">
-            <i data-feather="help-circle" style="margin-right: 10px"></i>
+            <i data-feather="help-circle"></i>
             Support
           </a>
           <a class="navbar-item has-tooltip-bottom" data-tooltip="Privacy Policy / Terms of Use" href="/tos">
-            <i data-feather="align-justify" style="margin-right: 10px"></i>
+            <i data-feather="align-justify"></i>
             Legal
           </a>
         </div>
         <div class="navbar-end">
           <a class="navbar-item" href="/invite">
-            <i data-feather="plus" style="margin-right: 10px"></i>
+            <i data-feather="plus"></i>
             Invite
           </a>
           <% if (user) { %>
             <a class="navbar-item has-tooltip-bottom" data-tooltip="Click to log out" href="/logout">
-              <figure class="image" style="margin-right: 10px;">
-                <img class="is-rounded" src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>">
-              </figure>
+              <img class="feather" style="border-radius: 10px;" src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>">
               <%= user.username %>#<%= user.discriminator %>
             </a>
           <% } else { %>
             <a class="navbar-item" href="/login">
-              <i data-feather="log-in" style="margin-right: 10px"></i>
+              <i data-feather="log-in"></i>
               Login
             </a>
           <% } %>
