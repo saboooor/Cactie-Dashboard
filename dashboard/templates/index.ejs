@@ -1,9 +1,4 @@
 <%- include("partials/header", { bot, user, path, title: `${bot.user.username}` }) %>
-<%
-settings.forEach(async reactionrole => {
-  reactionrole.roleName = guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Could not get role.';
-})
-%>
 
 <section class="hero is-fullheight is-black">
   <div class="hero-body">
