@@ -270,7 +270,11 @@ module.exports = async (client) => {
 				if (!fetchedMsg) return res.redirect(`/dashboard/${guild.id}?alert=The Message Id is invalid!#reactionroles`);
 
 				// Attempt to add the reaction to the message
-				const reaction = await fetchedMsg.react(req.body.emoji).catch(() => { return false; });
+				console.log(req.body.emoji);
+				const reaction = await fetchedMsg.react(req.body.emoji).catch((err) => {
+					client.logger.error(err);
+					return false;
+				});
 				if (!reaction) return res.redirect(`/dashboard/${guild.id}?alert=Unable to react to the message! Does ${client.user.username} have access to the message?#reactionroles`);
 
 				client.logger.info(`Created Reaction role: ${JSON.stringify(req.body)}`);
