@@ -513,6 +513,7 @@ roles.reverse();
                   <p class="subtitle">Channel</p>
                   <div class="select" style="width: 100%;">
                     <select name="channel" style="width: 100%;">
+                      <option value="0">Select the channel that it wil be given</option>
                       <% channels.forEach(channel => { %>
                         <% if (channel.type != Djs.ChannelType.GuildText) return %>
                         <option value="<%= channel.id %>"># <%= channel.name %></option>
@@ -523,6 +524,7 @@ roles.reverse();
                   <p class="subtitle">Role</p>
                   <div class="select" style="width: 100%;">
                     <select name="role" style="width: 100%;">
+                      <option value="0">Select the role that will be given</option>
                       <% roles.forEach(role => { 
                         if (role.id == guild.id) return; %>
                         <option value="<%= role.id %>" style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
