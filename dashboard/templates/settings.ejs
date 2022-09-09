@@ -513,7 +513,7 @@ roles.reverse();
                   <p class="subtitle">Channel</p>
                   <div class="select" style="width: 100%;">
                     <select name="channel" style="width: 100%;">
-                      <option value="0">Select the channel that it wil be given</option>
+                      <option value="0">Select the channel that will have the reaction role</option>
                       <% channels.forEach(channel => { %>
                         <% if (channel.type != Djs.ChannelType.GuildText) return %>
                         <option value="<%= channel.id %>"># <%= channel.name %></option>
