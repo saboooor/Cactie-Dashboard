@@ -203,74 +203,76 @@ module.exports = async (client) => {
 
 		// retrive the settings stored for this guild and load the page
 		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: null });
+		const reactionroles = {
+			raw: await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`),
+			channels: [],
+		};
+		for (const i in reactionroles.raw) {
+			if (reactionroles.channels.includes(reactionroles.raw[i].channelId)) continue;
+			const channelInfo = {
+				id: reactionroles.raw[i].channelId,
+				messages: [],
+			};
+			const channelreactionroles = reactionroles.raw.filter(r => r.channelId == reactionroles.raw[i].channelId);
+			for (const i2 in channelreactionroles) {
+				if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
+				channelInfo.messages.push(channelreactionroles[i2].messageId);
+			}
+			reactionroles.channels.push(channelInfo);
+		}
+		console.log(reactionroles);
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: null });
 	});
 
 	// General endpoint.
-	app.post('/settings/:guildId', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
+	app.post('/dashboard/:guildId', checkAuth, async (req, res) => {
+		// Get the guild from the guildId in the URL and check if it exists
 		const guild = client.guilds.cache.get(req.params.guildId);
-		const setting = req.body;
 		if (!guild) return res.redirect('/dashboard');
+
+		// Get the member by the userId and check if permission is set
 		const member = guild.members.cache.get(req.user.id);
 		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
-		for (const key in setting) {
-			let value = setting[key];
+
+		// Get the current settings
+		let settings = await client.getData('settings', 'guildId', guild.id);
+
+		// Iterate through the form body's keys
+		for (const key in req.body) {
+			// Get the value of the key and convert arrays into strings with commas
+			let value = req.body[key] == '' ? 'false' : req.body[key];
 			if (Array.isArray(value)) value = value.join(',');
-			console.log(value);
-			await client.setData('settings', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
+
+			// Check if the value is unchanged
+			if (settings[key] == value) continue;
+
+			// Log and set the data
+			client.logger.info(`${key}: ${value}`);
+			await client.setData('settings', 'guildId', guild.id, key, value);
 		}
 
-		// retrive the settings stored for this guild and load the page with the alert
-		const settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'settings.ejs', { guild, settings, alert: 'Your settings have been saved successfully.' });
-	});
-
-	// Reaction Roles endpoint.
-	app.post('/reactionroles/:guildId', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildId);
-		const setting = req.body;
-		if (!guild) return res.redirect('/dashboard');
-		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
-		for (const key in setting) {
-			let value = setting[key];
-			if (Array.isArray(value)) value = value.join(',');
-			console.log(value);
-			await client.setData('reactionroles', 'guildId', guild.id, key, setting[key] == '' ? 'false' : setting[key]);
+		// Create reaction roles object and sort data by messages and channels
+		const reactionroles = {
+			raw: await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`),
+			channels: [],
+		};
+		for (const i in reactionroles.raw) {
+			if (reactionroles.channels.includes(reactionroles.raw[i].channelId)) continue;
+			const channelInfo = {
+				id: reactionroles.raw[i].channelId,
+				messages: [],
+			};
+			const channelreactionroles = reactionroles.raw.filter(r => r.channelId == reactionroles.raw[i].channelId);
+			for (const i2 in channelreactionroles) {
+				if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
+				channelInfo.messages.push(channelreactionroles[i2].messageId);
+			}
+			reactionroles.channels.push(channelInfo);
 		}
 
-		// render the template with an alert text which confirms that settings have been saved.
-		renderTemplate(res, req, 'reactionroles.ejs', {
-			guild, alert: 'Your reaction roles have been saved.',
-		});
-	});
-
-	// Reaction Roles deletion endpoint.
-	app.post('/reactionroles/:guildId/delete', checkAuth, async (req, res) => {
-		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
-		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
-		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'reactionroles.ejs', guild, { alert: 'You don\'t have the permission to change this server\'s settings!' });
-
-		// delete the reaction role.
-		let settings = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
-		const rr = settings[req.body.id];
-		if (!rr || !rr.messageId || !rr.emojiId) return renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'That reaction role doesn\'t exist.' });
-		await client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' emojiId = '${rr.emojiId}'`);
-
-		// retrive the settings stored for this guild.
-		settings = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
-		for (const reactionrole of settings) {
-			const channel = guild.channels.cache.get(reactionrole.channelId);
-			if (!channel) continue;
-			reactionrole.message = await channel.messages.fetch(reactionrole.messageId);
-		}
-
-		// Response
-		renderTemplate(res, req, 'reactionroles.ejs', { guild, settings, alert: 'The reaction role has been deleted.' });
+		// Update server settings and load the settings page
+		settings = await client.getData('settings', 'guildId', guild.id);
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'Settings have been saved successfully' });
 	});
 
 	app.listen(client.config.port, null, null, () => {

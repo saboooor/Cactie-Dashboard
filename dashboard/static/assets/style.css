@@ -151,12 +151,9 @@ a, button, .is-parent {
   visibility: hidden;
 }
 
-.modal-card-head, .modal-card-title {
-  background-color: #222;
-  color: white;
-}
-
-.modal-card-body, .modal-card-foot {
-  background-color: #111;
+.modal-card-head, .modal-card-title, .modal-card-foot { background-color: #222; }
+.modal-card-body { background-color: #111; }
+.modal-card-head, .modal-card-title, .modal-card-body, .modal-card-foot {
+  border: none;
   color: white;
 }

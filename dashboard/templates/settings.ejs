@@ -6,7 +6,7 @@
     <br><br><br><br>
     <div class="columns">
       <div class="column is-one-fifth">
-        <aside class="menu floating">
+        <aside class="menu">
           <p class="menu-label">
             <img class="feather" width="32px" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
             <%= guild.name %>
@@ -31,17 +31,13 @@
             Reaction Roles
           </p>
           <ul class="menu-list">
-            <li><a>Reaction role channel 1</a></li>
-            <li><a>Reaction role channel 2</a></li>
-            <li><a>Reaction role channel 3</a></li>
-            <li><a>Reaction role channel 4</a></li>
-            <li><a>Reaction role channel 5</a></li>
-            <li><a>Reaction role channel 6</a></li>
-            <li><a>Reaction role channel 7</a></li>
-            <li><a onclick="openModal(document.getElementById('reactionrole-create'))">Create</a></li>
+            <% reactionroles.channels.forEach(channelInfo => { %>
+              <li><a># <%= bot.channels.cache.get(channelInfo.id).name %></a></li>
+            <% }); %>
+            <li><a onclick="openModal(document.getElementById('reactionrole-create'))" class="has-text-info">Create</a></li>
           </ul>
           <br>
-      <form action="/settings/<%= guild.id %>" method="POST">
+      <form action="/dashboard/<%= guild.id %>" method="POST">
             <button type="submit" class="button is-success is-outlined is-rounded">
               <i data-feather="save"></i>
               Save
@@ -396,44 +392,113 @@
           Save
         </button>
 
+      </form>
+
         <br>
         <a class="title">Reaction Roles</a>
         <br><br>
 
-      </form>
+        <% reactionroles.channels.forEach(channelInfo => { %>
+          <div class="box">
+            <p class="title"># <%= bot.channels.cache.get(channelInfo.id).name %></p>
 
-          <div id="reactionrole-create" class="modal is-active">
+            <% channelInfo.messages.forEach(messageId => { %>
+              <div class="box" style="background: black">
+                <p class="subtitle"><strong>Message # <%= messageId %></strong></p>
+
+                <% reactionroles.raw.filter(r => r.messageId == messageId).forEach(reactionrole => { %>
+                    <div class="box">
+                      <article class="media">
+                        <figure class="media-left">
+                          <% if (!isNaN(reactionrole.emojiId)) { %>
+                            <p class="image is-64x64">
+                              <img src="https://cdn.discordapp.com/emojis/<%= reactionrole.emojiId %>.webp">
+                            </p>
+                          <% } else { %>
+                            <p class="is-size-1">
+                              <%= reactionrole.emojiId %>
+                            </p>
+                          <% } %>
+                        </figure>
+                        <div class="media-content">
+                          <p>
+                            <strong><%= reactionroles.raw.indexOf(reactionrole) %>.
+                              <span style="color: <%= guild.roles.cache.get(reactionrole.roleId).color.toString(16); %>">
+                                @<%= guild.roles.cache.get(reactionrole.roleId).name %>
+                              </span>
+                            </strong><br>
+                            <%= reactionrole.type %>
+                          </p>
+                          <nav class="level is-mobile">
+                            <div class="level-left">
+                              <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                              </a>
+                              <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                              </a>
+                              <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                              </a>
+                            </div>
+                          </nav>
+                        </div>
+                        <div class="media-right">
+                          <form action="/dashboard/<%= reactionrole.guildId %>" method="post">
+                            <button type="submit" name="id" value="<%= reactionroles.raw.indexOf(reactionrole) %>" class="button is-danger is-outlined is-rounded">Delete</button>
+                          </form>
+                        </div>
+                      </article>
+                    </div>
+                <% }); %>
+
+                <a class="button is-primary is-outlined is-rounded" href="https://discord.com/channels/<%= guild.id %>/<%= channelInfo.id %>/<%= messageId %>">Go to message</a>
+              </div>
+            <% }); %>
+
+          </div>
+        <% }); %>
+
+          <div id="reactionrole-create" class="modal">
             <div class="modal-background"></div>
             <div class="modal-card">
               <header class="modal-card-head">
                 <p class="modal-card-title">Create a Reaction Role</p>
                 <button class="delete" aria-label="close"></button>
               </header>
-              <form action="/settings/<%= guild.id %>" method="POST">
+              <form action="/dashboard/<%= guild.id %>/reactionroles" method="POST">
                 <section class="modal-card-body">
                   <p class="subtitle">Channel</p>
                   <div class="select" style="width: 100%;">
                     <select name="channel" style="width: 100%;">
                       <% guild.channels.cache.forEach(channel => { %>
                         <% if (channel.type != Djs.ChannelType.GuildText) return %>
-                        <option value="<%= channel.id %>"> <%= `# ${channel.name}` %></option>
+                        <option value="<%= channel.id %>"># <%= channel.name %></option>
                       <% }) %>
                     </select>
                   </div>
                   <br><br>
-                  <p class="subtitle">Message Id <a style="color: #5ea3e47a;" href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">What's this?</a></label></p>
+                  <p class="subtitle">Message Id <a class="has-text-info" href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">What's this?</a></label></p>
                   <div class="control">
                     <input class="input" type="text" name="message">
                   </div>
                   <br>
                   <p class="subtitle">Emoji</p>
                   <div class="control">
-                    <input class="input" type="text" name="message">
+                    <input class="input" type="text" name="emoji">
+                  </div>
+                  <br>
+                  <p class="subtitle">Behaviour</p>
+                  <div class="select" style="width: 100%;">
+                    <select name="type" style="width: 100%;">
+                      <option value="switch">Add the role by adding a reaction and vice versa.</option>
+                      <option value="toggle">Add or remove the role by adding a reaction and auto-remove the reaction.</option>
+                    </select>
                   </div>
                 </section>
                 <footer class="modal-card-foot">
-                  <button class="button is-success is-rounded">Create</button>
-                  <button class="button is-rounded">Cancel</button>
+                  <button class="button is-success is-rounded is-outlined">Create</button>
+                  <button class="button is-white is-rounded is-outlined">Cancel</button>
                 </footer>
               </form>
             </div>
