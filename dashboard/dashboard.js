@@ -188,7 +188,7 @@ module.exports = async (client) => {
 	app.get('/invite/:type', (req, res) => renderTemplate(res, req, `invite/${req.params.type}.ejs`));
 
 	// Dashboard endpoint.
-	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs', { alert: null }));
+	app.get('/dashboard', checkAuth, (req, res) => renderTemplate(res, req, 'dashboard.ejs'));
 
 	const wsurl = client.config.wsurl;
 	app.get('/music', checkAuth, (req, res) => renderTemplate(res, req, 'music.ejs', { wsurl }));
@@ -206,9 +206,9 @@ module.exports = async (client) => {
 	app.get('/dashboard/:guildId', checkAuth, async (req, res) => {
 		// validate the request, check if guild exists, member is in guild and if member has minimum permissions, if not, we redirect it back.
 		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
+		if (!guild) return res.redirect('/dashboard?alert=This server couldn\'t be found!');
 		const member = await guild.members.fetch(req.user.id).catch(() => { return null; });
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return res.redirect('/dashboard?alert=You don\'t have the permission to change this server\'s settings!');
 
 		// retrive the settings stored for this guild and load the page
 		const settings = await client.getData('settings', 'guildId', guild.id);
@@ -229,22 +229,22 @@ module.exports = async (client) => {
 			}
 			reactionroles.channels.push(channelInfo);
 		}
-		renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: null });
+		renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles });
 	});
 
 	// General endpoint.
 	app.post('/dashboard/:guildId', checkAuth, async (req, res) => {
 		// Get the guild from the guildId in the URL and check if it exists
 		const guild = client.guilds.cache.get(req.params.guildId);
-		if (!guild) return res.redirect('/dashboard');
+		if (!guild) return res.redirect('/dashboard?alert=This server couldn\'t be found!');
 
 		// Get the member by the userId and check if permission is set
 		const member = guild.members.cache.get(req.user.id);
-		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return renderTemplate(res, req, 'dashboard.ejs', { alert: 'You don\'t have the permission to change this server\'s settings!' });
+		if (!member || !member.permissions.has(Djs.PermissionsBitField.Flags.ManageGuild)) return res.redirect('/dashboard?alert=You don\'t have the permission to change this server\'s settings!');
 
 		// Get the current settings
-		let settings = await client.getData('settings', 'guildId', guild.id);
-		let reactionroles = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
+		const settings = await client.getData('settings', 'guildId', guild.id);
+		const reactionroles = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
 
 		if (req.body.reactionroles) {
 			const query = req.body.reactionroles.split('_');
@@ -254,26 +254,28 @@ module.exports = async (client) => {
 				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}`);
 				client.logger.info(`Deleted Reaction role: #${id} ${rr.messageId} / ${rr.emojiId}`);
 				client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' AND emojiId = '${rr.emojiId}'`);
+				res.redirect(`/dashboard/${guild.id}?alert=Reaction role deleted successfully!`);
 			}
 			else if (query[0] == 'create') {
 				// Get the channel from the channel id in the url and check if it exists
 				const channel = await guild.channels.fetch(req.body.channel);
-				if (!channel) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'That channel doesn\'t exist!' });
+				if (!channel) return res.redirect(`/dashboard/${guild.id}?alert=That channel doesn't exist!`);
 
 				// Check if the bot has sufficient permissions in the channel
 				const permCheck = checkPerms(['ViewChannel', 'SendMessages', 'AddReactions', 'ReadMessageHistory'], guild.members.me, channel);
-				if (permCheck) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: permCheck });
+				if (permCheck) return res.redirect(`/dashboard/${guild.id}?alert=${permCheck}`);
 
 				// Check if the message exist
 				const fetchedMsg = await channel.messages.fetch(req.body.message);
-				if (!fetchedMsg) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'Message Id is invalid!' });
+				if (!fetchedMsg) return res.redirect(`/dashboard/${guild.id}?alert=The Message Id is invalid!`);
 
 				// Attempt to add the reaction to the message
 				const reaction = await fetchedMsg.react(req.body.emoji).catch(() => { return false; });
-				if (!reaction) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'Unable to react to the message! Does the bot have access to the message?' });
+				if (!reaction) return res.redirect(`/dashboard/${guild.id}?alert=Unable to react to the message! Does ${client.user.username} have access to the message?`);
 
 				client.logger.info(`Created Reaction role: ${JSON.stringify(req.body)}`);
 				await client.query(`INSERT INTO reactionroles (guildId, channelId, messageId, emojiId, roleId, type) VALUES ('${guild.id}', '${req.body.channel}', '${req.body.message}', '${req.body.emoji}', '${req.body.role}', '${req.body.type}');`);
+				res.redirect(`/dashboard/${guild.id}?alert=Reaction role added successfully!`);
 			}
 		}
 		else {
@@ -290,30 +292,8 @@ module.exports = async (client) => {
 				client.logger.info(`${key}: ${value}`);
 				await client.setData('settings', 'guildId', guild.id, key, value);
 			}
+			res.redirect(`/dashboard/${guild.id}?alert=Settings have been saved successfully!`);
 		}
-
-		// Create reaction roles object and sort data by messages and channels
-		reactionroles = {
-			raw: await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`),
-			channels: [],
-		};
-		for (const i in reactionroles.raw) {
-			if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
-			const channelInfo = {
-				id: reactionroles.raw[i].channelId,
-				messages: [],
-			};
-			const channelreactionroles = reactionroles.raw.filter(r => r.channelId == reactionroles.raw[i].channelId);
-			for (const i2 in channelreactionroles) {
-				if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
-				channelInfo.messages.push(channelreactionroles[i2].messageId);
-			}
-			reactionroles.channels.push(channelInfo);
-		}
-
-		// Update server settings and load the settings page
-		settings = await client.getData('settings', 'guildId', guild.id);
-		renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'Settings have been saved successfully' });
 	});
 
 	app.listen(client.config.port, null, null, () => {

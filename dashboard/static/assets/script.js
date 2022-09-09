@@ -31,11 +31,15 @@ document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .de
 // Hide the parent element of an x button
 function hide(event) { event.srcElement.parentElement.style.display = 'none'; }
 
-// Add the notifications
+const urlParams = new URLSearchParams(window.location.search);
+const alert = urlParams.get('alert');
+
 const notificationList = document.getElementById('notifications');
-notificationList.innerHTML = `
-    <div class="notification" style="margin: 0 10px 10px 0;">
-        <a class="delete" onclick="hide(event)"></a>
-        <p><strong style="color: white">Successfully updated settings!</strong></p>
-    </div>
-`;
+if (notificationList && alert) {
+	notificationList.innerHTML = `
+		<div class="notification" style="margin: 0 10px 10px 0;">
+			<a class="delete" onclick="hide(event)"></a>
+			<p><strong style="color: white">${alert}</strong></p>
+		</div>
+	`;
+}
