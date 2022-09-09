@@ -251,7 +251,7 @@ module.exports = async (client) => {
 			if (query[0] == 'delete') {
 				const id = query[1];
 				const rr = reactionroles[id];
-				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}`);
+				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}?alert=That's not a valid reaction role!`);
 				client.logger.info(`Deleted Reaction role: #${id} ${rr.messageId} / ${rr.emojiId}`);
 				client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' AND emojiId = '${rr.emojiId}'`);
 				res.redirect(`/dashboard/${guild.id}?alert=Reaction role deleted successfully!`);
