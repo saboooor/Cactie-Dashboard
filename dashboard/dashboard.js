@@ -270,7 +270,7 @@ module.exports = async (client) => {
 				if (!fetchedMsg) return res.redirect(`/dashboard/${guild.id}?alert=The Message Id is invalid!#reactionroles`);
 
 				// Attempt to add the reaction to the message
-				console.log(req.body.emoji);
+				console.log([req.body.emoji]);
 				const reaction = await fetchedMsg.react(req.body.emoji).catch((err) => {
 					client.logger.error(err);
 					return false;
