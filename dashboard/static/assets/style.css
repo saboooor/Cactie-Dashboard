@@ -118,6 +118,19 @@ a, button, .is-parent {
   vertical-align: middle;
 }
 
+.notification, #ip {
+  border-radius: 10px;
+  background-color: #4e834e;
+  color: #fff;
+}
+
+#notifications {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 35;
+}
+
 .portrait-only { display: none; }
 @media screen and (max-width: 1023px) {
   .menu { position: static; }
@@ -130,6 +143,11 @@ a, button, .is-parent {
     background-color: #22222280;
     margin: 10px;
     border-radius: 10px;
+  }
+  #notifications > .notification {
+    margin: 0;
+    padding: 16px;
+    font-size: 12px;
   }
 }
 
