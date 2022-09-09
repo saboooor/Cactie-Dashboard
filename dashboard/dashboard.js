@@ -251,31 +251,31 @@ module.exports = async (client) => {
 			if (query[0] == 'delete') {
 				const id = query[1];
 				const rr = reactionroles[id];
-				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}?alert=That's not a valid reaction role!`);
+				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}?alert=That's not a valid reaction role!#reactionroles`);
 				client.logger.info(`Deleted Reaction role: #${id} ${rr.messageId} / ${rr.emojiId}`);
 				client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' AND emojiId = '${rr.emojiId}'`);
-				res.redirect(`/dashboard/${guild.id}?alert=Reaction role deleted successfully!`);
+				res.redirect(`/dashboard/${guild.id}?alert=Reaction role deleted successfully!#reactionroles`);
 			}
 			else if (query[0] == 'create') {
 				// Get the channel from the channel id in the url and check if it exists
 				const channel = await guild.channels.fetch(req.body.channel);
-				if (!channel) return res.redirect(`/dashboard/${guild.id}?alert=That channel doesn't exist!`);
+				if (!channel) return res.redirect(`/dashboard/${guild.id}?alert=That channel doesn't exist!#reactionroles`);
 
 				// Check if the bot has sufficient permissions in the channel
 				const permCheck = checkPerms(['ViewChannel', 'SendMessages', 'AddReactions', 'ReadMessageHistory'], guild.members.me, channel);
-				if (permCheck) return res.redirect(`/dashboard/${guild.id}?alert=${permCheck}`);
+				if (permCheck) return res.redirect(`/dashboard/${guild.id}?alert=${permCheck}#reactionroles`);
 
 				// Check if the message exist
 				const fetchedMsg = await channel.messages.fetch(req.body.message);
-				if (!fetchedMsg) return res.redirect(`/dashboard/${guild.id}?alert=The Message Id is invalid!`);
+				if (!fetchedMsg) return res.redirect(`/dashboard/${guild.id}?alert=The Message Id is invalid!#reactionroles`);
 
 				// Attempt to add the reaction to the message
 				const reaction = await fetchedMsg.react(req.body.emoji).catch(() => { return false; });
-				if (!reaction) return res.redirect(`/dashboard/${guild.id}?alert=Unable to react to the message! Does ${client.user.username} have access to the message?`);
+				if (!reaction) return res.redirect(`/dashboard/${guild.id}?alert=Unable to react to the message! Does ${client.user.username} have access to the message?#reactionroles`);
 
 				client.logger.info(`Created Reaction role: ${JSON.stringify(req.body)}`);
 				await client.query(`INSERT INTO reactionroles (guildId, channelId, messageId, emojiId, roleId, type) VALUES ('${guild.id}', '${req.body.channel}', '${req.body.message}', '${req.body.emoji}', '${req.body.role}', '${req.body.type}');`);
-				res.redirect(`/dashboard/${guild.id}?alert=Reaction role added successfully!`);
+				res.redirect(`/dashboard/${guild.id}?alert=Reaction role added successfully!#reactionroles`);
 			}
 		}
 		else {
