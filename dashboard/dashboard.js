@@ -9,6 +9,15 @@ const session = require('express-session');
 const Djs = require('discord.js');
 const Strategy = require('passport-discord').Strategy;
 
+function checkPerms(perms, member, channel) {
+	if (member.id == '249638347306303499') return;
+	const rejectedPerms = [];
+	if (channel) perms.forEach(perm => { if (!member.permissionsIn(channel).has(Djs.PermissionsBitField.Flags[perm])) rejectedPerms.push(perm); });
+	else perms.forEach(perm => { if (!member.permissions.has(Djs.PermissionsBitField.Flags[perm])) rejectedPerms.push(perm); });
+	if (!rejectedPerms.length) return;
+	return `${member.displayName} has missing permissions${channel ? ` in #${channel.name}` : ''}: ${rejectedPerms.join(', ')}`;
+}
+
 // instantiate express app and the session store.
 const app = express();
 const MemoryStore = require('memorystore')(session);
@@ -208,7 +217,7 @@ module.exports = async (client) => {
 			channels: [],
 		};
 		for (const i in reactionroles.raw) {
-			if (reactionroles.channels.includes(reactionroles.raw[i].channelId)) continue;
+			if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
 			const channelInfo = {
 				id: reactionroles.raw[i].channelId,
 				messages: [],
@@ -220,7 +229,6 @@ module.exports = async (client) => {
 			}
 			reactionroles.channels.push(channelInfo);
 		}
-		console.log(reactionroles);
 		renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: null });
 	});
 
@@ -236,28 +244,61 @@ module.exports = async (client) => {
 
 		// Get the current settings
 		let settings = await client.getData('settings', 'guildId', guild.id);
+		let reactionroles = await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`);
 
-		// Iterate through the form body's keys
-		for (const key in req.body) {
-			// Get the value of the key and convert arrays into strings with commas
-			let value = req.body[key] == '' ? 'false' : req.body[key];
-			if (Array.isArray(value)) value = value.join(',');
+		if (req.body.reactionroles) {
+			const query = req.body.reactionroles.split('_');
+			if (query[0] == 'delete') {
+				const id = query[1];
+				const rr = reactionroles[id];
+				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}`);
+				client.logger.info(`Deleted Reaction role: #${id} ${rr.messageId} / ${rr.emojiId}`);
+				client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' AND emojiId = '${rr.emojiId}'`);
+			}
+			else if (query[0] == 'create') {
+				// Get the channel from the channel id in the url and check if it exists
+				const channel = await guild.channels.fetch(req.body.channel);
+				if (!channel) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'That channel doesn\'t exist!' });
 
-			// Check if the value is unchanged
-			if (settings[key] == value) continue;
+				// Check if the bot has sufficient permissions in the channel
+				const permCheck = checkPerms(['ViewChannel', 'SendMessages', 'AddReactions', 'ReadMessageHistory'], guild.members.me, channel);
+				if (permCheck) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: permCheck });
 
-			// Log and set the data
-			client.logger.info(`${key}: ${value}`);
-			await client.setData('settings', 'guildId', guild.id, key, value);
+				// Check if the message exist
+				const fetchedMsg = await channel.messages.fetch(req.body.message);
+				if (!fetchedMsg) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'Message Id is invalid!' });
+
+				// Attempt to add the reaction to the message
+				const reaction = await fetchedMsg.react(req.body.emoji).catch(() => { return false; });
+				if (!reaction) return renderTemplate(res, req, 'settings.ejs', { guild, settings, reactionroles, alert: 'Unable to react to the message! Does the bot have access to the message?' });
+
+				client.logger.info(`Created Reaction role: ${JSON.stringify(req.body)}`);
+				await client.query(`INSERT INTO reactionroles (guildId, channelId, messageId, emojiId, roleId, type) VALUES ('${guild.id}', '${req.body.channel}', '${req.body.message}', '${req.body.emoji}', '${req.body.role}', '${req.body.type}');`);
+			}
+		}
+		else {
+			// Iterate through the form body's keys
+			for (const key in req.body) {
+				// Get the value of the key and convert arrays into strings with commas
+				let value = req.body[key] == '' ? 'false' : req.body[key];
+				if (Array.isArray(value)) value = value.join(',');
+
+				// Check if the value is unchanged
+				if (settings[key] == value) continue;
+
+				// Log and set the data
+				client.logger.info(`${key}: ${value}`);
+				await client.setData('settings', 'guildId', guild.id, key, value);
+			}
 		}
 
 		// Create reaction roles object and sort data by messages and channels
-		const reactionroles = {
+		reactionroles = {
 			raw: await client.query(`SELECT * FROM reactionroles WHERE guildId = '${guild.id}'`),
 			channels: [],
 		};
 		for (const i in reactionroles.raw) {
-			if (reactionroles.channels.includes(reactionroles.raw[i].channelId)) continue;
+			if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
 			const channelInfo = {
 				id: reactionroles.raw[i].channelId,
 				messages: [],

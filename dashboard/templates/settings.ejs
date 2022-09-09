@@ -467,7 +467,7 @@
                         </div>
                         <div class="media-right">
                           <form action="/dashboard/<%= reactionrole.guildId %>" method="post">
-                            <button type="submit" name="id" value="<%= reactionroles.raw.indexOf(reactionrole) %>" class="button is-danger is-outlined is-rounded">Delete</button>
+                            <button type="submit" class="button is-danger is-outlined is-rounded" name="reactionroles" value="delete_<%= reactionroles.raw.indexOf(reactionrole) %>">Delete</button>
                           </form>
                         </div>
                       </article>
@@ -486,7 +486,7 @@
                 <p class="modal-card-title">Create a Reaction Role</p>
                 <button class="delete" aria-label="close"></button>
               </header>
-              <form action="/dashboard/<%= guild.id %>/reactionroles" method="POST">
+              <form action="/dashboard/<%= guild.id %>" method="POST">
                 <section class="modal-card-body">
                   <p class="subtitle">Channel</p>
                   <div class="select" style="width: 100%;">
@@ -494,6 +494,16 @@
                       <% guild.channels.cache.forEach(channel => { %>
                         <% if (channel.type != Djs.ChannelType.GuildText) return %>
                         <option value="<%= channel.id %>"># <%= channel.name %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                  <br><br>
+                  <p class="subtitle">Role</p>
+                  <div class="select" style="width: 100%;">
+                    <select name="role" style="width: 100%;">
+                      <% guild.roles.cache.forEach(role => { 
+                        if (role.id == guild.id) return; %>
+                        <option value="<%= role.id %>"> <%= `@ ${role.name}` %></option>
                       <% }) %>
                     </select>
                   </div>
@@ -514,8 +524,8 @@
                   </div>
                 </section>
                 <footer class="modal-card-foot">
-                  <button class="button is-success is-rounded is-outlined">Create</button>
-                  <button class="button is-white is-rounded is-outlined">Cancel</button>
+                  <button type="submit" class="button is-success is-rounded is-outlined" name="reactionroles" value="create">Create</button>
+                  <a class="button is-white is-rounded is-outlined">Cancel</a>
                 </footer>
               </form>
             </div>
