@@ -1,5 +1,30 @@
 <%- include("partials/header", { bot, user, path, title: `General | ${guild.name}` }) %>
 <% const commands = ['awooga', 'bite', 'bonk', 'giggle', 'hug', 'kill', 'kiss', 'lick', 'mad', 'nuzzle', 'stare', 'approve', 'ban', 'clear', 'deny', 'implement', 'kick', 'mute', 'react', 'reactionroles', 'settings', 'unban', 'unmute', 'duck', 'goose', 'kitty', 'lizard', 'meerkat', 'monkey', 'puppy', 'raccoon', 'redpanda', 'snake', 'Ban Member', 'Get Raw Embed JSON', 'Get Raw Message', 'Kick Member', 'Do action on user', 'User Info', '21questions', '8ball', 'animal', 'boner', 'buttons', 'coinflip', 'instaboner', 'meme', 'rate', 'rockpaperscissors', 'tictactoe', '247', 'cleareffects', 'clearqueue', 'effect', 'eq', 'forceskip', 'join', 'leave', 'loop', 'loopqueue', 'move', 'nowplaying', 'pause', 'play', 'playtop', 'queue', 'removesong', 'resume', 'reverse', 'search', 'seek', 'shuffle', 'skip', 'sponsorblock', 'stats', 'stop', 'volume', 'blowjob', 'confused', 'cum', 'dick', 'dilf', 'femdom', 'furryporn', 'futanari', 'gay', 'hentai', 'jackoff', 'lesbian', 'milf', 'nsfwgifs', 'nudes', 'oppai', 'petite', 'pussy', 'r34', 'thick', 'thighs', 'tits', 'trap', 'yuri', 'crash', 'dm', 'eval', 'psa', 'reload', 'reloadcmds', 'reloadcontext', 'transcript', 'add', 'close', 'delete', 'forcedelete', 'open', 'remove', 'resolved', 'subticket', 'ticket', 'voiceticket', 'avatar', 'color', 'help', 'invite', 'language', 'mcstats', 'ping', 'poll', 'reactions', 'server', 'serverjar', 'suggest', 'timings', 'userinfo', 'wallpaper']; %>
+<%
+function sort_by_key(array, key) {
+ return array.sort(function(a, b) {
+  var x = a[key]; var y = b[key];
+  return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+ });
+}
+
+let channels = [];
+guild.channels.cache.forEach(channel => channels.push({
+  name: channel.name,
+  id: channel.id,
+  pos: channel.rawPosition,
+  type: channel.type
+}));
+channels = sort_by_key(channels, 'pos');
+let roles = [];
+guild.roles.cache.forEach(role => roles.push({
+  name: role.name,
+  id: role.id,
+  pos: role.rawPosition,
+  color: role.color
+}));
+roles = sort_by_key(roles, 'pos');
+%>
 
 <section class="hero is-black">
   <div class="hero-body">
@@ -107,7 +132,7 @@
               <div class="select" style="width: 100%;">
                 <select name="suggestionchannel" value="<%= settings.suggestionchannel %>" placeholder="The suggestion channel" style="width: 100%;">
                   <option value="false" <% if (settings.suggestionchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.channels.cache.forEach(channel => { %>
+                  <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
                     <option value="<%= channel.id %>" <% if (channel.id === settings.suggestionchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
@@ -134,7 +159,7 @@
               <div class="select" style="width: 100%;">
                 <select name="pollchannel" value="<%= settings.pollchannel %>" placeholder="The poll channel" style="width: 100%;">
                   <option value="false" <% if (settings.pollchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.channels.cache.forEach(channel => { %>
+                  <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
                     <option value="<%= channel.id %>" <% if (channel.id === settings.pollchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
@@ -219,7 +244,7 @@
               <div class="select" style="width: 100%;">
                 <select name="logchannel" value="<%= settings.logchannel %>" placeholder="The log channel" style="width: 100%;">
                   <option value="false" <% if (settings.logchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.channels.cache.forEach(channel => { %>
+                  <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
                     <option value="<%= channel.id %>" <% if (channel.id === settings.logchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
@@ -255,7 +280,7 @@
               <div class="select" style="width: 100%;">
                 <select name="ticketcategory" value="<%= settings.ticketcategory %>" placeholder="The ticket category" style="width: 100%;">
                   <option value="false" <% if (settings.ticketcategory === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.channels.cache.forEach(channel => { %>
+                  <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildCategory) return %>
                     <option value="<%= channel.id %>" <% if (channel.id === settings.ticketcategory) {%> selected <%} else {%> <% } %> > <%= `› ${channel.name}` %></option>
                   <% }) %>
@@ -270,7 +295,7 @@
               <div class="select" style="width: 100%;">
                 <select name="ticketlogchannel" value="<%= settings.ticketlogchannel %>" placeholder="The ticket log channel" style="width: 100%;">
                   <option value="false" <% if (settings.ticketlogchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.channels.cache.forEach(channel => { %>
+                  <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
                     <option value="<%= channel.id %>" <% if (channel.id === settings.ticketlogchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
@@ -287,7 +312,7 @@
               <div class="select" style="width: 100%;">
                 <select name="supportrole" value="<%= settings.supportrole %>" placeholder="The Support Role" style="width: 100%;">
                   <option value="false" <% if (settings.supportrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.roles.cache.forEach(role => { %>
+                  <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.supportrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
@@ -303,7 +328,7 @@
                   <option value="false" <% if (settings.ticketmention === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
                   <option value="here" <% if (settings.ticketmention === 'here') {%> selected <%} else {%> <%} %>>@ here</option>
                   <option value="everyone" <% if (settings.ticketmention === 'everyone') {%> selected <%} else {%> <%} %>>@ everyone</option>
-                  <% guild.roles.cache.forEach(role => { %>
+                  <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.ticketmention) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
@@ -347,7 +372,7 @@
               <div class="select" style="width: 100%;">
                 <select name="djrole" value="<%= settings.djrole %>" placeholder="The DJ Role" style="width: 100%;">
                   <option value="false" <% if (settings.djrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.roles.cache.forEach(role => { %>
+                  <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.djrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
@@ -363,7 +388,7 @@
               <div class="select" style="width: 100%;">
                 <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
                   <option value="false" <% if (settings.adminrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <% guild.roles.cache.forEach(role => { %>
+                  <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.adminrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
@@ -377,7 +402,7 @@
               <div class="select" style="width: 100%;">
                 <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
                   <option value="timeout" <% if (settings.mutecmd === 'timeout') {%> selected <%} else {%> <%} %>>Use Discord's timeout feature</option>
-                  <% guild.roles.cache.forEach(role => { %>
+                  <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
@@ -487,7 +512,7 @@
                   <p class="subtitle">Channel</p>
                   <div class="select" style="width: 100%;">
                     <select name="channel" style="width: 100%;">
-                      <% guild.channels.cache.forEach(channel => { %>
+                      <% channels.forEach(channel => { %>
                         <% if (channel.type != Djs.ChannelType.GuildText) return %>
                         <option value="<%= channel.id %>"># <%= channel.name %></option>
                       <% }) %>
@@ -497,7 +522,7 @@
                   <p class="subtitle">Role</p>
                   <div class="select" style="width: 100%;">
                     <select name="role" style="width: 100%;">
-                      <% guild.roles.cache.forEach(role => { 
+                      <% roles.forEach(role => { 
                         if (role.id == guild.id) return; %>
                         <option value="<%= role.id %>"> <%= `@ ${role.name}` %></option>
                       <% }) %>
