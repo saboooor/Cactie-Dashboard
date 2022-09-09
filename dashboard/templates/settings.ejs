@@ -24,6 +24,7 @@ guild.roles.cache.forEach(role => roles.push({
   color: role.color
 }));
 roles = sort_by_key(roles, 'pos');
+roles.reverse();
 %>
 
 <section class="hero is-black">
@@ -313,7 +314,7 @@ roles = sort_by_key(roles, 'pos');
                 <select name="supportrole" value="<%= settings.supportrole %>" placeholder="The Support Role" style="width: 100%;">
                   <option value="false" <% if (settings.supportrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.supportrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.supportrole) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -329,7 +330,7 @@ roles = sort_by_key(roles, 'pos');
                   <option value="here" <% if (settings.ticketmention === 'here') {%> selected <%} else {%> <%} %>>@ here</option>
                   <option value="everyone" <% if (settings.ticketmention === 'everyone') {%> selected <%} else {%> <%} %>>@ everyone</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.ticketmention) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.ticketmention) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -373,7 +374,7 @@ roles = sort_by_key(roles, 'pos');
                 <select name="djrole" value="<%= settings.djrole %>" placeholder="The DJ Role" style="width: 100%;">
                   <option value="false" <% if (settings.djrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.djrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.djrole) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -389,7 +390,7 @@ roles = sort_by_key(roles, 'pos');
                 <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
                   <option value="false" <% if (settings.adminrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.adminrole) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.adminrole) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -403,7 +404,7 @@ roles = sort_by_key(roles, 'pos');
                 <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
                   <option value="timeout" <% if (settings.mutecmd === 'timeout') {%> selected <%} else {%> <%} %>>Use Discord's timeout feature</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) {%> selected <%} else {%> <% } %> > <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -524,7 +525,7 @@ roles = sort_by_key(roles, 'pos');
                     <select name="role" style="width: 100%;">
                       <% roles.forEach(role => { 
                         if (role.id == guild.id) return; %>
-                        <option value="<%= role.id %>"> <%= `@ ${role.name}` %></option>
+                        <option value="<%= role.id %>" style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                       <% }) %>
                     </select>
                   </div>
