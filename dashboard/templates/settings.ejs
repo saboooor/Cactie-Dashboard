@@ -534,8 +534,12 @@ roles = sort_by_key(roles, 'pos');
                     <input class="input" type="text" name="message">
                   </div>
                   <br>
-                  <p class="subtitle"><span class="feather">Emoji</span><input class="input feather" type="text" name="emoji" readonly onclick="togglePicker()" value="😀" style="width: 200px"></p>
-                  <emoji-picker style="display: none;"></emoji-picker><br>
+                  <p class="subtitle">
+                    <span class="feather">Emoji</span>
+                    <input class="input feather" type="text" name="emoji" readonly onclick="togglePicker()" value="😀" style="width: 200px">
+                    <p style="color: #666">Click on the text field to open or close the emoji picker</p>
+                    <emoji-picker style="display: none;"></emoji-picker><br>
+                  </p>
                   <p class="subtitle">Behaviour</p>
                   <div class="select" style="width: 100%;">
                     <select name="type" style="width: 100%;">
