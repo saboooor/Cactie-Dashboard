@@ -503,11 +503,8 @@
                     <input class="input" type="text" name="message">
                   </div>
                   <br>
-                  <p class="subtitle">Emoji</p>
-                  <div class="control">
-                    <input class="input" type="text" name="emoji">
-                  </div>
-                  <br>
+                  <p class="subtitle"><span class="feather">Emoji</span><input class="input feather" type="text" name="emoji" readonly onclick="togglePicker()" value="😀" style="width: 200px"></p>
+                  <emoji-picker style="display: none;"></emoji-picker><br>
                   <p class="subtitle">Behaviour</p>
                   <div class="select" style="width: 100%;">
                     <select name="type" style="width: 100%;">
@@ -523,10 +520,22 @@
               </form>
             </div>
           </div>
-
       </div>
     </div>
   </div>
 </section>
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element/index.js"></script>
+<script>
+  const picker = document.querySelector('emoji-picker');
+  fetch('/emojis/<%= guild.id %>').then(res => res.json()).then(emojis => {
+    picker.customEmoji = emojis;
+  });
+  function togglePicker() {
+    picker.style.display = picker.style.display == 'none' ? 'block' : 'none';
+  }
+  picker.addEventListener('emoji-click', event => {
+    document.getElementsByName('emoji')[0].value = event.detail.unicode ?? event.detail.emoji.name;
+  });
+</script>
 
 <%- include("partials/footer") %>
