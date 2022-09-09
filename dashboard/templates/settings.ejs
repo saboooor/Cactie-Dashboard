@@ -11,6 +11,7 @@
             <img class="feather" width="32px" src="<%= guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : '/assets/images/placeholder.svg' %>">
             <%= guild.name %>
           </p>
+          <hr style="background-color: #222">
           <p class="menu-label">
             General
           </p>
@@ -27,21 +28,24 @@
             <li><a href="#tickets">Ticket System</a></li>
             <li><a href="#moderation">Moderation</a></li>
           </ul>
-          <p class="menu-label">
-            Reaction Roles
-          </p>
-          <ul class="menu-list">
-            <% reactionroles.channels.forEach(channelInfo => { %>
-              <li><a># <%= bot.channels.cache.get(channelInfo.id).name %></a></li>
-            <% }); %>
-            <li><a onclick="openModal(document.getElementById('reactionrole-create'))" class="has-text-info">Create</a></li>
-          </ul>
-          <br>
+            <br>
       <form action="/dashboard/<%= guild.id %>" method="POST">
             <button type="submit" class="button is-success is-outlined is-rounded">
               <i data-feather="save"></i>
               Save
             </button>
+            <br>
+            <hr style="background-color: #222">
+          <p class="menu-label">
+            Reaction Roles
+          </p>
+          <ul class="menu-list">
+            <% reactionroles.channels.forEach(channelInfo => { %>
+              <li><a href="#<%= channelInfo.id %>"># <%= bot.channels.cache.get(channelInfo.id).name %></a></li>
+            <% }); %>
+            <li><a onclick="openModal(document.getElementById('reactionrole-create'))" class="has-text-info">Create</a></li>
+          </ul>
+          <br>
         </aside>    
       </div>
       <div class="column">
@@ -395,16 +399,34 @@
       </form>
 
         <hr style="background-color: #222"><br>
-        <a class="title">Reaction Roles</a>
-        <br><br>
+        <a class="title" style="float: left">
+          Reaction Roles
+        </a>
+        <a class="button is-primary is-outlined is-rounded" style="float: right;" onclick="openModal(document.getElementById('reactionrole-create'))">
+          <i data-feather="plus"></i>Create new
+        </a>
+        <br><br><br>
 
         <% reactionroles.channels.forEach(channelInfo => { %>
+          <span class="anchor" id="<%= channelInfo.id %>"></span>
           <div class="box">
-            <p class="title"># <%= bot.channels.cache.get(channelInfo.id).name %></p>
+            <a class="subtitle" style="float: left" href="https://discord.com/channels/<%= guild.id %>/<%= channelInfo.id %>" target=”_blank”>
+              <strong># <%= bot.channels.cache.get(channelInfo.id).name %></strong> <i data-feather="external-link" style="margin-bottom: 5px; color: #ffffff80"></i>
+            </a>
+            <a class="has-text-primary" style="float: right;" onclick="openModal(document.getElementById('reactionrole-create'), { channel: '<%= channelInfo.id %>' })">
+              Create in this channel
+            </a>
+            <br><br>
 
             <% channelInfo.messages.forEach(messageId => { %>
               <div class="box" style="background: #111">
-                <p class="subtitle"><strong>Message # <%= messageId %></strong></p>
+                <a class="subtitle" href="https://discord.com/channels/<%= guild.id %>/<%= channelInfo.id %>/<%= messageId %>" target=”_blank”>
+                  <strong>Message # <%= messageId %></strong> <i data-feather="external-link" style="margin-bottom: 5px; color: #ffffff80"></i>
+                </a>
+                <a class="has-text-primary" style="float: right;" onclick="openModal(document.getElementById('reactionrole-create'), { channel: '<%= channelInfo.id %>', message: '<%= messageId %>' })">
+                  Create in this message
+                </a>
+                <br><br>
 
                 <% reactionroles.raw.filter(r => r.messageId == messageId).forEach(reactionrole => { %>
                     <div class="box" style="background: #0A0A0A">
@@ -451,15 +473,11 @@
                       </article>
                     </div>
                 <% }); %>
-
-                <a class="button is-primary is-outlined is-rounded" href="https://discord.com/channels/<%= guild.id %>/<%= channelInfo.id %>/<%= messageId %>">Go to message</a>
               </div>
             <% }); %>
 
           </div>
         <% }); %>
-
-        <a class="button is-primary is-outlined is-rounded" onclick="openModal(document.getElementById('reactionrole-create'))">Create a new reaction role</a>
 
           <div id="reactionrole-create" class="modal">
             <div class="modal-background"></div>
