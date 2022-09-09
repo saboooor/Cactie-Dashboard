@@ -467,8 +467,8 @@ roles.reverse();
                         <div class="media-content">
                           <p>
                             <strong><%= reactionroles.raw.indexOf(reactionrole) %>.
-                              <span style="color: <%= guild.roles.cache.get(reactionrole.roleId).color ? guild.roles.cache.get(reactionrole.roleId).color.toString(16) : 'white'; %>">
-                                @<%= guild.roles.cache.get(reactionrole.roleId).name %>
+                              <span style="color: <%= guild.roles.cache.get(reactionrole.roleId) && guild.roles.cache.get(reactionrole.roleId).color ? guild.roles.cache.get(reactionrole.roleId).color.toString(16) : 'white'; %>">
+                                @<%= guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Role not found! Delete this reaction.' %>
                               </span>
                             </strong><br>
                             <%= reactionrole.type %>

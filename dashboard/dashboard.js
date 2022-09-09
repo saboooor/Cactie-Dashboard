@@ -253,7 +253,7 @@ module.exports = async (client) => {
 				const rr = reactionroles[id];
 				if (!rr || !rr.messageId || !rr.emojiId) return res.redirect(`/dashboard/${guild.id}?alert=That's not a valid reaction role!#reactionroles`);
 				client.logger.info(`Deleted Reaction role: #${id} ${rr.messageId} / ${rr.emojiId}`);
-				client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' AND emojiId = '${rr.emojiId}'`);
+				client.query(`DELETE FROM reactionroles WHERE messageId = '${rr.messageId}' AND emojiId = '${rr.emojiId}' AND roleId = '${rr.roleId}'`);
 				res.redirect(`/dashboard/${guild.id}?alert=Reaction role deleted successfully!#reactionroles`);
 			}
 			else if (query[0] == 'create') {
@@ -266,16 +266,17 @@ module.exports = async (client) => {
 				if (permCheck) return res.redirect(`/dashboard/${guild.id}?alert=${permCheck}#reactionroles`);
 
 				// Check if the message exist
-				const fetchedMsg = await channel.messages.fetch(req.body.message);
+				const fetchedMsg = await channel.messages.fetch(req.body.message).catch(() => {
+					return false;
+				});
 				if (!fetchedMsg) return res.redirect(`/dashboard/${guild.id}?alert=The Message Id is invalid!#reactionroles`);
 
 				// Attempt to add the reaction to the message
-				console.log([req.body.emoji]);
 				const reaction = await fetchedMsg.react(req.body.emoji).catch((err) => {
-					client.logger.error(err);
+					res.redirect(`/dashboard/${guild.id}?alert=Unable to react to the message! Does ${client.user.username} have access to the message? / ${err}#reactionroles`);
 					return false;
 				});
-				if (!reaction) return res.redirect(`/dashboard/${guild.id}?alert=Unable to react to the message! Does ${client.user.username} have access to the message?#reactionroles`);
+				if (!reaction) return;
 
 				client.logger.info(`Created Reaction role: ${JSON.stringify(req.body)}`);
 				await client.query(`INSERT INTO reactionroles (guildId, channelId, messageId, emojiId, roleId, type) VALUES ('${guild.id}', '${req.body.channel}', '${req.body.message}', '${req.body.emoji}', '${req.body.role}', '${req.body.type}');`);
