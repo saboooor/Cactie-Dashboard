@@ -97,8 +97,8 @@ roles.reverse();
               <p class="subtitle">Reacts with various reactions on some words</p>
               <div class="select" style="width: 100%;">
                 <select name="reactions" value="<%= settings.reactions %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.reactions === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <option value="true" <% if (settings.reactions === 'true') {%> selected <%} else {%> <%} %>>Enabled</option>
+                  <option value="false" <% if (settings.reactions === 'false') { %> selected <% } %>>Disabled</option>
+                  <option value="true" <% if (settings.reactions === 'true') { %> selected <% } %>>Enabled</option>
                 </select>
               </div>
             </article>
@@ -109,11 +109,11 @@ roles.reverse();
               <p class="subtitle">The language Cactie will use (overrides the server language)</p>
               <div class="select" style="width: 100%;">
                 <select name="language" value="<%= settings.language %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.language === 'false') {%> selected <%} else {%> <%} %>>Use the server default</option>
-                  <option value="English" <% if (settings.language === 'English') {%> selected <%} else {%> <%} %>>English</option>
-                  <option value="Portuguese" <% if (settings.language === 'Portuguese') {%> selected <%} else {%> <%} %>>Portuguese</option>
-                  <option value="Lispuwu" <% if (settings.language === 'Lispuwu') {%> selected <%} else {%> <%} %>>Lisp UwU</option>
-                  <option value="Uwu" <% if (settings.language === 'Uwu') {%> selected <%} else {%> <%} %>>UwU</option>
+                  <option value="false" <% if (settings.language === 'false') { %> selected <% } %>>Use the server default</option>
+                  <option value="English" <% if (settings.language === 'English') { %> selected <% } %>>English</option>
+                  <option value="Portuguese" <% if (settings.language === 'Portuguese') { %> selected <% } %>>Portuguese</option>
+                  <option value="Lispuwu" <% if (settings.language === 'Lispuwu') { %> selected <% } %>>Lisp UwU</option>
+                  <option value="Uwu" <% if (settings.language === 'Uwu') { %> selected <% } %>>UwU</option>
                 </select>
               </div>
             </article>
@@ -132,10 +132,10 @@ roles.reverse();
               <p class="subtitle">The channel where the bot puts suggestions in</p>
               <div class="select" style="width: 100%;">
                 <select name="suggestionchannel" value="<%= settings.suggestionchannel %>" placeholder="The suggestion channel" style="width: 100%;">
-                  <option value="false" <% if (settings.suggestionchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.suggestionchannel === 'false') { %> selected <% } %>>Disabled</option>
                   <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
-                    <option value="<%= channel.id %>" <% if (channel.id === settings.suggestionchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
+                    <option value="<%= channel.id %>" <% if (channel.id === settings.suggestionchannel) { %> selected <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -147,8 +147,8 @@ roles.reverse();
               <p class="subtitle">Creates a thread for discussion when a suggestion is created</p>
               <div class="select" style="width: 100%;">
                 <select name="suggestthreads" value="<%= settings.suggestthreads %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.suggestthreads === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <option value="true" <% if (settings.suggestthreads === 'true') {%> selected <%} else {%> <%} %>>Enabled</option>
+                  <option value="false" <% if (settings.suggestthreads === 'false') { %> selected <% } %>>Disabled</option>
+                  <option value="true" <% if (settings.suggestthreads === 'true') { %> selected <% } %>>Enabled</option>
                 </select>
               </div>
             </article>
@@ -159,10 +159,10 @@ roles.reverse();
               <p class="subtitle">The channel where the bot puts polls in</p>
               <div class="select" style="width: 100%;">
                 <select name="pollchannel" value="<%= settings.pollchannel %>" placeholder="The poll channel" style="width: 100%;">
-                  <option value="false" <% if (settings.pollchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.pollchannel === 'false') { %> selected <% } %>>Disabled</option>
                   <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
-                    <option value="<%= channel.id %>" <% if (channel.id === settings.pollchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
+                    <option value="<%= channel.id %>" <% if (channel.id === settings.pollchannel) { %> selected <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -221,19 +221,22 @@ roles.reverse();
               <p class="subtitle">Logs certain events in the guild</p>
               <div class="control">
                 <select name="auditlogs" multiple data-type="tags" data-placeholder="The logs to enable">
-                  <option value="member" <% if (settings.auditlogs.split(',').includes('member')) {%> selected <%} else {%> <%} %>>All Member-Related Logs</option>
-                  <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) {%> selected <%} else {%> <%} %>>Member Joined</option>
-                  <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) {%> selected <%} else {%> <%} %>>Member Left</option>
-                  <option value="channel" <% if (settings.auditlogs.split(',').includes('channel')) {%> selected <%} else {%> <%} %>>All Channel-Related Logs</option>
-                  <option value="channelcreate" <% if (settings.auditlogs.split(',').includes('channelcreate')) {%> selected <%} else {%> <%} %>>Channel Created</option>
-                  <option value="channeldelete" <% if (settings.auditlogs.split(',').includes('channeldelete')) {%> selected <%} else {%> <%} %>>Channel Deleted</option>
-                  <option value="voice" <% if (settings.auditlogs.split(',').includes('voice')) {%> selected <%} else {%> <%} %>>All Voice-Related Logs</option>
-                  <option value="voicejoin" <% if (settings.auditlogs.split(',').includes('voicejoin')) {%> selected <%} else {%> <%} %>>Joined Voice Channel</option>
-                  <option value="voiceleave" <% if (settings.auditlogs.split(',').includes('voiceleave')) {%> selected <%} else {%> <%} %>>Left Voice Channel</option>
-                  <option value="voicemove" <% if (settings.auditlogs.split(',').includes('voicemove')) {%> selected <%} else {%> <%} %>>Moved Voice Channels</option>
-                  <option value="voicedeafen" <% if (settings.auditlogs.split(',').includes('voicedeafen')) {%> selected <%} else {%> <%} %>>Voice Deafened</option>
-                  <option value="voicemute" <% if (settings.auditlogs.split(',').includes('voicemute')) {%> selected <%} else {%> <%} %>>Voice Muted</option>
-                  <option value="all" <% if (settings.auditlogs.split(',').includes('all')) {%> selected <%} else {%> <%} %>>All Logs</option>
+                  <option value="member" <% if (settings.auditlogs.split(',').includes('member')) { %> selected <% } %>>All Member-Related Logs</option>
+                  <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) { %> selected <% } %>>Member Joined</option>
+                  <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) { %> selected <% } %>>Member Left</option>
+                  <option value="message" <% if (settings.auditlogs.split(',').includes('message')) { %> selected <% } %>>All Message-Related Logs</option>
+                  <option value="messagedelete" <% if (settings.auditlogs.split(',').includes('messagedelete')) { %> selected <% } %>>Message Deleted</option>
+                  <option value="channel" <% if (settings.auditlogs.split(',').includes('channel')) { %> selected <% } %>>All Channel-Related Logs</option>
+                  <option value="channelcreate" <% if (settings.auditlogs.split(',').includes('channelcreate')) { %> selected <% } %>>Channel Created</option>
+                  <option value="channeldelete" <% if (settings.auditlogs.split(',').includes('channeldelete')) { %> selected <% } %>>Channel Deleted</option>
+                  <option value="channelupdate" <% if (settings.auditlogs.split(',').includes('channeldelete')) { %> selected <% } %>>Channel Updated</option>
+                  <option value="voice" <% if (settings.auditlogs.split(',').includes('voice')) { %> selected <% } %>>All Voice-Related Logs</option>
+                  <option value="voicejoin" <% if (settings.auditlogs.split(',').includes('voicejoin')) { %> selected <% } %>>Joined Voice Channel</option>
+                  <option value="voiceleave" <% if (settings.auditlogs.split(',').includes('voiceleave')) { %> selected <% } %>>Left Voice Channel</option>
+                  <option value="voicemove" <% if (settings.auditlogs.split(',').includes('voicemove')) { %> selected <% } %>>Moved Voice Channels</option>
+                  <option value="voicedeafen" <% if (settings.auditlogs.split(',').includes('voicedeafen')) { %> selected <% } %>>Voice Deafened</option>
+                  <option value="voicemute" <% if (settings.auditlogs.split(',').includes('voicemute')) { %> selected <% } %>>Voice Muted</option>
+                  <option value="all" <% if (settings.auditlogs.split(',').includes('all')) { %> selected <% } %>>All Logs</option>
                 </select>
               </div> 
             </article>
@@ -244,10 +247,10 @@ roles.reverse();
               <p class="subtitle">The channel where the bot puts various logs in</p>
               <div class="select" style="width: 100%;">
                 <select name="logchannel" value="<%= settings.logchannel %>" placeholder="The log channel" style="width: 100%;">
-                  <option value="false" <% if (settings.logchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.logchannel === 'false') { %> selected <% } %>>Disabled</option>
                   <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
-                    <option value="<%= channel.id %>" <% if (channel.id === settings.logchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
+                    <option value="<%= channel.id %>" <% if (channel.id === settings.logchannel) { %> selected <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -267,9 +270,9 @@ roles.reverse();
               <p class="subtitle">Enables the ticket system</p>
               <div class="select" style="width: 100%;">
                 <select name="tickets" value="<%= settings.tickets %>" placeholder="The ticket option" style="width: 100%;">
-                  <option value="false" <% if (settings.tickets === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <option value="buttons" <% if (settings.tickets === 'buttons') {%> selected <%} else {%> <%} %>>Enabled, using Buttons</option>
-                  <option value="reactions" <% if (settings.tickets === 'reactions') {%> selected <%} else {%> <%} %>>Enabled, using Reactions</option>
+                  <option value="false" <% if (settings.tickets === 'false') { %> selected <% } %>>Disabled</option>
+                  <option value="buttons" <% if (settings.tickets === 'buttons') { %> selected <% } %>>Enabled, using Buttons</option>
+                  <option value="reactions" <% if (settings.tickets === 'reactions') { %> selected <% } %>>Enabled, using Reactions</option>
                 </select>
               </div>
             </article>
@@ -280,10 +283,10 @@ roles.reverse();
               <p class="subtitle">The category where the bot creates tickets in</p>
               <div class="select" style="width: 100%;">
                 <select name="ticketcategory" value="<%= settings.ticketcategory %>" placeholder="The ticket category" style="width: 100%;">
-                  <option value="false" <% if (settings.ticketcategory === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.ticketcategory === 'false') { %> selected <% } %>>Disabled</option>
                   <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildCategory) return %>
-                    <option value="<%= channel.id %>" <% if (channel.id === settings.ticketcategory) {%> selected <%} else {%> <% } %> > <%= `› ${channel.name}` %></option>
+                    <option value="<%= channel.id %>" <% if (channel.id === settings.ticketcategory) { %> selected <% } %> > <%= `› ${channel.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -295,10 +298,10 @@ roles.reverse();
               <p class="subtitle">The channel where the bot puts ticket logs in</p>
               <div class="select" style="width: 100%;">
                 <select name="ticketlogchannel" value="<%= settings.ticketlogchannel %>" placeholder="The ticket log channel" style="width: 100%;">
-                  <option value="false" <% if (settings.ticketlogchannel === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.ticketlogchannel === 'false') { %> selected <% } %>>Disabled</option>
                   <% channels.forEach(channel => { %>
                     <% if (channel.type != Djs.ChannelType.GuildText) return %>
-                    <option value="<%= channel.id %>" <% if (channel.id === settings.ticketlogchannel) {%> selected <%} else {%> <% } %> > <%= `# ${channel.name}` %></option>
+                    <option value="<%= channel.id %>" <% if (channel.id === settings.ticketlogchannel) { %> selected <% } %> > <%= `# ${channel.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -312,9 +315,9 @@ roles.reverse();
               <p class="subtitle">The role that can access tickets</p>
               <div class="select" style="width: 100%;">
                 <select name="supportrole" value="<%= settings.supportrole %>" placeholder="The Support Role" style="width: 100%;">
-                  <option value="false" <% if (settings.supportrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.supportrole === 'false') { %> selected <% } %>>Disabled</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.supportrole) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.supportrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -326,11 +329,11 @@ roles.reverse();
               <p class="subtitle">Pings the specified role every time a new ticket is created</p>
               <div class="select" style="width: 100%;">
                 <select name="ticketmention" value="<%= settings.ticketmention %>" placeholder="The Role to mention" style="width: 100%;">
-                  <option value="false" <% if (settings.ticketmention === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
-                  <option value="here" <% if (settings.ticketmention === 'here') {%> selected <%} else {%> <%} %>>@ here</option>
-                  <option value="everyone" <% if (settings.ticketmention === 'everyone') {%> selected <%} else {%> <%} %>>@ everyone</option>
+                  <option value="false" <% if (settings.ticketmention === 'false') { %> selected <% } %>>Disabled</option>
+                  <option value="here" <% if (settings.ticketmention === 'here') { %> selected <% } %>>@ here</option>
+                  <option value="everyone" <% if (settings.ticketmention === 'everyone') { %> selected <% } %>>@ everyone</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.ticketmention) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.ticketmention) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -360,7 +363,7 @@ roles.reverse();
               <div class="control">
                 <select name="disabledcmds" multiple data-type="tags" data-placeholder="The commands to disable">
                   <% commands.forEach(command => { %>
-                    <option value="<%= command %>" <% if (settings.disabledcmds.split(',').includes(command)) {%> selected <%} else {%> <%} %>><%= command %></option>
+                    <option value="<%= command %>" <% if (settings.disabledcmds.split(',').includes(command)) { %> selected <% } %>><%= command %></option>
                   <% }) %>
                 </select>
               </div>
@@ -372,9 +375,9 @@ roles.reverse();
               <p class="subtitle">The DJ feature of the bot that limits the skip/etc commands</p>
               <div class="select" style="width: 100%;">
                 <select name="djrole" value="<%= settings.djrole %>" placeholder="The DJ Role" style="width: 100%;">
-                  <option value="false" <% if (settings.djrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.djrole === 'false') { %> selected <% } %>>Disabled</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.djrole) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.djrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -388,9 +391,9 @@ roles.reverse();
               <p class="subtitle">The role to replace the 'Administrator' permission</p>
               <div class="select" style="width: 100%;">
                 <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
-                  <option value="false" <% if (settings.adminrole === 'false') {%> selected <%} else {%> <%} %>>Disabled</option>
+                  <option value="false" <% if (settings.adminrole === 'false') { %> selected <% } %>>Disabled</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.adminrole) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.adminrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -402,9 +405,9 @@ roles.reverse();
               <p class="subtitle">Use the timeout feature or a role for the mute command</p>
               <div class="select" style="width: 100%;">
                 <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
-                  <option value="timeout" <% if (settings.mutecmd === 'timeout') {%> selected <%} else {%> <%} %>>Use Discord's timeout feature</option>
+                  <option value="timeout" <% if (settings.mutecmd === 'timeout') { %> selected <% } %>>Use Discord's timeout feature</option>
                   <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) {%> selected <%} else {%> <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -467,8 +470,8 @@ roles.reverse();
                         <div class="media-content">
                           <p>
                             <strong><%= reactionroles.raw.indexOf(reactionrole) %>.
-                              <span style="color: <%= guild.roles.cache.get(reactionrole.roleId).color ? guild.roles.cache.get(reactionrole.roleId).color.toString(16) : 'white'; %>">
-                                @<%= guild.roles.cache.get(reactionrole.roleId).name %>
+                              <span style="color: <%= guild.roles.cache.get(reactionrole.roleId) && guild.roles.cache.get(reactionrole.roleId).color ? guild.roles.cache.get(reactionrole.roleId).color.toString(16) : 'white'; %>">
+                                @<%= guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Role not found! Delete this reaction.' %>
                               </span>
                             </strong><br>
                             <%= reactionrole.type %>
