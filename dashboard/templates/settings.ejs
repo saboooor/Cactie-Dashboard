@@ -1,5 +1,5 @@
 <%- include("partials/header", { bot, user, path, title: `General | ${guild.name}` }) %>
-<% const commands = ['awooga', 'bite', 'bonk', 'giggle', 'hug', 'kill', 'kiss', 'lick', 'mad', 'nuzzle', 'stare', 'approve', 'ban', 'clear', 'deny', 'implement', 'kick', 'mute', 'react', 'reactionroles', 'settings', 'unban', 'unmute', 'duck', 'goose', 'kitty', 'lizard', 'meerkat', 'monkey', 'puppy', 'raccoon', 'redpanda', 'snake', 'Ban Member', 'Get Raw Embed JSON', 'Get Raw Message', 'Kick Member', 'Do action on user', 'User Info', '21questions', '8ball', 'animal', 'boner', 'buttons', 'coinflip', 'instaboner', 'meme', 'rate', 'rockpaperscissors', 'tictactoe', '247', 'cleareffects', 'clearqueue', 'effect', 'eq', 'forceskip', 'join', 'leave', 'loop', 'loopqueue', 'move', 'nowplaying', 'pause', 'play', 'playtop', 'queue', 'removesong', 'resume', 'reverse', 'search', 'seek', 'shuffle', 'skip', 'sponsorblock', 'stats', 'stop', 'volume', 'blowjob', 'confused', 'cum', 'dick', 'dilf', 'femdom', 'furryporn', 'futanari', 'gay', 'hentai', 'jackoff', 'lesbian', 'milf', 'nsfwgifs', 'nudes', 'oppai', 'petite', 'pussy', 'r34', 'thick', 'thighs', 'tits', 'trap', 'yuri', 'crash', 'dm', 'eval', 'psa', 'reload', 'reloadcmds', 'reloadcontext', 'transcript', 'add', 'close', 'delete', 'forcedelete', 'open', 'remove', 'resolved', 'subticket', 'ticket', 'voiceticket', 'avatar', 'color', 'help', 'invite', 'language', 'mcstats', 'ping', 'poll', 'reactions', 'server', 'serverjar', 'suggest', 'timings', 'userinfo', 'wallpaper']; %>
+<% const commands = ['awooga', 'bite', 'bonk', 'giggle', 'hug', 'kill', 'kiss', 'lick', 'mad', 'nuzzle', 'stare', 'approve', 'ban', 'clear', 'deny', 'kick', 'mute', 'react', 'reactionroles', 'settings', 'unban', 'unmute', 'duck', 'goose', 'horse', 'kitty', 'lizard', 'meerkat', 'monkey', 'puppy', 'raccoon', 'redpanda', 'snake', 'Ban Member', 'Get Raw Embed JSON', 'Get Raw Message', 'Kick Member', 'Do action on user', 'User Info', '21questions', '8ball', 'animal', 'boner', 'buttons', 'coinflip', 'instaboner', 'meme', 'rate', 'rockpaperscissors', 'tictactoe', '247', 'cleareffects', 'clearqueue', 'effect', 'eq', 'forceskip', 'join', 'leave', 'loop', 'loopqueue', 'move', 'nowplaying', 'pause', 'play', 'playtop', 'queue', 'removesong', 'resume', 'reverse', 'search', 'seek', 'shuffle', 'skip', 'sponsorblock', 'stats', 'stop', 'volume', 'blowjob', 'confused', 'cum', 'dick', 'dilf', 'femdom', 'furryporn', 'futanari', 'gay', 'hentai', 'jackoff', 'lesbian', 'milf', 'nsfwgifs', 'nudes', 'oppai', 'petite', 'pussy', 'r34', 'thick', 'thighs', 'tits', 'trap', 'yuri', 'add', 'close', 'delete', 'forcedelete', 'open', 'remove', 'resolve', 'ticket', 'voiceticket', 'avatar', 'color', 'github', 'help', 'invite', 'language', 'mcstats', 'ping', 'poll', 'profile', 'reactions', 'server', 'serverjar', 'suggest', 'timings', 'userinfo', 'wallpaper']; %>
 <%
 function sort_by_key(array, key) {
  return array.sort(function(a, b) {
@@ -95,12 +95,8 @@ roles.reverse();
             <article class="tile is-child box">
               <p class="title">Reactions</p>
               <p class="subtitle">Reacts with various reactions on some words</p>
-              <div class="select" style="width: 100%;">
-                <select name="reactions" value="<%= settings.reactions %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.reactions === 'false') { %> selected <% } %>>Disabled</option>
-                  <option value="true" <% if (settings.reactions === 'true') { %> selected <% } %>>Enabled</option>
-                </select>
-              </div>
+              <input name="reactions" id="reactions" type="checkbox" <% if (settings.reactions === 'true') { %> checked <% } %> class="switch is-outlined is-success">
+              <label for="reactions" class="title">Enabled</label>
             </article>
           </div>
           <div class="tile is-parent">
@@ -144,13 +140,9 @@ roles.reverse();
           <div class="tile is-parent">
             <article class="tile is-child box">
               <p class="title">Suggestion Threads</p>
-              <p class="subtitle">Creates a thread for discussion when a suggestion is created</p>
-              <div class="select" style="width: 100%;">
-                <select name="suggestthreads" value="<%= settings.suggestthreads %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.suggestthreads === 'false') { %> selected <% } %>>Disabled</option>
-                  <option value="true" <% if (settings.suggestthreads === 'true') { %> selected <% } %>>Enabled</option>
-                </select>
-              </div>
+              <p class="subtitle">Creates a thread for discussion of suggestions</p>
+              <input name="suggestthreads" id="suggestthreads" type="checkbox" <% if (settings.suggestthreads === 'true') { %> checked <% } %> class="switch is-outlined is-success">
+              <label for="suggestthreads" class="title">Enabled</label>
             </article>
           </div>
           <div class="tile is-parent">
@@ -220,7 +212,7 @@ roles.reverse();
               <p class="title">Audit Logs</p>
               <p class="subtitle">Logs certain events in the guild</p>
               <div class="control">
-                <select name="auditlogs" multiple data-type="tags" data-placeholder="The logs to enable">
+                <select name="auditlogs" multiple data-type="tags" data-selectable="false" data-close-dropdown-on-item-select="false" data-placeholder="The logs to enable">
                   <option value="member" <% if (settings.auditlogs.split(',').includes('member')) { %> selected <% } %>>All Member-Related Logs</option>
                   <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) { %> selected <% } %>>Member Joined</option>
                   <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) { %> selected <% } %>>Member Left</option>
@@ -358,10 +350,26 @@ roles.reverse();
           </div>
           <div class="tile is-parent">
             <article class="tile is-child box">
+              <p class="title">Mute Command</p>
+              <p class="subtitle">Use the timeout feature or a role for the mute command</p>
+              <div class="select" style="width: 100%;">
+                <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
+                  <option value="timeout" <% if (settings.mutecmd === 'timeout') { %> selected <% } %>>Use Discord's timeout feature</option>
+                  <% roles.forEach(role => { %>
+                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box">
               <p class="title">Disabled commands</p>
               <p class="subtitle">Disable certain commands from the bot</p>
               <div class="control">
-                <select name="disabledcmds" multiple data-type="tags" data-placeholder="The commands to disable">
+                <select name="disabledcmds" multiple data-type="tags" data-selectable="false" data-close-dropdown-on-item-select="false" data-placeholder="The commands to disable">
                   <% commands.forEach(command => { %>
                     <option value="<%= command %>" <% if (settings.disabledcmds.split(',').includes(command)) { %> selected <% } %>><%= command %></option>
                   <% }) %>
@@ -378,36 +386,6 @@ roles.reverse();
                   <option value="false" <% if (settings.djrole === 'false') { %> selected <% } %>>Disabled</option>
                   <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.djrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
-                  <% }) %>
-                </select>
-              </div>
-            </article>
-          </div>
-        </div>
-        <div class="tile is-ancestor">
-          <div class="tile is-parent">
-            <article class="tile is-child box">
-              <p class="title">Admin Role</p>
-              <p class="subtitle">The role to replace the 'Administrator' permission</p>
-              <div class="select" style="width: 100%;">
-                <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
-                  <option value="false" <% if (settings.adminrole === 'false') { %> selected <% } %>>Disabled</option>
-                  <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.adminrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
-                  <% }) %>
-                </select>
-              </div>
-            </article>
-          </div>
-          <div class="tile is-parent">
-            <article class="tile is-child box">
-              <p class="title">Mute Command</p>
-              <p class="subtitle">Use the timeout feature or a role for the mute command</p>
-              <div class="select" style="width: 100%;">
-                <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
-                  <option value="timeout" <% if (settings.mutecmd === 'timeout') { %> selected <% } %>>Use Discord's timeout feature</option>
-                  <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
@@ -474,7 +452,8 @@ roles.reverse();
                                 @<%= guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Role not found! Delete this reaction.' %>
                               </span>
                             </strong><br>
-                            <%= reactionrole.type %>
+                            <%= reactionrole.type == 'switch' ? 'Adds the role by reacting / Removes the role by unreacting' : 'Adds / Removes the role by reacting but remove the reaction' %><br>
+                            <%= reactionrole.silent == 'false' ? 'Sends a message when reacted' : 'Keeps quiet when reacted' %>
                           </p>
                           <nav class="level is-mobile">
                             <div class="level-left">
@@ -548,11 +527,15 @@ roles.reverse();
                   </p>
                   <p class="subtitle">Behaviour</p>
                   <div class="select" style="width: 100%;">
-                    <select name="type" style="width: 100%;">
-                      <option value="switch">Add the role by adding a reaction and vice versa.</option>
-                      <option value="toggle">Add or remove the role by adding a reaction and auto-remove the reaction.</option>
+                    <select name="type" style="width: 100%;" onchange="updateBehaviourDesc(event)">
+                      <option value="switch">Add the role by reacting / Remove the role by unreacting</option>
+                      <option value="toggle">Add / Remove the role by reacting but remove the reaction</option>
                     </select>
                   </div>
+                  <br>
+                  <input name="silent" id="silent" type="checkbox" class="switch is-outlined is-info">
+                  <label for="silent">Silent</label>
+                  <p style="color: #666">Don't send a message whenever the role is added/removed</p>
                 </section>
                 <footer class="modal-card-foot">
                   <button type="submit" class="button is-success is-rounded is-outlined" name="reactionroles" value="create">Create</button>

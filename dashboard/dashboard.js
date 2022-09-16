@@ -279,15 +279,20 @@ module.exports = async (client) => {
 				if (!reaction) return;
 
 				client.logger.info(`Created Reaction role: ${JSON.stringify(req.body)}`);
-				await client.query(`INSERT INTO reactionroles (guildId, channelId, messageId, emojiId, roleId, type) VALUES ('${guild.id}', '${req.body.channel}', '${req.body.message}', '${req.body.emoji}', '${req.body.role}', '${req.body.type}');`);
+				await client.query(`INSERT INTO reactionroles (guildId, channelId, messageId, emojiId, roleId, type, silent) VALUES ('${guild.id}', '${req.body.channel}', '${req.body.message}', '${req.body.emoji}', '${req.body.role}', '${req.body.type}', '${req.body.silent == 'on'}');`);
 				res.redirect(`/dashboard/${guild.id}?alert=Reaction role added successfully!#reactionroles`);
 			}
 		}
 		else {
+			// Set false for checkboxes
+			const checkboxes = ['reactions', 'suggestthreads'];
+			checkboxes.forEach(checkbox => { if (!req.body[checkbox]) req.body[checkbox] = 'false'; });
+
 			// Iterate through the form body's keys
 			for (const key in req.body) {
 				// Get the value of the key and convert arrays into strings with commas
 				let value = req.body[key] == '' ? 'false' : req.body[key];
+				if (value == 'on') value = 'true';
 				if (Array.isArray(value)) value = value.join(',');
 
 				// Check if the value is unchanged
