@@ -358,6 +358,22 @@ roles.reverse();
           </div>
           <div class="tile is-parent">
             <article class="tile is-child box">
+              <p class="title">Mute Command</p>
+              <p class="subtitle">Use the timeout feature or a role for the mute command</p>
+              <div class="select" style="width: 100%;">
+                <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
+                  <option value="timeout" <% if (settings.mutecmd === 'timeout') { %> selected <% } %>>Use Discord's timeout feature</option>
+                  <% roles.forEach(role => { %>
+                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box">
               <p class="title">Disabled commands</p>
               <p class="subtitle">Disable certain commands from the bot</p>
               <div class="control">
@@ -378,36 +394,6 @@ roles.reverse();
                   <option value="false" <% if (settings.djrole === 'false') { %> selected <% } %>>Disabled</option>
                   <% roles.forEach(role => { %>
                     <option value="<%= role.id %>" <% if (role.id === settings.djrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
-                  <% }) %>
-                </select>
-              </div>
-            </article>
-          </div>
-        </div>
-        <div class="tile is-ancestor">
-          <div class="tile is-parent">
-            <article class="tile is-child box">
-              <p class="title">Admin Role</p>
-              <p class="subtitle">The role to replace the 'Administrator' permission</p>
-              <div class="select" style="width: 100%;">
-                <select name="adminrole" value="<%= settings.adminrole %>" placeholder="The Admin Role" style="width: 100%;">
-                  <option value="false" <% if (settings.adminrole === 'false') { %> selected <% } %>>Disabled</option>
-                  <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.adminrole) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
-                  <% }) %>
-                </select>
-              </div>
-            </article>
-          </div>
-          <div class="tile is-parent">
-            <article class="tile is-child box">
-              <p class="title">Mute Command</p>
-              <p class="subtitle">Use the timeout feature or a role for the mute command</p>
-              <div class="select" style="width: 100%;">
-                <select name="mutecmd" value="<%= settings.mutecmd %>" placeholder="The value" style="width: 100%;">
-                  <option value="timeout" <% if (settings.mutecmd === 'timeout') { %> selected <% } %>>Use Discord's timeout feature</option>
-                  <% roles.forEach(role => { %>
-                    <option value="<%= role.id %>" <% if (role.id === settings.mutecmd) { %> selected <% } %>  style="color: <%= role.color ? role.color.toString(16) : 'white'; %>"> <%= `@ ${role.name}` %></option>
                   <% }) %>
                 </select>
               </div>
