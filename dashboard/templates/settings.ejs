@@ -452,8 +452,10 @@ roles.reverse();
                                 @<%= guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Role not found! Delete this reaction.' %>
                               </span>
                             </strong><br>
-                            <%= reactionrole.type == 'switch' ? 'Adds the role by reacting / Removes the role by unreacting' : 'Adds / Removes the role by reacting but remove the reaction' %><br>
-                            <%= reactionrole.silent == 'false' ? 'Sends a message when reacted' : 'Keeps quiet when reacted' %>
+                            <span style="color: #ffffff50">
+                              <%= reactionrole.type == 'switch' ? 'Adds the role by reacting / Removes the role by unreacting' : 'Adds / Removes the role by reacting but remove the reaction' %><br>
+                              <%= reactionrole.silent == 'false' ? 'Sends a message when reacted' : 'Keeps quiet when reacted' %>  
+                            </span>
                           </p>
                           <nav class="level is-mobile">
                             <div class="level-left">
