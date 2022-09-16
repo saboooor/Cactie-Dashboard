@@ -220,7 +220,7 @@ roles.reverse();
               <p class="title">Audit Logs</p>
               <p class="subtitle">Logs certain events in the guild</p>
               <div class="control">
-                <select name="auditlogs" multiple data-type="tags" data-placeholder="The logs to enable">
+                <select name="auditlogs" multiple data-type="tags" data-close-dropdown-on-item-select="false" data-placeholder="The logs to enable">
                   <option value="member" <% if (settings.auditlogs.split(',').includes('member')) { %> selected <% } %>>All Member-Related Logs</option>
                   <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) { %> selected <% } %>>Member Joined</option>
                   <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) { %> selected <% } %>>Member Left</option>
@@ -377,7 +377,7 @@ roles.reverse();
               <p class="title">Disabled commands</p>
               <p class="subtitle">Disable certain commands from the bot</p>
               <div class="control">
-                <select name="disabledcmds" multiple data-type="tags" data-placeholder="The commands to disable">
+                <select name="disabledcmds" multiple data-type="tags" data-close-dropdown-on-item-select="false" data-placeholder="The commands to disable">
                   <% commands.forEach(command => { %>
                     <option value="<%= command %>" <% if (settings.disabledcmds.split(',').includes(command)) { %> selected <% } %>><%= command %></option>
                   <% }) %>
