@@ -220,7 +220,7 @@ roles.reverse();
               <p class="title">Audit Logs</p>
               <p class="subtitle">Logs certain events in the guild</p>
               <div class="control">
-                <select name="auditlogs" multiple data-type="tags" data-close-dropdown-on-item-select="false" data-placeholder="The logs to enable">
+                <select name="auditlogs" multiple data-type="tags" data-selectable="false" data-close-dropdown-on-item-select="false" data-placeholder="The logs to enable">
                   <option value="member" <% if (settings.auditlogs.split(',').includes('member')) { %> selected <% } %>>All Member-Related Logs</option>
                   <option value="memberjoin" <% if (settings.auditlogs.split(',').includes('memberjoin')) { %> selected <% } %>>Member Joined</option>
                   <option value="memberleave" <% if (settings.auditlogs.split(',').includes('memberleave')) { %> selected <% } %>>Member Left</option>
@@ -377,7 +377,7 @@ roles.reverse();
               <p class="title">Disabled commands</p>
               <p class="subtitle">Disable certain commands from the bot</p>
               <div class="control">
-                <select name="disabledcmds" multiple data-type="tags" data-close-dropdown-on-item-select="false" data-placeholder="The commands to disable">
+                <select name="disabledcmds" multiple data-type="tags" data-selectable="false" data-close-dropdown-on-item-select="false" data-placeholder="The commands to disable">
                   <% commands.forEach(command => { %>
                     <option value="<%= command %>" <% if (settings.disabledcmds.split(',').includes(command)) { %> selected <% } %>><%= command %></option>
                   <% }) %>
@@ -534,11 +534,15 @@ roles.reverse();
                   </p>
                   <p class="subtitle">Behaviour</p>
                   <div class="select" style="width: 100%;">
-                    <select name="type" style="width: 100%;">
-                      <option value="switch">Add the role by adding a reaction and vice versa.</option>
-                      <option value="toggle">Add or remove the role by adding a reaction and auto-remove the reaction.</option>
+                    <select name="type" style="width: 100%;" onchange="updateBehaviourDesc(event)">
+                      <option value="switch">Add the role by reacting / Remove the role by unreacting</option>
+                      <option value="toggle">Add / Remove the role by reacting but remove the reaction</option>
                     </select>
                   </div>
+                  <br>
+                  <input name="silent" id="silent" type="checkbox" class="switch is-outlined is-danger">
+                  <label for="silent">Silent</label>
+                  <p style="color: #666">Don't send a message whenever the role is added/removed</p>
                 </section>
                 <footer class="modal-card-foot">
                   <button type="submit" class="button is-success is-rounded is-outlined" name="reactionroles" value="create">Create</button>
