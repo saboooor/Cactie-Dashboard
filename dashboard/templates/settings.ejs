@@ -95,12 +95,8 @@ roles.reverse();
             <article class="tile is-child box">
               <p class="title">Reactions</p>
               <p class="subtitle">Reacts with various reactions on some words</p>
-              <div class="select" style="width: 100%;">
-                <select name="reactions" value="<%= settings.reactions %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.reactions === 'false') { %> selected <% } %>>Disabled</option>
-                  <option value="true" <% if (settings.reactions === 'true') { %> selected <% } %>>Enabled</option>
-                </select>
-              </div>
+              <input name="reactions" id="reactions" type="checkbox" <% if (settings.reactions === 'true') { %> checked <% } %> class="switch is-outlined is-success">
+              <label for="reactions" class="title">Enabled</label>
             </article>
           </div>
           <div class="tile is-parent">
@@ -144,13 +140,9 @@ roles.reverse();
           <div class="tile is-parent">
             <article class="tile is-child box">
               <p class="title">Suggestion Threads</p>
-              <p class="subtitle">Creates a thread for discussion when a suggestion is created</p>
-              <div class="select" style="width: 100%;">
-                <select name="suggestthreads" value="<%= settings.suggestthreads %>" placeholder="The value" style="width: 100%;">
-                  <option value="false" <% if (settings.suggestthreads === 'false') { %> selected <% } %>>Disabled</option>
-                  <option value="true" <% if (settings.suggestthreads === 'true') { %> selected <% } %>>Enabled</option>
-                </select>
-              </div>
+              <p class="subtitle">Creates a thread for discussion of suggestions</p>
+              <input name="suggestthreads" id="suggestthreads" type="checkbox" <% if (settings.suggestthreads === 'true') { %> checked <% } %> class="switch is-outlined is-success">
+              <label for="suggestthreads" class="title">Enabled</label>
             </article>
           </div>
           <div class="tile is-parent">
@@ -460,7 +452,8 @@ roles.reverse();
                                 @<%= guild.roles.cache.get(reactionrole.roleId) ? guild.roles.cache.get(reactionrole.roleId).name : 'Role not found! Delete this reaction.' %>
                               </span>
                             </strong><br>
-                            <%= reactionrole.type %>
+                            <%= reactionrole.type == 'switch' ? 'Adds the role by reacting / Removes the role by unreacting' : 'Adds / Removes the role by reacting but remove the reaction' %><br>
+                            <%= reactionrole.silent == 'false' ? 'Sends a message when reacted' : 'Keeps quiet when reacted' %>
                           </p>
                           <nav class="level is-mobile">
                             <div class="level-left">
@@ -540,7 +533,7 @@ roles.reverse();
                     </select>
                   </div>
                   <br>
-                  <input name="silent" id="silent" type="checkbox" class="switch is-outlined is-danger">
+                  <input name="silent" id="silent" type="checkbox" class="switch is-outlined is-info">
                   <label for="silent">Silent</label>
                   <p style="color: #666">Don't send a message whenever the role is added/removed</p>
                 </section>
