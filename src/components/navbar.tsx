@@ -27,9 +27,9 @@ export default component$(() => {
               <div class="sm:ml-6 sm:block">
                 <div class="flex space-x-4">
                   <a href="/dashboard" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Dashboard</a>
-                  <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Music</a>
+                  <a href="/music" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Music</a>
                   <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Support</a>
-                  <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Legal</a>
+                  <a href="/legal" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Legal</a>
                   <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Invite</a>
                 </div>
               </div>
@@ -39,6 +39,10 @@ export default component$(() => {
                 <img class="h-8 w-8 sm:mr-3 rounded-full" src="https://cdn.discordapp.com/avatars/249638347306303499/1850dd504cb868e2b47e5997f5e90e26" />
                 <span class="hidden sm:flex">sab#6969</span>
               </a>
+              <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl sm:px-3 sm:py-2 rounded-full text-sm font-medium flex items-center">
+                <img class="h-8 w-8 sm:mr-3 rounded-full" src="https://cdn.discordapp.com/avatars/249638347306303499/1850dd504cb868e2b47e5997f5e90e26" />
+                <span class="hidden sm:flex">Login</span>
+              </a>
             </div>
           </div>
         </div>
@@ -46,9 +50,9 @@ export default component$(() => {
         <div class="hidden" id="mobile-menu">
           <div class="space-y-1 pb-3 justify-center items-center flex">
             <a href="/dashboard" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Dashboard</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Music</a>
+            <a href="/music" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Music</a>
             <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Support</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Legal</a>
+            <a href="/legal" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Legal</a>
             <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Invite</a>
           </div>
         </div>
