@@ -6,5 +6,13 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(() => {
   return {
     plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
+    build: {
+        target: 'es2020'
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'es2020'
+      }
+    }
   };
 });
