@@ -3,6 +3,10 @@ import { qwikVite } from '@builder.io/qwik/optimizer';
 import { qwikCity } from '@builder.io/qwik-city/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+import { readFileSync } from 'fs';
+import YAML from 'yaml';
+const { dashboard } = YAML.parse(readFileSync('./config.yml', 'utf8'));
+
 export default defineConfig(() => {
   return {
     plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
@@ -13,6 +17,9 @@ export default defineConfig(() => {
       esbuildOptions: {
         target: 'es2020'
       }
+    },
+    server: {
+      port: dashboard.port
     }
   };
 });

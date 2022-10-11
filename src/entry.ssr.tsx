@@ -17,9 +17,10 @@ import { Client, Partials, GatewayIntentBits } from 'discord.js';
 
 import { readFileSync } from 'fs';
 import YAML from 'yaml';
-const { con } = YAML.parse(readFileSync('./config.yml', 'utf8'));
+const { con, dashboard } = YAML.parse(readFileSync('./config.yml', 'utf8'));
 
-const client = new Client({
+declare global { var client: any; var dashboardUrl: 'string' };
+global.client = new Client({
 	shards: 'auto',
 	partials: [
 		Partials.Message,
@@ -44,11 +45,26 @@ const client = new Client({
 	},
 });
 
+let domain;
+
+try {
+	const domainUrl = new URL(dashboard.domain);
+	domain = {
+		host: domainUrl.hostname,
+		protocol: domainUrl.protocol,
+	};
+}
+catch (e) {
+	console.error(e);
+	throw new TypeError('Invalid domain specified in config.yml');
+}
+
+if (dashboard.usingCustomDomain) client.dashboardDomain = `${domain.protocol}//${domain.host}`;
+else client.dashboardDomain = `${domain.protocol}//${domain.host}${dashboard.port == 80 ? '' : `:${dashboard.port}`}`;
+
 client.login(con.token);
 
-client.on('ready', () => {
-  console.log('Bot started')
-})
+client.on('ready', () => console.log(`Bot started, dashboard at ${client.dashboardDomain}`));
 
 export default function (opts: RenderToStreamOptions) {
   // Render the elements
