@@ -10,7 +10,7 @@ specifiers:
   autoprefixer: 10.4.12
   discord.js: 14.6.0
   eslint: 8.25.0
-  eslint-plugin-qwik: 0.10.0
+  eslint-plugin-qwik: 0.11.1
   node-fetch: 3.2.10
   postcss: 8.4.18
   prettier: 2.7.1
@@ -24,13 +24,13 @@ devDependencies:
   '@builder.io/qwik': 0.10.0
   '@builder.io/qwik-city': 0.0.112
   '@types/eslint': 8.4.6
-  '@types/node': 18.8.5
+  '@types/node': 18.11.0
   '@typescript-eslint/eslint-plugin': 5.40.0_25sstg4uu2sk4pm7xcyzuov7xq
   '@typescript-eslint/parser': 5.40.0_z4bbprzjrhnsfa24uvmcbu7f5q
   autoprefixer: 10.4.12_postcss@8.4.18
   discord.js: 14.6.0
   eslint: 8.25.0
-  eslint-plugin-qwik: 0.10.0_eslint@8.25.0
+  eslint-plugin-qwik: 0.11.1_eslint@8.25.0
   node-fetch: 3.2.10
   postcss: 8.4.18
   prettier: 2.7.1
@@ -274,8 +274,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node/18.8.5:
-    resolution: {integrity: sha512-Bq7G3AErwe5A/Zki5fdD3O6+0zDChhg671NfPjtIcbtzDNZTv4NPKMRFr7gtYPG7y+B8uTiNK4Ngd9T0FTar6Q==}
+  /@types/node/18.11.0:
+    resolution: {integrity: sha512-IOXCvVRToe7e0ny7HpT/X9Rb2RYtElG1a+VshjwT00HxrM2dWBApHQoqsI6WiY7Q03vdf2bCrIGzVrkF/5t10w==}
     dev: true
 
   /@types/unist/2.0.6:
@@ -285,7 +285,7 @@ packages:
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 18.8.5
+      '@types/node': 18.11.0
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.40.0_25sstg4uu2sk4pm7xcyzuov7xq:
@@ -969,8 +969,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-plugin-qwik/0.10.0_eslint@8.25.0:
-    resolution: {integrity: sha512-GY0SCAXRKawl7W7aryRC+EHafOOJEmrYTXgTsn5CYxiotyIKyN5waF06xgBFCNVa7hHkLSJbs5xAle31tECAtQ==}
+  /eslint-plugin-qwik/0.11.1_eslint@8.25.0:
+    resolution: {integrity: sha512-GIQP8EtjYV3CG/7+RHG3lrHWUxkqmeAb9L3/V6QnRQHs0Ew+u8GHAk0++OOM2vKb7xb9YbmtyiNGSgjf0k8Zcg==}
     engines: {node: '>=16'}
     peerDependencies:
       eslint: '>= 8'
