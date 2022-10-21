@@ -14,7 +14,7 @@ specifiers:
   node-fetch: 3.2.10
   postcss: 8.4.18
   prettier: 2.7.1
-  tailwindcss: 3.2.0
+  tailwindcss: 3.2.1
   typescript: 4.8.4
   vite: 3.1.8
   vite-tsconfig-paths: 3.5.1
@@ -24,7 +24,7 @@ devDependencies:
   '@builder.io/qwik': 0.11.1
   '@builder.io/qwik-city': 0.0.112
   '@types/eslint': 8.4.6
-  '@types/node': 18.11.2
+  '@types/node': 18.11.3
   '@typescript-eslint/eslint-plugin': 5.40.1_ukgdydjtebaxmxfqp5v5ulh64y
   '@typescript-eslint/parser': 5.40.1_z4bbprzjrhnsfa24uvmcbu7f5q
   autoprefixer: 10.4.12_postcss@8.4.18
@@ -34,7 +34,7 @@ devDependencies:
   node-fetch: 3.2.10
   postcss: 8.4.18
   prettier: 2.7.1
-  tailwindcss: 3.2.0_postcss@8.4.18
+  tailwindcss: 3.2.1_postcss@8.4.18
   typescript: 4.8.4
   vite: 3.1.8
   vite-tsconfig-paths: 3.5.1_vite@3.1.8
@@ -274,8 +274,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node/18.11.2:
-    resolution: {integrity: sha512-BWN3M23gLO2jVG8g/XHIRFWiiV4/GckeFIqbU/C4V3xpoBBWSMk4OZomouN0wCkfQFPqgZikyLr7DOYDysIkkw==}
+  /@types/node/18.11.3:
+    resolution: {integrity: sha512-fNjDQzzOsZeKZu5NATgXUPsaFaTxeRgFXoosrHivTl8RGeV733OLawXsGfEk9a8/tySyZUyiZ6E8LcjPFZ2y1A==}
     dev: true
 
   /@types/semver/7.3.12:
@@ -289,7 +289,7 @@ packages:
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 18.11.2
+      '@types/node': 18.11.3
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.40.1_ukgdydjtebaxmxfqp5v5ulh64y:
@@ -2393,8 +2393,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /tailwindcss/3.2.0_postcss@8.4.18:
-    resolution: {integrity: sha512-ARh/W0uH5UlWIC2nn02V0+5fyF0k6qZliyt4QYic2upOhPUE/Spu1EURNc9txJ3+4j8OEmdigqfDpw4d2tA4vA==}
+  /tailwindcss/3.2.1_postcss@8.4.18:
+    resolution: {integrity: sha512-Uw+GVSxp5CM48krnjHObqoOwlCt5Qo6nw1jlCRwfGy68dSYb/LwS9ZFidYGRiM+w6rMawkZiu1mEMAsHYAfoLg==}
     engines: {node: '>=12.13.0'}
     hasBin: true
     peerDependencies:
@@ -2410,6 +2410,7 @@ packages:
       glob-parent: 6.0.2
       is-glob: 4.0.3
       lilconfig: 2.0.6
+      micromatch: 4.0.5
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.0.0
