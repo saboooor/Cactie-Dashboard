@@ -1,8 +1,8 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 
-import { readFileSync } from 'fs';
+import fs from 'fs';
 import YAML from 'yaml';
-const { dashboard } = YAML.parse(readFileSync('./config.yml', 'utf8'));
+const { dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
 export const onGet: RequestHandler = async ({ url, params, request, response }) => {
   if (!client.readyTimestamp) throw response.redirect('/');
