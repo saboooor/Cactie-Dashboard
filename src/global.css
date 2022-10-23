@@ -11,19 +11,16 @@
 @tailwind utilities;
 
 @layer utilities {
-    .animation-delay-2000 {
-        animation-delay: 2s;
-    }
-    .animation-delay-4000 {
-        animation-delay: 4s;
-    }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
 }
 
 html {
   overflow: overlay;
   background-color: rgb(17 24 39);
 }
-  
+
+* { scroll-behavior: smooth; }
 *::-webkit-scrollbar {
   appearance: none;
   -webkit-appearance: none;
@@ -36,7 +33,4 @@ html {
 *::-webkit-scrollbar-thumb {
   background-color: #ffffff60;
   border-radius: 2px;
-}
-* {
-  scroll-behavior: smooth;
 }

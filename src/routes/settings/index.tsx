@@ -3,7 +3,7 @@ import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import checkAuth from '../../auth.js';
 
 export const onGet: RequestHandler = async ({ url, params, request, response }) => {
-  if (!client.readyTimestamp || !checkAuth(request)) throw response.redirect('/login');
+  console.log(checkAuth(request))
 };
 
 export default component$(() => {

@@ -19,7 +19,8 @@ import { readFileSync } from 'fs';
 import YAML from 'yaml';
 const { con, dashboard } = YAML.parse(readFileSync('./config.yml', 'utf8'));
 
-declare global { var client: any; var dashboardUrl: 'string' };
+declare global { var client: any; var dashboardUrl: string; var sessions: any };
+global.sessions = {};
 global.client = new Client({
 	shards: 'auto',
 	partials: [

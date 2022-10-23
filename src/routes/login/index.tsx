@@ -31,6 +31,9 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
         },
       });
       const oauthData = await tokenResponseData.json();
+      const sid = crypto.randomUUID();
+      sessions[sid] = oauthData;
+      response.headers.set('Set-Cookie', `connect.sid=${sid}`);
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401
