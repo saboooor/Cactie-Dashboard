@@ -1,9 +1,17 @@
 import { component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import checkAuth from '../../auth.js';
+import getAuth from '../../auth';
 
 export const onGet: RequestHandler = async ({ url, params, request, response }) => {
-  console.log(checkAuth(request))
+  const auth = getAuth(request);
+  if (!auth) throw response.redirect('/login');
+  const res = await fetch('https://discord.com/api/users/@me', {
+    headers: {
+      authorization: `${auth.token_type} ${auth.access_token}`,
+    },
+  })
+  const userdata = await res.json();
+  console.log(userdata);
 };
 
 export default component$(() => {
@@ -14,7 +22,7 @@ export default component$(() => {
           Select a <span class="text-blue-400">Server</span>.
         </h1>
         <p class="mt-5 text-2xl text-gray-500">
-          Select a server to open the dashboard for
+          to open the dashboard for
         </p>
       </div>
     </section>
