@@ -27,7 +27,6 @@ export default component$(() => {
               <div class="sm:ml-6 sm:block">
                 <div class="flex space-x-4">
                   <a href="/dashboard" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Dashboard</a>
-                  <a href="/music" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Music</a>
                   <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Support</a>
                   <a href="/legal" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Legal</a>
                   <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Invite</a>
@@ -49,7 +48,6 @@ export default component$(() => {
         <div class="hidden" id="mobile-menu">
           <div class="space-y-1 pb-3 justify-center items-center flex">
             <a href="/dashboard" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Dashboard</a>
-            <a href="/music" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Music</a>
             <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Support</a>
             <a href="/legal" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Legal</a>
             <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-base font-medium">Invite</a>

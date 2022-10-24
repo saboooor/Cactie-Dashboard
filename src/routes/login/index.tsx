@@ -9,7 +9,6 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
 
   const code = url.searchParams.get('code');
   if (!code) {
-    const referer = request.headers.get('referer');
     const oAuth2URL = 'https://discord.com/api/oauth2/authorize' + `?client_id=${client.user.id}` + `&redirect_uri=${client.dashboardDomain.replace(/\//g, '%2F').replace(/:/g, '%3A')}%2Flogin` + '&response_type=code' + '&scope=identify guilds'
     throw response.redirect(oAuth2URL);
   }
@@ -32,14 +31,28 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
       });
       const oauthData = await tokenResponseData.json();
       const sid = crypto.randomUUID();
-      sessions[sid] = oauthData;
+      const res = await fetch('https://discord.com/api/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
+      const userdata = await res.json();
+      sessions[sid] = {
+        ...oauthData,
+        tag: `${userdata.username}#${userdata.discriminator}`,
+        pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
+      };
       response.headers.set('Set-Cookie', `connect.sid=${sid}`);
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401
       console.error(error);
     }
-    throw response.redirect('/');
+    const cookieJSON: any = {};
+    const cookiesArray = request.headers.get('cookie')?.split('; ');
+    cookiesArray?.forEach((cookie: string) => {
+        const values = cookie.split('=');
+        cookieJSON[values[0]] = values[1];
+    });
+    console.log(cookieJSON);
+    const href = cookieJSON['redirect.url'];
+    throw response.redirect(href ?? '/');
   }
 };
 
