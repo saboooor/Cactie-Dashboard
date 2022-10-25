@@ -1,6 +1,18 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useClientEffect$ } from '@builder.io/qwik';
 
 export default component$(() => {
+	useClientEffect$(async () => {
+	  const res = await fetch('/user');
+    const json = await res.json();
+    if (!json) document.getElementById('loggedout')?.classList.replace('hidden', 'flex');
+    else {
+      const pfp: any = document.getElementById('pfp');
+      const tag: any = document.getElementById('tag');
+      pfp.src = json.pfp;
+      tag.innerText = json.tag;
+      document.getElementById('loggedin')?.classList.replace('hidden', 'flex');
+    }
+	});
   return (
     <header>
       <nav class="z-10 fixed top-0 w-screen my-3">
@@ -34,11 +46,11 @@ export default component$(() => {
               </div>
             </div>
             <div class="flex flex-1 items-center justify-end sm:items-stretch">
-              <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl sm:px-3 sm:py-2 rounded-full text-sm font-medium flex items-center">
-                <img class="h-8 w-8 sm:mr-3 rounded-full" src="https://cdn.discordapp.com/avatars/249638347306303499/1850dd504cb868e2b47e5997f5e90e26" />
-                <span class="hidden sm:flex">sab#6969</span>
+              <a href="/logout" id="loggedin" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl sm:px-3 sm:py-2 rounded-full text-sm font-medium hidden items-center">
+                <img class="h-8 w-8 sm:mr-3 rounded-full" id="pfp" src="" />
+                <span class="hidden sm:flex" id="tag"></span>
               </a>
-              <a href="/login" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium flex items-center">
+              <a href="/login" id="loggedout" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium hidden items-center">
                 Login
               </a>
             </div>

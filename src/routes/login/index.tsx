@@ -50,7 +50,6 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
         const values = cookie.split('=');
         cookieJSON[values[0]] = values[1];
     });
-    console.log(cookieJSON);
     const href = cookieJSON['redirect.url'];
     throw response.redirect(href ?? '/');
   }
