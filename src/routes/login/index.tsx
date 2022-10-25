@@ -1,4 +1,5 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import crypto from 'crypto';
 
 import fs from 'fs';
 import YAML from 'yaml';
@@ -30,7 +31,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
         },
       });
       const oauthData = await tokenResponseData.json();
-      const sid = crypto.randomUUID();
+      const sid = crypto.randomBytes(32).toString('hex');
       const res = await fetch('https://discord.com/api/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
       const userdata = await res.json();
       sessions[sid] = {
