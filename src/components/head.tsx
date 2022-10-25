@@ -16,7 +16,7 @@ export const RouterHead = component$(() => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="icon" href={`/assets/images/${(client.user ? client.user.username : 'Cactie').replace(/ /g, '')}.webp`} />
       <meta content={head.title} property="og:title" />
-      <meta content={client.dashboardDomain} property="og:url" />
+      <meta content={loc.href} property="og:url" />
       <meta content={`/assets/images/${(client.user ? client.user.username : 'Cactie').replace(/ /g, '')}.webp`} property="og:image" />
 
       {head.meta.map((m) => (
