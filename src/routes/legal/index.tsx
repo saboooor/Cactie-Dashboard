@@ -68,6 +68,7 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
+      property: 'og:description',
       content: 'Privacy Policy / Terms of Use. GNU Affero General Public License v3.0.'
     }
   ]

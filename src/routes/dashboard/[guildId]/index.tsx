@@ -197,6 +197,7 @@ export const head: DocumentHead<EndpointData> = ({ data }) => {
         meta: [
             {
                 name: 'description',
+                property: 'og:description',
                 content: `Set the settings of ${data?.name}`
             }
         ]

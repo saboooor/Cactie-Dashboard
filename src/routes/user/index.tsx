@@ -22,6 +22,7 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
+      property: 'og:description',
       content: 'Info for the current logged in user. Will be null if the user is not logged in.'
     }
   ]

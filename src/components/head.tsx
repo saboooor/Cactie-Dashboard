@@ -10,15 +10,13 @@ export const RouterHead = component$(() => {
 
   return (
     <>
-      <title>Cactie - {head.title}</title>
+      <title>{client.user.username} - {head.title}</title>
 
       <link rel="canonical" href={loc.href} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="icon" href="/assets/images/Cactie.webp" />
-
-      <meta property="og:site_name" content="Qwik" />
-      <meta name="twitter:site" content="@QwikDev" />
-      <meta name="twitter:title" content="Qwik" />
+      <link rel="icon" href={`/assets/images/${client.user.username.replace(/ /g, '')}.webp`} />
+      <meta content={head.title} property="og:title" />
+      <meta content={`/assets/images/${client.user.username.replace(/ /g, '')}.webp`} property="og:image" />
 
       {head.meta.map((m) => (
         <meta {...m} />

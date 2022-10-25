@@ -55,6 +55,7 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
+      property: 'og:description',
       content: 'A bot that does stuff ig'
     }
   ]
