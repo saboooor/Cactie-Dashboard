@@ -19,7 +19,8 @@ export default defineConfig(() => {
       }
     },
     server: {
-      port: dashboard.port
+      port: dashboard.port,
+      host: 'localhost'
     }
   };
 });
