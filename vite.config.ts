@@ -22,7 +22,7 @@ export default defineConfig(() => {
       hmr: { clientPort: 443 },
       port: dashboard.port,
       strictPort: true,
-      host: 'localhost'
+      host: '0.0.0.0'
     }
   };
 });
