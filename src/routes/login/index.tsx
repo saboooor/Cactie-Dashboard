@@ -6,7 +6,7 @@ import YAML from 'yaml';
 const { dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
 export const onGet: RequestHandler = async ({ url, params, request, response }) => {
-  if (!client.readyTimestamp) throw response.redirect('/');
+  if (!global.client || !client.readyTimestamp) throw response.redirect('/');
 
   const code = url.searchParams.get('code');
   if (!code) {
