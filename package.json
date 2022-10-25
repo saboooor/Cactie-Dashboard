@@ -27,7 +27,7 @@
     "@builder.io/qwik": "0.11.1",
     "@builder.io/qwik-city": "0.0.117",
     "@tailwindcss/line-clamp": "0.4.2",
-    "@types/eslint": "8.4.7",
+    "@types/eslint": "8.4.8",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
