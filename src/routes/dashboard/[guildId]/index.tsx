@@ -28,7 +28,7 @@ export const onGet: RequestHandler<guildData[]> = async ({ url, params, request,
 export default component$(() => {
     const GuildData = useEndpoint<guildData>();
     return (
-        <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-6 pt-12" style="height: calc(100vh - 64px);">
+        <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-12" style="height: calc(100vh - 64px);">
             <aside class="w-full sm:h-1 align-middle sm:sticky sm:top-28" aria-label="Sidebar">
                 <p class="flex items-center p-6 text-base font-bold rounded-2xl mb-6 bg-gray-800 text-white">
                     <Resource
