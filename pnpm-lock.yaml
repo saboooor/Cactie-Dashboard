@@ -4,7 +4,7 @@ specifiers:
   '@builder.io/qwik': 0.11.1
   '@builder.io/qwik-city': 0.0.112
   '@tailwindcss/line-clamp': 0.4.2
-  '@types/eslint': 8.4.7
+  '@types/eslint': 8.4.8
   '@types/node': latest
   '@typescript-eslint/eslint-plugin': 5.41.0
   '@typescript-eslint/parser': 5.41.0
@@ -25,7 +25,7 @@ devDependencies:
   '@builder.io/qwik': 0.11.1
   '@builder.io/qwik-city': 0.0.112
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.1
-  '@types/eslint': 8.4.7
+  '@types/eslint': 8.4.8
   '@types/node': 18.11.5
   '@typescript-eslint/eslint-plugin': 5.41.0_huremdigmcnkianavgfk3x6iou
   '@typescript-eslint/parser': 5.41.0_wyqvi574yv7oiwfeinomdzmc3m
@@ -243,8 +243,8 @@ packages:
       '@types/ms': 0.7.31
     dev: true
 
-  /@types/eslint/8.4.7:
-    resolution: {integrity: sha512-ehM7cCt2RSFs42mb+lcmhFT9ouIlV92PuaeRGn8N8c98oMjG4Z5pJHA9b1QiCcuqnbPSHcyfiD3mlhqMaHsQIw==}
+  /@types/eslint/8.4.8:
+    resolution: {integrity: sha512-zUCKQI1bUCTi+0kQs5ZQzQ/XILWRLIlh15FXWNykJ+NG3TMKMVvwwC6GP3DR1Ylga15fB7iAExSzc4PNlR5i3w==}
     dependencies:
       '@types/estree': 1.0.0
       '@types/json-schema': 7.0.11
