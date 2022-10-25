@@ -6,11 +6,13 @@ export default component$(() => {
     const json = await res.json();
     if (!json) document.getElementById('loggedout')?.classList.replace('hidden', 'flex');
     else {
+      const loggedin: any = document.getElementById('loggedin');
       const pfp: any = document.getElementById('pfp');
       const tag: any = document.getElementById('tag');
       pfp.src = json.pfp;
       tag.innerText = json.tag;
-      document.getElementById('loggedin')?.classList.replace('hidden', 'flex');
+      loggedin.style.backgroundColor = json.accent
+      loggedin.classList.replace('hidden', 'flex');
     }
 	});
   return (
@@ -31,7 +33,7 @@ export default component$(() => {
             </div>
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
               <a href="/" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl pl-2 pr-3 py-2 rounded-full text-sm font-medium flex items-center">
-                <img class="h-8 w-8 mr-3 rounded-full" src="/assets/images/Cactie.webp" />
+                <img class="h-8 w-8 mr-3 rounded-full" src="/assets/images/Cactie.webp" alt="Cactie" />
                 Cactie
               </a>
             </div>
@@ -47,10 +49,10 @@ export default component$(() => {
             </div>
             <div class="flex flex-1 items-center justify-end sm:items-stretch">
               <a href="/logout" id="loggedin" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl sm:px-3 sm:py-2 rounded-full text-sm font-medium hidden items-center">
-                <img class="h-8 w-8 sm:mr-3 rounded-full" id="pfp" src="" />
+                <img class="h-8 w-8 sm:mr-3 rounded-full" id="pfp" src="" alt="User Avatar" />
                 <span class="hidden sm:flex" id="tag"></span>
               </a>
-              <a href="/login" id="loggedout" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium hidden items-center">
+              <a href="/login" id="loggedout" class="bg-indigo-700 hover:bg-indigo-600 text-white hover:drop-shadow-2xl px-4 py-2 rounded-full text-sm font-medium hidden items-center">
                 Login
               </a>
             </div>

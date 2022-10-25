@@ -1,8 +1,24 @@
 /** @type {import('tailwindcss').Config} */
+
+const gray = {
+   50: "hsl(220deg, 20%, 98%)",
+  100: "hsl(230deg, 14%, 96%)",
+  200: "hsl(230deg, 13%, 91%)",
+  300: "hsl(226deg, 12%, 84%)",
+  400: "hsl(228deg, 11%, 65%)",
+  500: "hsl(230deg,  9%, 46%)",
+  600: "hsl(225deg, 14%, 34%)",
+  700: "hsl(227deg, 19%, 27%)",
+  800: "hsl(225deg, 28%, 17%)",
+  900: "hsl(231deg, 39%, 11%)"
+};
+
+
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      colors: { gray },
       animation: {
         blob: "blob 16s infinite",
         float: "float 6s infinite"

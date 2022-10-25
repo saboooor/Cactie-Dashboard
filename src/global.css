@@ -17,7 +17,7 @@
 
 html {
   overflow: overlay;
-  background-color: rgb(17 24 39);
+  background-color: hsl(231deg, 39%, 11%);
 }
 
 * { scroll-behavior: smooth; }

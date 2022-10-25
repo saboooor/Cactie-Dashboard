@@ -37,6 +37,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
         ...oauthData,
         tag: `${userdata.username}#${userdata.discriminator}`,
         pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
+        accent: userdata.banner_color,
       };
       response.headers.set('Set-Cookie', `connect.sid=${sid}`);
     } catch (error) {
@@ -56,5 +57,11 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
 };
 
 export const head: DocumentHead = {
-  title: 'Login with Discord',
-};
+  title: 'Login',
+  meta: [
+    {
+      name: 'description',
+      content: 'Login to the dashboard using Discord'
+    }
+  ]
+}

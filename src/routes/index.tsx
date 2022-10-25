@@ -9,15 +9,15 @@ export default component$(() => {
           <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style="left: 45%"></div>
           <div class="absolute top-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-2000" style="right: 50%"></div>
           <div class="absolute bottom-5 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-4000" style="left: 40%"></div>
-          <img class="rounded-full z-10 animate-float ease-in-out" src="/assets/images/Cactie.webp" style="max-width: 40%" />
+          <img class="rounded-full z-10 animate-float ease-in-out" src="/assets/images/Cactie.webp" style="max-width: 40%" alt="Cactie" />
         </div>
         <h1 class="font-bold tracking-tight text-white text-5xl">
           The last <span class="text-blue-400">Discord</span> bot you need, <span class="text-green-200">Cactie</span>.
         </h1>
-        <p class="mt-5 text-2xl text-gray-500">
+        <p class="mt-5 text-2xl text-gray-400">
           Moderation, Fun, Music, Utilities, and More!
         </p>
-        <p class="mb-5 mt-2 text-xs text-gray-600">
+        <p class="mb-5 mt-2 text-xs text-gray-400">
           It's pronounced Cact-E, btw
         </p>
         <div class="flex justify-center sm:justify-start">
@@ -44,12 +44,18 @@ export default component$(() => {
         <div class="absolute top-10 left-10 w-72 h-72 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
         <div class="absolute top-10 right-10 w-72 h-72 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
         <div class="absolute bottom-5 left-32 w-72 h-72 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
-        <img class="rounded-full z-10 animate-float ease-in-out" src="/assets/images/Cactie.webp" />
+        <img class="rounded-full z-10 animate-float ease-in-out" src="/assets/images/Cactie.webp" alt="Cactie" />
       </div>
     </section>
   );
 });
 
 export const head: DocumentHead = {
-  title: 'Home',
-};
+  title: 'Cactie',
+  meta: [
+    {
+      name: 'description',
+      content: 'A bot that does stuff ig'
+    }
+  ]
+}
