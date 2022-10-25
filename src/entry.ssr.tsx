@@ -19,7 +19,7 @@ import { readFileSync } from 'fs';
 import YAML from 'yaml';
 const { con, dashboard } = YAML.parse(readFileSync('./config.yml', 'utf8'));
 
-declare global { var client: any; var dashboardUrl: string; var sessions: any };
+declare global { var client: any; var dashboardUrl: string; var sessions: any; var sleep: Function };
 global.sessions = {};
 global.client = new Client({
 	shards: 'auto',
@@ -45,6 +45,7 @@ global.client = new Client({
 		parse: ['users', 'roles', 'everyone'],
 	},
 });
+global.sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
 let domain;
 

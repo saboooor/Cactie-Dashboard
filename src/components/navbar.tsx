@@ -43,7 +43,7 @@ export default component$(() => {
                   <a href="/dashboard" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Dashboard</a>
                   <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Support</a>
                   <a href="/legal" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Legal</a>
-                  <a href="#" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Invite</a>
+                  <a href="/invite" class="text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl px-3 py-2 rounded-full text-sm font-medium">Invite</a>
                 </div>
               </div>
             </div>
@@ -64,7 +64,7 @@ export default component$(() => {
             <a href="/dashboard" class="text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white hover:drop-shadow-2xl px-4 py-2 rounded-full text-base font-medium">Dashboard</a>
             <a href="#" class="text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white hover:drop-shadow-2xl px-4 py-2 rounded-full text-base font-medium">Support</a>
             <a href="/legal" class="text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white hover:drop-shadow-2xl px-4 py-2 rounded-full text-base font-medium">Legal</a>
-            <a href="#" class="text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white hover:drop-shadow-2xl px-4 py-2 rounded-full text-base font-medium">Invite</a>
+            <a href="/invite" class="text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white hover:drop-shadow-2xl px-4 py-2 rounded-full text-base font-medium">Invite</a>
           </div>
         </div>
       </nav>

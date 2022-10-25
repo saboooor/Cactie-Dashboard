@@ -22,7 +22,7 @@ export default component$(() => {
         </p>
         <div class="flex justify-center sm:justify-start">
           <div class="rounded-md shadow">
-            <a href="#" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-indigo-600 px-8 py-3 text-base font-bold text-gray-200 hover:bg-indigo-500 md:py-4 md:px-10 md:text-lg">
+            <a href="/invite" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-indigo-600 px-8 py-3 text-base font-bold text-gray-200 hover:bg-indigo-500 md:py-4 md:px-10 md:text-lg">
               Invite me to your server!
             </a>
           </div>

@@ -2,6 +2,7 @@ import { Resource, component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import { useEndpoint } from "@builder.io/qwik-city";
 import getAuth from '../../auth';
+import { PermissionsBitField } from 'discord.js';
 
 interface guildData {
   id: string,
@@ -19,7 +20,8 @@ export const onGet: RequestHandler<guildData[]> = async ({ url, params, request,
       authorization: `${auth.token_type} ${auth.access_token}`,
     },
   })
-  const guildList = await res.json();
+  let guildList = await res.json();
+  guildList = guildList.filter((guild: any) => new PermissionsBitField(guild.permissions_new).has(PermissionsBitField.Flags.ManageGuild));
   return guildList;
 };
 
@@ -41,8 +43,9 @@ export default component$(() => {
         onRejected={() => <p class="mt-5 text-2xl text-red-500">Error</p>}
         onResolved={(guilds) => {
           const guildElements = guilds.map(guild => {
+            const guildFromClient = client.guilds.cache.get(guild.id);
             return (
-              <a class="sm:hover:bg-gray-800 p-8 rounded-2xl text-gray-400 hover:text-white sm:hover:drop-shadow-2xl" href={`/dashboard/${guild.id}`}>
+              <a class={`sm:hover:bg-gray-800 p-8 rounded-2xl text-gray-400 hover:text-white sm:hover:drop-shadow-2xl${guildFromClient ? '' : ' grayscale'}`} href={guildFromClient ? `/dashboard/${guild.id}` : `/invite?guild=${guild.id}`}>
                 <img class="rounded-full m-auto w-32 h-32" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name}/>
                 <p class="mt-10 text-2xl overflow-hidden text-ellipsis line-clamp-1">{guild.name}</p>
               </a>

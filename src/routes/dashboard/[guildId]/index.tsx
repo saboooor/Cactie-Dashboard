@@ -22,6 +22,12 @@ export const onGet: RequestHandler<guildData[]> = async ({ url, params, request,
     },
   })
   const GuildData = await res.json();
+  if (GuildData.message) {
+    if (!GuildData.retry_after) throw response.redirect('/dashboard');
+    console.log(`Guild data rate limit retrying after ${GuildData.retry_after}ms`)
+    await sleep(GuildData.retry_after);
+    throw response.redirect(url.href);
+  }
   return GuildData.find((g: guildData) => g.id == params.guildId);
 };
 
@@ -91,6 +97,7 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Prefix</h1>
                         <p class="text-gray-400 text-md">Cactie's text command prefix</p>
+                        <input type="text" id="first_name" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 mt-2.5" placeholder="The bot's prefix" />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Reactions</h1>
