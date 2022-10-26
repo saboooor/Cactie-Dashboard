@@ -15,12 +15,13 @@ import { manifest } from '@qwik-client-manifest';
 import Root from './root';
 import { Client, Partials, GatewayIntentBits } from 'discord.js';
 
-import { readFileSync } from 'fs';
+import fs from 'fs';
 import YAML from 'yaml';
-const { con, dashboard } = YAML.parse(readFileSync('./config.yml', 'utf8'));
+const { con, dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
 declare global { var client: any; var dashboardUrl: string; var sessions: any; var sleep: Function };
-global.sessions = {};
+if (dashboard.debug && !fs.existsSync('./sessions.json')) fs.writeFileSync('./sessions.json', '{}');
+global.sessions = dashboard.debug ? JSON.parse(`${fs.readFileSync('./sessions.json')}`) : {};
 global.client = new Client({
 	shards: 'auto',
 	partials: [

@@ -11,7 +11,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/oauth2/authorize' + `?client_id=${client.user.id}` + `&redirect_uri=${client.dashboardDomain.replace(/\//g, '%2F').replace(/:/g, '%3A')}%2Flogin` + '&response_type=code' + '&scope=identify guilds'
+    const oAuth2URL = 'https://discord.com/api/oauth2/authorize' + `?client_id=${client.user.id}` + `&redirect_uri=${url.href.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
     throw response.redirect(oAuth2URL);
   }
 
@@ -41,6 +41,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
         pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
         accent: userdata.banner_color,
       };
+      if (dashboard.debug) fs.writeFileSync('./sessions.json', JSON.stringify(sessions));
       response.headers.set('Set-Cookie', `connect.sid=${sid}`);
       console.log(`${sessions[sid].tag} logged in`);
     } catch (error) {

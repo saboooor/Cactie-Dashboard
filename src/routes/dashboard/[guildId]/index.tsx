@@ -93,19 +93,28 @@ export default component$(() => {
             </aside>
             <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4">
                 <h1 class="font-bold tracking-tight text-white text-4xl" id="general">General</h1>
-                <div class="grid md:grid-cols-3 gap-6 py-10">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 py-10">
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Prefix</h1>
                         <p class="text-gray-400 text-md">Cactie's text command prefix</p>
-                        <input type="text" id="first_name" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 mt-2.5" placeholder="The bot's prefix" />
+                        <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 outline-none focus:bg-gray-600 focus:ring" placeholder="The bot's prefix" />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
-                        <h1 class="font-bold tracking-tight text-white text-2xl">Reactions</h1>
-                        <p class="text-gray-400 text-md">Reacts with various reactions on some words</p>
+                        <div class="sm:flex">
+                            <div>
+                                <label for="default-toggle" class="inline-flex relative items-center cursor-pointer mr-4">
+                                    <input type="checkbox" value="" id="default-toggle" class="sr-only peer"/>
+                                    <div class="w-12 h-7 outline-none peer-focus:ring rounded-full peer bg-gray-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
+                            <h1 class="font-bold tracking-tight text-white text-2xl">Reactions</h1>
+                        </div>
+                        <p class="text-gray-400 text-md mt-2.5">Reacts with various reactions on messages with some words</p>
                     </div>
-                    <div class="bg-gray-800 rounded-2xl p-6">
+                    <div class="bg-gray-800 rounded-2xl p-6 col-span-2">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Language</h1>
                         <p class="text-gray-400 text-md">The language Cactie will use</p>
+                        <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 outline-none focus:bg-gray-600 focus:ring" placeholder="" />
                     </div>
                 </div>
                 <h1 class="font-bold tracking-tight text-white text-4xl" id="suggestpolls">Suggestions / Polls</h1>
@@ -118,12 +127,12 @@ export default component$(() => {
                         <h1 class="font-bold tracking-tight text-white text-2xl">Suggestion Threads</h1>
                         <p class="text-gray-400 text-md">Creates a thread for discussing a suggestion</p>
                     </div>
-                    <div class="bg-gray-800 rounded-2xl p-6">
+                    <div class="bg-gray-800 ronded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Poll Channel</h1>
                         <p class="text-gray-400 text-md">This is where polls are made</p>
                     </div>
                 </div>
-                <h1 class="font-bold tracking-tight text-white text-4xl" id="fun">Fun Commands</h1>
+                <h1 class="font-bold tracking-tiught text-white text-4xl" id="fun">Fun Commands</h1>
                 <div class="grid gap-6 py-10">
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Max PP Size</h1>

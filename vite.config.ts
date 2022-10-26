@@ -19,7 +19,9 @@ export default defineConfig(() => {
       }
     },
     server: {
-      hmr: { clientPort: 443 },
+      hmr: {
+        clientPort: dashboard.domain.endsWith(`:${dashboard.port}`) ? dashboard.port : 443
+      },
       port: dashboard.port,
       strictPort: true,
       host: '0.0.0.0'
