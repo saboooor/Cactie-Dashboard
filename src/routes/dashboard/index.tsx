@@ -21,6 +21,12 @@ export const onGet: RequestHandler<guildData[]> = async ({ url, params, request,
     },
   })
   let guildList = await res.json();
+  if (guildList.message) {
+    if (!guildList.retry_after) throw response.redirect('/');
+    console.log(`Guild data rate limit retrying after ${guildList.retry_after}ms`)
+    await sleep(guildList.retry_after);
+    throw response.redirect(url.href);
+  }
   guildList = guildList.filter((guild: any) => new PermissionsBitField(guild.permissions_new).has(PermissionsBitField.Flags.ManageGuild));
   return guildList;
 };

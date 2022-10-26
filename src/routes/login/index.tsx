@@ -24,7 +24,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
           client_secret: dashboard.clientSecret,
           code,
           grant_type: 'authorization_code',
-          redirect_uri: `${client.dashboardDomain}/login`,
+          redirect_uri: url.origin + url.pathname,
           scope: 'identify',
         }),
         headers: {
@@ -40,6 +40,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
         tag: `${userdata.username}#${userdata.discriminator}`,
         pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
         accent: userdata.banner_color,
+        expires_in: (Date.now() + oauthData.expires_in),
       };
       if (dashboard.debug) fs.writeFileSync('./sessions.json', JSON.stringify(sessions));
       response.headers.set('Set-Cookie', `connect.sid=${sid}`);

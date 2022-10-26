@@ -48,26 +48,9 @@ global.client = new Client({
 });
 global.sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
-let domain;
-
-try {
-	const domainUrl = new URL(dashboard.domain);
-	domain = {
-		host: domainUrl.hostname,
-		protocol: domainUrl.protocol,
-	};
-}
-catch (e) {
-	console.error(e);
-	throw new TypeError('Invalid domain specified in config.yml');
-}
-
-if (dashboard.usingCustomDomain) client.dashboardDomain = `${domain.protocol}//${domain.host}`;
-else client.dashboardDomain = `${domain.protocol}//${domain.host}${dashboard.port == 80 ? '' : `:${dashboard.port}`}`;
-
 client.login(con.token);
 
-client.on('ready', () => console.log(`Bot started, dashboard at ${client.dashboardDomain}`));
+client.on('ready', () => console.log(`Bot started, dashboard at ${dashboard.domain}`));
 
 export default function (opts: RenderToStreamOptions) {
   // Render the elements
