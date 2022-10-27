@@ -11,7 +11,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/oauth2/authorize' + `?client_id=${client.user.id}` + `&redirect_uri=${dashboard.domain.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
+    const oAuth2URL = 'https://discord.com/api/oauth2/authorize' + `?client_id=${client.user.id}` + `&redirect_uri=${`${dashboard.domain}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
     throw response.redirect(oAuth2URL);
   }
 
