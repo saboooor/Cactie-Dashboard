@@ -24,7 +24,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
           client_secret: dashboard.clientSecret,
           code,
           grant_type: 'authorization_code',
-          redirect_uri: url.origin + url.pathname,
+          redirect_uri: `${dashboard.domain}/login`,
           scope: 'identify',
         }),
         headers: {
@@ -35,6 +35,7 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
       const sid = crypto.randomBytes(32).toString('hex');
       const res = await fetch('https://discord.com/api/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
       const userdata = await res.json();
+      console.log(userdata)
       sessions[sid] = {
         ...oauthData,
         tag: `${userdata.username}#${userdata.discriminator}`,
