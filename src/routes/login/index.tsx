@@ -35,7 +35,6 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
       const sid = crypto.randomBytes(32).toString('hex');
       const res = await fetch('https://discord.com/api/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
       const userdata = await res.json();
-      console.log(userdata)
       sessions[sid] = {
         ...oauthData,
         tag: `${userdata.username}#${userdata.discriminator}`,
@@ -45,7 +44,6 @@ export const onGet: RequestHandler = async ({ url, params, request, response }) 
       };
       if (dashboard.debug) fs.writeFileSync('./sessions.json', JSON.stringify(sessions));
       response.headers.set('Set-Cookie', `connect.sid=${sid}`);
-      console.log(`${sessions[sid].tag} logged in`);
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401
