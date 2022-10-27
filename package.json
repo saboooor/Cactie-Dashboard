@@ -22,7 +22,7 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@builder.io/qwik": "0.12.0-dev20221021220048",
+    "@builder.io/qwik": "0.12.0",
     "@builder.io/qwik-city": "0.0.118",
     "@tailwindcss/line-clamp": "0.4.2",
     "@types/eslint": "8.4.8",
@@ -32,7 +32,7 @@
     "autoprefixer": "10.4.12",
     "discord.js": "14.6.0",
     "eslint": "8.26.0",
-    "eslint-plugin-qwik": "0.12.0-dev20221021220048",
+    "eslint-plugin-qwik": "0.12.0",
     "postcss": "8.4.18",
     "prettier": "2.7.1",
     "tailwindcss": "3.2.1",
