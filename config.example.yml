@@ -1,6 +1,6 @@
 con:
   token: '' # Discord bot token
-# websocket: # Music dashboard websocket port
+  websocket: 19132 # Music dashboard websocket port
 # vote:
 #   webhook: # webhook port
 #   auth: # webhook auth (from vote site)
@@ -13,19 +13,16 @@ mysql: # MySQL database credentials
 
 music:
   lavalink:
+    identifier: '' # lavalink node name
     host: '' # lavalink node host ip
     port: 2333
     password: ''
-    identifier: '' # lavalink node name
     retryAmount: 3
     retryDelay: 5000
     secure: false
 
 dashboard:
   port: 6969
-  usingCustomDomain: false
-  domain: '' # Dashboard domain
+  domain: 'http://localhost:6969' # Dashboard domain
   clientSecret: '' # Client Secret from dev panel
-  secret: '' # Idfk it's a secret put it as a secret
-  wsurl: 'wss://cactiedev.smhsmh.club/ws/' # Websocket url for music player
-  colors: ['#ffffff', '#000000'] # colors for dashboard background
+  debug: false # Save sessions in a JSON file. ONLY FOR DEBUGGING, NEVER USE ON PROD.
