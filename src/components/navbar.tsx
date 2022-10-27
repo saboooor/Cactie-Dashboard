@@ -48,7 +48,7 @@ export default component$(() => {
               </div>
             </div>
             <div class="flex flex-1 items-center justify-end sm:items-stretch">
-              <a href="/logout" id="loggedin" class="pointer-events-auto text-gray-300 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl sm:px-3 sm:py-2 rounded-full text-sm font-medium hidden items-center">
+              <a href="/logout" id="loggedin" class="pointer-events-auto text-gray-300 bg-gray-900 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl sm:px-3 sm:py-2 rounded-full text-sm font-medium hidden items-center">
                 <img class="h-8 w-8 sm:mr-3 rounded-full" id="pfp" src="" alt="User Avatar" />
                 <span class="hidden sm:flex" id="tag"></span>
               </a>
