@@ -3,7 +3,7 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 
 export default component$(() => {
   return (
-    <section class="mx-auto max-w-5xl px-6 pt-12 items-center" style="height: calc(100vh - 64px);">
+    <section class="mx-auto max-w-5xl px-6 pt-12 items-center" style="min-height: calc(100vh - 64px);">
       <br/><br/>
       <div>
         <h1 class="font-bold tracking-tight text-white text-5xl">

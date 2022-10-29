@@ -3,7 +3,7 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 
 export default component$(() => {
   return (
-    <section class="flex mx-auto max-w-6xl px-6 items-center" style="height: calc(100vh - 64px);">
+    <section class="flex mx-auto max-w-6xl px-6 items-center" style="min-height: calc(100vh - 64px);">
       <div class="text-center sm:text-left justify-start" style="filter: drop-shadow(0 5rem 10rem rgba(79, 70, 229, 1));">
         <div class="flex sm:hidden relative justify-center align-center sm:ml-auto mb-10" style="width: 100%;">
           <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style="left: 45%"></div>

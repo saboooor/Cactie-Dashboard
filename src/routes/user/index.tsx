@@ -8,7 +8,7 @@ export interface UserInfo {
   accent: string;
 }
 
-export const onGet: RequestHandler<UserInfo> = async ({ url, params, request, response }) => {
+export const onGet: RequestHandler<UserInfo> = async ({ request }) => {
   const auth = getAuth(request);
   return auth ? {
     tag: auth.tag,

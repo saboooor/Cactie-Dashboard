@@ -4,7 +4,7 @@ import fs from 'fs';
 import YAML from 'yaml';
 const { dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
-export const onGet: RequestHandler = async ({ url, params, request, response }) => {
+export const onGet: RequestHandler = async ({ request, response }) => {
   const cookieJSON: any = {};
   const cookiesArray = request.headers.get('cookie')?.split('; ');
   cookiesArray?.forEach((cookie: string) => {

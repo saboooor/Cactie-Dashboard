@@ -1,6 +1,6 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 
-export const onGet: RequestHandler = async ({ url, params, request, response }) => {
+export const onGet: RequestHandler = async ({ url, response }) => {
   const guildId = url.searchParams.get('guild');
   throw response.redirect('https://discord.com/oauth2/authorize' + `?client_id=${client.user?.id ?? '848775888673439745'}` + '&permissions=1428382149750' + '&scope=bot%20applications.commands' + (guildId ? `&guild_id=${guildId}` : ''))
 };

@@ -34,7 +34,7 @@ export const onGet: RequestHandler<guildData[]> = async ({ url, params, request,
 export default component$(() => {
     const GuildData = useEndpoint<guildData>();
     return (
-        <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-12" style="height: calc(100vh - 64px);">
+        <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-12" style="min-height: calc(100vh - 64px);">
             <aside class="w-full sm:h-1 align-middle sm:sticky sm:top-28" aria-label="Sidebar">
                 <p class="flex items-center p-6 text-base font-bold rounded-2xl mb-6 bg-gray-800 text-white">
                     <Resource
@@ -54,38 +54,38 @@ export default component$(() => {
                 <div class="overflow-y-auto py-4 px-3 rounded-2xl bg-gray-800">
                     <ul class="space-y-2">
                         <li>
-                            <a href="#general" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">General Settings</span>
+                            <a href="#general" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                General Settings
                             </a>
                         </li>
                         <li>
-                            <a href="#suggestpolls" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">Suggestions / Polls</span>
+                            <a href="#suggestpolls" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                Suggestions / Polls
                             </a>
                         </li>
                         <li>
-                            <a href="#misc" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">Miscellaneous</span>
+                            <a href="#misc" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                Miscellaneous
                             </a>
                         </li>
                         <li>
-                            <a href="#logging" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">Audit Logs</span>
+                            <a href="#logging" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                Audit Logs
                             </a>
                         </li>
                         <li>
-                            <a href="#tickets" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">Ticket System</span>
+                            <a href="#tickets" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                Ticket System
                             </a>
                         </li>
                         <li>
-                            <a href="#moderation" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">Moderation</span>
+                            <a href="#moderation" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                Moderation
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
-                                <span class="flex-1">Reaction Roles</span>
+                            <a href="#reactionroles" class="flex flex-1 items-center p-2 text-base font-normal rounded-xl text-white hover:bg-gray-700">
+                                Reaction Roles
                             </a>
                         </li>
                     </ul>
