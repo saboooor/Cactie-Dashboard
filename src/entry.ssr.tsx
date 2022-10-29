@@ -19,9 +19,13 @@ import fs from 'fs';
 import YAML from 'yaml';
 const { con, dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
-declare global { var client: any; var dashboardUrl: string; var sessions: any; var sleep: Function };
+// eslint-disable-next-line no-var
+declare global { var client: any; var dashboardUrl: string; var sessions: any; var sleep: Function }
+
 if (dashboard.debug && !fs.existsSync('./sessions.json')) fs.writeFileSync('./sessions.json', '{}');
+
 global.sessions = dashboard.debug ? JSON.parse(`${fs.readFileSync('./sessions.json')}`) : {};
+
 global.client = new Client({
 	shards: 'auto',
 	partials: [
@@ -48,7 +52,7 @@ global.client = new Client({
 });
 global.sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
-client.login(con.token);
+await client.login(con.token);
 
 client.on('ready', () => console.log(`Bot started, dashboard at ${dashboard.domain}`));
 

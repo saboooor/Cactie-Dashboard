@@ -11,11 +11,11 @@ export default defineConfig(() => {
   return {
     plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
     build: {
-        target: 'es2020'
+        target: 'es2022'
     },
     optimizeDeps: {
       esbuildOptions: {
-        target: 'es2020'
+        target: 'es2022'
       }
     },
     server: {
