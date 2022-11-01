@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@builder.io/qwik': 0.12.0
+  '@builder.io/qwik': 0.12.1
   '@builder.io/qwik-city': 0.0.118
   '@tailwindcss/line-clamp': 0.4.2
   '@types/eslint': 8.4.9
@@ -21,7 +21,7 @@ specifiers:
   yaml: 2.1.3
 
 devDependencies:
-  '@builder.io/qwik': 0.12.0
+  '@builder.io/qwik': 0.12.1
   '@builder.io/qwik-city': 0.0.118
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.1
   '@types/eslint': 8.4.9
@@ -53,8 +53,8 @@ packages:
       - supports-color
     dev: true
 
-  /@builder.io/qwik/0.12.0:
-    resolution: {integrity: sha512-iIsbGO8bZhOMOJ/MmHcaXdsWWVCQIKD1LNQTERtePA695RB3jlmj7HQq4wMSNRRFEdeMKB2t/vmYFDjRJQWRNw==}
+  /@builder.io/qwik/0.12.1:
+    resolution: {integrity: sha512-ePxm9tr6qa+cNySuIhXOElozkkqdRfyPvEPEV659QJSq704C031/VC0S2lqqvKsc9+ZogBlejGuYWLmtRrsT6w==}
     engines: {node: '>=16'}
     hasBin: true
     dev: true
