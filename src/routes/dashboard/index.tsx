@@ -11,7 +11,7 @@ export const onGet: RequestHandler<APIPartialGuild[]> = async ({ url, request, r
     response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
     throw response.redirect('/login');
   }
-  const res = await fetch(`https://discord.com/api/users/@me/guilds`, {
+  const res = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
     headers: {
       authorization: `${auth.token_type} ${auth.access_token}`,
     },

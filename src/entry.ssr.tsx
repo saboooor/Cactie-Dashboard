@@ -57,7 +57,7 @@ global.client = new Client({
 	},
 });
 
-global.sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
+global.sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 await client.login(con.token);
 
