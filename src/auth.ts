@@ -6,5 +6,5 @@ export default function getAuth(request: any) {
         cookieJSON[values[0]] = values[1];
     });
     const sid = cookieJSON['connect.sid'];
-    return sid && sid in sessions ? sessions[sid] : null;
+    return global.sessions ? sessions[sid] : null;
 }

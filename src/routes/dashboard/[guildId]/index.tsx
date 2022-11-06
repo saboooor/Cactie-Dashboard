@@ -1,10 +1,18 @@
 import { Resource, component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import type { APIGuild, RESTRateLimit, RESTError } from 'discord-api-types/v10';
 import { useEndpoint } from "@builder.io/qwik-city";
 import getAuth from '../../../auth';
+import { ChannelType } from 'discord.js';
+
 interface guildData {
-    guild: APIGuild
+    guild: any,
+    srvconfig: any,
+}
+
+interface obj {
+    id: string,
+    name: string,
+    type?: number
 }
 
 export const onGet: RequestHandler<guildData> = async ({ url, params, request, response }) => {
@@ -13,21 +21,12 @@ export const onGet: RequestHandler<guildData> = async ({ url, params, request, r
     response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
     throw response.redirect('/login');
   }
-  const res = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
-    headers: {
-      authorization: `${auth.token_type} ${auth.access_token}`,
-    },
-  })
-  const GuildList: RESTError | RESTRateLimit | APIGuild[] = await res.json();
-  if ('retry_after' in GuildList) {
-    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`)
-    await sleep(GuildList.retry_after);
-    throw response.redirect(url.href);
-  }
-  if ('code' in GuildList) throw response.redirect(`/dashboard?error=${GuildList.code}`);
-  const guild = GuildList.find((g: APIGuild) => g.id == params.guildId);
+  const guild = client.guilds.cache.get(params.guildId);
   if (!guild) throw response.redirect(`/dashboard?error=guild_not_found`);
-  return { guild };
+  const guildJSON: any = guild.toJSON();
+  guildJSON.channels = guild.channels.cache.map(c => { return { name: c.name, id: c.id, type: c.type }; });
+  guildJSON.roles = guild.roles.cache.map(r => { return { name: r.name, id: r.id }; });
+  return { srvconfig: await db.getData('settings', { guildId: params.guildId }), guild: guildJSON };
 };
 
 export default component$(() => {
@@ -35,21 +34,19 @@ export default component$(() => {
     return (
         <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-12" style="min-height: calc(100vh - 64px);">
             <aside class="w-full sm:h-1 align-middle sm:sticky sm:top-28" aria-label="Sidebar">
-                <p class="flex items-center p-6 text-base font-bold rounded-2xl mb-6 bg-gray-800 text-white">
-                    <Resource
-                        value={GuildData}
-                        onPending={() => <span class="flex-1 ml-3">Loading...</span>}
-                        onRejected={() => <span class="flex-1 ml-3">Error</span>}
-                        onResolved={({ guild }) => {
-                            return (
-                                <>
-                                    <img class="w-10 h-10 rounded-full" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} ></img>
-                                    <span class="flex-1 ml-3 text-lg">{guild.name}</span>
-                                </>
-                            )
-                        }}
-                    />
-                </p>
+                <Resource
+                    value={GuildData}
+                    onPending={() => <span class="flex-1 ml-3">Loading...</span>}
+                    onRejected={() => <span class="flex-1 ml-3">Error</span>}
+                    onResolved={({ guild }) => {
+                        return (
+                            <p class="flex items-center p-6 text-base font-bold rounded-2xl mb-6 bg-gray-800 text-white">
+                                <img class="w-10 h-10 rounded-full" src={guild.iconURL ?? undefined} alt={guild.name} ></img>
+                                <span class="flex-1 ml-3 text-lg">{guild.name}</span>
+                            </p>
+                        )
+                    }}
+                />
                 <div class="overflow-y-auto py-4 px-3 rounded-2xl bg-gray-800">
                     <ul class="space-y-2">
                         <li>
@@ -96,13 +93,27 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Prefix</h1>
                         <p class="text-gray-400 text-md">Cactie's text command prefix</p>
-                        <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The bot's prefix" />
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { prefix } }) => {
+                                return (
+                                    <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The bot's prefix" value={prefix} />
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <div class="sm:flex">
                             <div>
                                 <label for="reactions" class="inline-flex relative items-center cursor-pointer mr-4">
-                                    <input type="checkbox" value="" id="reactions" class="sr-only peer"/>
+                                    <Resource
+                                        value={GuildData}
+                                        onResolved={({ srvconfig: { reactions } }) => {
+                                            return (
+                                                <input type="checkbox" value="" checked={reactions == 'true'} id="reactions" class="sr-only peer"/>
+                                            )
+                                        }}
+                                    />
                                     <div class="w-12 h-7 peer-focus:ring ring-indigo-600 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                 </label>
                             </div>
@@ -113,13 +124,20 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6 col-span-2 lg:col-span-1">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Language</h1>
                         <p class="text-gray-400 text-md">The language Cactie will use</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">Use the server default</option>
-                            <option value="English">English</option>
-                            <option value="Portuguese">Portuguese</option>
-                            <option value="Lispuwu">Lisp UwU</option>
-                            <option value="Uwu">UwU</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { language } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={language == 'false'}>Use the server default</option>
+                                        <option value="English" selected={language == 'English'}>English</option>
+                                        <option value="Portuguese" selected={language == 'Portuguese'}>Portuguese</option>
+                                        <option value="Lispuwu" selected={language == 'Lispuwu'}>Lisp UwU</option>
+                                        <option value="Uwu" selected={language == 'Uwu'}>UwU</option>
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                 </div>
                 <h1 class="font-bold tracking-tight text-white text-4xl" id="suggestpolls">Suggestions / Polls</h1>
@@ -127,15 +145,30 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Suggestion Channel</h1>
                         <p class="text-gray-400 text-md">This is where suggestions are made</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH TEXT CHANNELS</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { suggestchannel }, guild: { channels } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={suggestchannel == 'false'}>Same channel as user</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={suggestchannel == c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <div class="sm:flex">
                             <div>
                                 <label for="suggestthreads" class="inline-flex relative items-center cursor-pointer mr-4">
-                                    <input type="checkbox" value="" id="suggestthreads" class="sr-only peer"/>
+                                    <Resource
+                                        value={GuildData}
+                                        onResolved={({ srvconfig: { suggestthreads } }) => {
+                                            return (
+                                                <input type="checkbox" value="" checked={suggestthreads == 'true'} id="suggestthreads" class="sr-only peer"/>
+                                            )
+                                        }}
+                                    />
                                     <div class="w-12 h-7 peer-focus:ring ring-indigo-600 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                 </label>
                             </div>
@@ -146,9 +179,17 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-2 lg:col-span-1">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Poll Channel</h1>
                         <p class="text-gray-400 text-md">This is where polls are made</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH TEXT CHANNELS</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { pollchannel }, guild: { channels } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={pollchannel == 'false'}>Same channel as user</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={pollchannel == c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                 </div>
                 <h1 class="font-bold tracking-tight text-white text-4xl" id="misc">Miscellaneous</h1>

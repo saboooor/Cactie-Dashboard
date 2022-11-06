@@ -21,11 +21,21 @@ import fs from 'fs';
 import YAML from 'yaml';
 const { con, dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
+import type { Connection } from 'mariadb/types';
+import mysql from './mysql';
+
 declare global {
 	var client: Client;
 	var dashboardUrl: string;
 	var sessions: any;
-	var sleep: Function
+	var sleep: (ms: number) => {};
+	var db: {
+		con: Connection;
+		createData(table: string, body: any): Promise<any>;
+		delData(table: string, where: any): Promise<any>;
+		getData(table: string, where: any, options?: any): Promise<any>;
+		setData(table: string, where: any, body: any): Promise<any>;
+	}
 }
 
 if (dashboard.debug && !fs.existsSync('./sessions.json')) fs.writeFileSync('./sessions.json', '{}');
@@ -60,6 +70,8 @@ global.client = new Client({
 global.sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 await client.login(con.token);
+
+await mysql(client);
 
 client.on('ready', () => console.log(`Bot started, dashboard at ${dashboard.domain}`));
 
