@@ -1,39 +1,34 @@
 import { Resource, component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import type { APIPartialGuild, RESTRateLimit, RESTError } from 'discord-api-types/v10';
 import { useEndpoint } from "@builder.io/qwik-city";
 import getAuth from '../../auth';
 import { PermissionsBitField } from 'discord.js';
 
-interface guildData {
-  id: string,
-  name: string,
-  icon: string
-}
-
-export const onGet: RequestHandler<guildData[]> = async ({ url, request, response }) => {
+export const onGet: RequestHandler<APIPartialGuild[]> = async ({ url, request, response }) => {
   const auth = getAuth(request);
   if (!auth) {
     response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
     throw response.redirect('/login');
   }
-  const res = await fetch('https://discord.com/api/users/@me/guilds', {
+  const res = await fetch(`https://discord.com/api/users/@me/guilds`, {
     headers: {
       authorization: `${auth.token_type} ${auth.access_token}`,
     },
   })
-  let guildList = await res.json();
-  if (guildList.message) {
-    if (!guildList.retry_after) throw response.redirect('/');
-    console.log(`Guild data rate limit retrying after ${guildList.retry_after}ms`)
-    await sleep(guildList.retry_after);
+  let GuildList: RESTError | RESTRateLimit | APIPartialGuild[] = await res.json();
+  if ('retry_after' in GuildList) {
+    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`)
+    await sleep(GuildList.retry_after);
     throw response.redirect(url.href);
   }
-  guildList = guildList.filter((guild: any) => new PermissionsBitField(guild.permissions_new).has(PermissionsBitField.Flags.ManageGuild));
-  return guildList;
+  if ('code' in GuildList) throw response.redirect(`/dashboard?error=${GuildList.code}`);
+  GuildList = GuildList.filter((guild: any) => new PermissionsBitField(guild.permissions_new).has(PermissionsBitField.Flags.ManageGuild));
+  return GuildList;
 };
 
 export default component$(() => {
-  const GuildData = useEndpoint<guildData[]>();
+  const GuildData = useEndpoint<APIPartialGuild[]>();
   return (
     <section class="mx-auto max-w-screen-2xl px-6 pt-12 items-center" style="min-height: calc(100vh - 64px);">
       <div class="text-center" style="filter: drop-shadow(0 0 2rem rgba(79, 70, 229, 1));">

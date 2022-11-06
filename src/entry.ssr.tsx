@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 /**
  * WHAT IS THIS FILE?
  *
@@ -10,6 +11,7 @@
  * - npm run build
  *
  */
+
 import { renderToStream, RenderToStreamOptions } from '@builder.io/qwik/server';
 import { manifest } from '@qwik-client-manifest';
 import Root from './root';
@@ -19,8 +21,12 @@ import fs from 'fs';
 import YAML from 'yaml';
 const { con, dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
-// eslint-disable-next-line no-var
-declare global { var client: any; var dashboardUrl: string; var sessions: any; var sleep: Function }
+declare global {
+	var client: Client;
+	var dashboardUrl: string;
+	var sessions: any;
+	var sleep: Function
+}
 
 if (dashboard.debug && !fs.existsSync('./sessions.json')) fs.writeFileSync('./sessions.json', '{}');
 
@@ -50,6 +56,7 @@ global.client = new Client({
 		parse: ['users', 'roles', 'everyone'],
 	},
 });
+
 global.sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
 await client.login(con.token);
