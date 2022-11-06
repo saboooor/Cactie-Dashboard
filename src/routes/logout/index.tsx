@@ -29,6 +29,9 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
+      content: 'Login to the dashboard using Discord'
+    },
+    {
       property: 'og:description',
       content: 'Login to the dashboard using Discord'
     }

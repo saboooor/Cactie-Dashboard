@@ -23,12 +23,12 @@ export const onGet: RequestHandler<APIPartialGuild[]> = async ({ url, request, r
     throw response.redirect(url.href);
   }
   if ('code' in GuildList) throw response.redirect(`/dashboard?error=${GuildList.code}`);
-  GuildList = GuildList.filter((guild: any) => new PermissionsBitField(guild.permissions_new).has(PermissionsBitField.Flags.ManageGuild));
+  GuildList = GuildList.filter((guild: any) => new PermissionsBitField(guild.permissions).has(PermissionsBitField.Flags.ManageGuild));
   return GuildList;
 };
 
 export default component$(() => {
-  const GuildData = useEndpoint<APIPartialGuild[]>();
+  const GuildList = useEndpoint<APIPartialGuild[]>();
   return (
     <section class="mx-auto max-w-screen-2xl px-6 pt-12 items-center" style="min-height: calc(100vh - 64px);">
       <div class="text-center" style="filter: drop-shadow(0 0 2rem rgba(79, 70, 229, 1));">
@@ -40,7 +40,7 @@ export default component$(() => {
         </p>
       </div>
       <Resource
-        value={GuildData}
+        value={GuildList}
         onPending={() => <p class="mt-5 text-2xl text-gray-500">Loading...</p>}
         onRejected={() => <p class="mt-5 text-2xl text-red-500">Error</p>}
         onResolved={(guilds) => {
@@ -69,6 +69,9 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
+      content: 'The Cactie Dashboard'
+    },
+    {
       property: 'og:description',
       content: 'The Cactie Dashboard'
     }

@@ -7,6 +7,9 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
+      content: 'Join the Discord Server!'
+    },
+    {
       property: 'og:description',
       content: 'Join the Discord Server!'
     }

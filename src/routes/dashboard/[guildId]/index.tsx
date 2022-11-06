@@ -1,12 +1,10 @@
 import { Resource, component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import type { APIPartialGuild, RESTRateLimit, RESTError } from 'discord-api-types/v10';
+import type { APIGuild, RESTRateLimit, RESTError } from 'discord-api-types/v10';
 import { useEndpoint } from "@builder.io/qwik-city";
 import getAuth from '../../../auth';
-
-type EndpointData = guildData | null;
 interface guildData {
-    guild: APIPartialGuild
+    guild: APIGuild
 }
 
 export const onGet: RequestHandler<guildData> = async ({ url, params, request, response }) => {
@@ -15,19 +13,19 @@ export const onGet: RequestHandler<guildData> = async ({ url, params, request, r
     response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
     throw response.redirect('/login');
   }
-  const res = await fetch(`https://discord.com/api/users/@me/guilds`, {
+  const res = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
     headers: {
       authorization: `${auth.token_type} ${auth.access_token}`,
     },
   })
-  const GuildList: RESTError | RESTRateLimit | APIPartialGuild[] = await res.json();
+  const GuildList: RESTError | RESTRateLimit | APIGuild[] = await res.json();
   if ('retry_after' in GuildList) {
     console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`)
     await sleep(GuildList.retry_after);
     throw response.redirect(url.href);
   }
   if ('code' in GuildList) throw response.redirect(`/dashboard?error=${GuildList.code}`);
-  const guild = GuildList.find((g: APIPartialGuild) => g.id == params.guildId);
+  const guild = GuildList.find((g: APIGuild) => g.id == params.guildId);
   if (!guild) throw response.redirect(`/dashboard?error=guild_not_found`);
   return { guild };
 };
@@ -345,14 +343,17 @@ export default component$(() => {
     );
 });
 
-export const head: DocumentHead<EndpointData> = ({ data }) => {
+export const head: DocumentHead<guildData> = ({ data: { guild } }) => {
     return {
         title: 'Dashboard',
         meta: [
             {
                 name: 'description',
+                content: `Set the settings of ${guild.name}`
+            },
+            {
                 property: 'og:description',
-                content: `Set the settings of ${data?.guild.name}`
+                content: `Set the settings of ${guild.name}`
             }
         ]
     }
