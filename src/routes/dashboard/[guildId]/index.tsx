@@ -197,22 +197,60 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Join Message</h1>
                         <p class="text-gray-400 text-md">The message when someone joins the server</p>
-                        <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone joins" />
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { joinmessage } }) => {
+                                joinmessage = JSON.parse(joinmessage);
+                                return (
+                                    <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone joins">
+                                        {joinmessage.message}
+                                    </textarea>
+                                )
+                            }}
+                        />
                         <p class="text-gray-400 text-md">Variables: {'{USER MENTION} {USER TAG}'}</p>
                         <p class="font-bold text-white text-lg pt-2.5">The channel to post in</p>
-                        <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH TEXT CHANNELS</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { joinmessage }, guild: { channels } }) => {
+                                joinmessage = JSON.parse(joinmessage);
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={joinmessage.channel == 'false'}>Use system channel</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={joinmessage.channel == c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Leave Message</h1>
                         <p class="text-gray-400 text-md">The message when someone leaves the server</p>
-                        <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone leaves" />
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { leavemessage } }) => {
+                                leavemessage = JSON.parse(leavemessage);
+                                return (
+                                    <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone leaves">
+                                        {leavemessage.message}
+                                    </textarea>
+                                )
+                            }}
+                        />
                         <p class="text-gray-400 text-md">Variables: {'{USER MENTION} {USER TAG}'}</p>
                         <p class="font-bold text-white text-lg pt-2.5">The channel to post in</p>
-                        <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH TEXT CHANNELS</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { leavemessage }, guild: { channels } }) => {
+                                leavemessage = JSON.parse(leavemessage);
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={leavemessage.channel == 'false'}>Use system channel</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={leavemessage.channel == c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-2 lg:col-span-1">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Max PP Size</h1>
@@ -221,7 +259,14 @@ export default component$(() => {
                             <button data-action="decrement" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-l-lg cursor-pointer">
                                 -
                             </button>
-                            <input type="number" class="text-sm text-center w-full bg-gray-700 placeholder-gray-400 text-white focus:bg-gray-600 focus:ring ring-indigo-600" value="0" />
+                            <Resource
+                                value={GuildData}
+                                onResolved={({ srvconfig: { maxppsize } }) => {
+                                    return (
+                                        <input type="number" class="text-sm text-center w-full bg-gray-700 placeholder-gray-400 text-white focus:bg-gray-600 focus:ring ring-indigo-600" value={maxppsize} />
+                                    )
+                                }}
+                            />
                             <button data-action="increment" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-r-lg cursor-pointer">
                                 +
                             </button>
@@ -230,85 +275,170 @@ export default component$(() => {
                 </div>
                 <h1 class="font-bold tracking-tiught text-white text-4xl" id="logging">Audit Logs</h1>
                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-10">
-                    <div class="bg-gray-800 rounded-2xl p-6 col-span-2 lg:col-span-3 xl:col-span-4">
-                        <h1 class="font-bold tracking-tight text-white text-2xl">Default Log Channel</h1>
+                    <div class="bg-gray-800 rounded-2xl p-6 col-span-1 lg:col-span-2 xl:col-span-3">
+                        <h1 class="font-bold tracking-tight text-white text-2xl">Default Channel</h1>
                         <p class="text-gray-400 text-md">This is where audit logs without a channel specified will be posted</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH TEXT CHANNELS</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { auditlogs }, guild: { channels } }) => {
+                                auditlogs = JSON.parse(auditlogs);
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={auditlogs.channel == 'false'}>Use system channel</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={auditlogs.channel == c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
-                        <h1 class="font-bold tracking-tight text-white text-2xl">[Log Name]</h1>
-                        <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">Use Default Channel</option>
-                        </select>
-                    </div>
-                    <div class="bg-gray-800 rounded-2xl p-6">
-                        <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="all">All Logs</option>
-                            <option value="member">All Member-Related Logs</option>
-                            <option value="memberjoin">Member Joined</option>
-                            <option value="memberleave">Member Left</option>
-                            <option value="message">All Message-Related Logs</option>
-                            <option value="messagedelete">Message Deleted</option>
-                            <option value="messagedeletebulk">Messages Bulk-Deleted</option>
-                            <option value="messageupdate">Message Edited</option>
-                            <option value="channel">All Channel-Related Logs</option>
-                            <option value="channelcreate">Channel Created</option>
-                            <option value="channeldelete">Channel Deleted</option>
-                            <option value="channelupdate">Channel Updated</option>
-                            <option value="voice">All Voice-Related Logs</option>
-                            <option value="voicejoin">Joined Voice Channel</option>
-                            <option value="voiceleave">Left Voice Channel</option>
-                            <option value="voicemove">Moved Voice Channels</option>
-                            <option value="voicedeafen">Voice Deafened</option>
-                            <option value="voicemute">Voice Muted</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { auditlogs } }) => {
+                                auditlogs = JSON.parse(auditlogs);
+                                return (
+                                    <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        {!auditlogs.logs?.all && <option value="all">All Logs</option>}
+                                        {!auditlogs.logs?.member && <option value="member">All Member-Related Logs</option>}
+                                        {!auditlogs.logs?.member && !auditlogs.logs?.memberjoin && <option value="memberjoin">Member Joined</option>}
+                                        {!auditlogs.logs?.member && !auditlogs.logs?.memberleave && <option value="memberleave">Member Left</option>}
+                                        {!auditlogs.logs?.message && <option value="message">All Message-Related Logs</option>}
+                                        {!auditlogs.logs?.message && !auditlogs.logs?.messagedelete && <option value="messagedelete">Message Deleted</option>}
+                                        {!auditlogs.logs?.message && !auditlogs.logs?.messagedeletebulk && <option value="messagedeletebulk">Messages Bulk-Deleted</option>}
+                                        {!auditlogs.logs?.message && !auditlogs.logs?.messageupdate && <option value="messageupdate">Message Edited</option>}
+                                        {!auditlogs.logs?.channel && <option value="channel">All Channel-Related Logs</option>}
+                                        {!auditlogs.logs?.channel && !auditlogs.logs?.channelcreate && <option value="channelcreate">Channel Created</option>}
+                                        {!auditlogs.logs?.channel && !auditlogs.logs?.channeldelete && <option value="channeldelete">Channel Deleted</option>}
+                                        {!auditlogs.logs?.channel && !auditlogs.logs?.channelupdate && <option value="channelupdate">Channel Updated</option>}
+                                        {!auditlogs.logs?.voice && <option value="voice">All Voice-Related Logs</option>}
+                                        {!auditlogs.logs?.voice && !auditlogs.logs?.voicejoin && <option value="voicejoin">Joined Voice Channel</option>}
+                                        {!auditlogs.logs?.voice && !auditlogs.logs?.voiceleave && <option value="voiceleave">Left Voice Channel</option>}
+                                        {!auditlogs.logs?.voice && !auditlogs.logs?.voicemove && <option value="voicemove">Moved Voice Channels</option>}
+                                        {!auditlogs.logs?.voice && !auditlogs.logs?.voicedeafen && <option value="voicedeafen">Voice Deafened</option>}
+                                        {!auditlogs.logs?.voice && !auditlogs.logs?.voicemute && <option value="voicemute">Voice Muted</option>}
+                                    </select>
+                                )
+                            }}
+                        />
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ guild: { channels } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected>Use Default Channel</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                         <div class="rounded-md shadow">
-                            <a href="/invite" class="flex w-full items-center justify-center rounded-lg border border-transparent bg-lime-600 p-2.5 text-sm font-bold text-gray-200 hover:bg-lime-500">
+                            <a class="flex w-full items-center justify-center rounded-lg border border-transparent bg-lime-600 p-2.5 text-sm font-bold text-gray-200 hover:bg-lime-500">
                                 Add Audit Log
                             </a>
                         </div>
                     </div>
+                    <Resource
+                        value={GuildData}
+                        onResolved={({ guild: { channels }, srvconfig: { auditlogs } }) => {
+                            auditlogs = JSON.parse(auditlogs);
+                            const tiles = Object.keys(auditlogs.logs ?? {}).map(log => {
+                                return (
+                                    <div class="bg-gray-800 rounded-2xl p-6">
+                                        <h1 class="font-bold tracking-tight text-white text-2xl">{log}</h1>
+                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                            <option value="false" selected={auditlogs.logs[log].channel == 'false'}>Use Default Channel</option>
+                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={auditlogs.logs[log].channel == c.id}># {c.name}</option>) })}
+                                        </select>
+                                    </div>
+                                )
+                            });
+                            return (
+                                <>
+                                    {tiles}
+                                </>
+                            )
+                        }}
+                    />
                 </div>
                 <h1 class="font-bold tracking-tight text-white text-4xl" id="tickets">Ticket System</h1>
                 <div class="grid md:grid-cols-6 gap-6 py-10">
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-2">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Mode</h1>
                         <p class="text-gray-400 text-md">This is how the bot will handle tickets</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">Disable Tickets</option>
-                            <option value="buttons">Use buttons</option>
-                            <option value="reactions">Use reactions</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { tickets } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={tickets == 'false'}>Disable Tickets</option>
+                                        <option value="buttons" selected={tickets == 'buttons'}>Use buttons</option>
+                                        <option value="reactions" selected={tickets == 'reactions'}>Use reactions</option>
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-2">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Category</h1>
                         <p class="text-gray-400 text-md">The category where tickets will appear</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH CATEGORY CHANNELS</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { ticketcategory }, guild: { channels } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={ticketcategory == 'false'}>No category</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildCategory).map((c: obj) => { return (<option value={c.id} selected={ticketcategory == c.id}>&gt; {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-2">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Log Channel</h1>
-                        <p class="text-gray-400 text-md">The channel where ticket transcripts will appear</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH TEXT CHANNELS</option>
-                        </select>
+                        <p class="text-gray-400 text-md">The channel where transcripts will appear</p>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { ticketlogchannel }, guild: { channels } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={ticketlogchannel == 'false'}>No logs</option>
+                                        {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={ticketlogchannel == c.id}># {c.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-3">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Access Role</h1>
                         <p class="text-gray-400 text-md">The role that may access tickets</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH ROLES</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { supportrole }, guild: { roles } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={supportrole == 'false'}>Only Administrators</option>
+                                        {roles.map((r: obj) => { return (<option value={r.id} selected={supportrole == r.id}>@ {r.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6 md:col-span-3">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Mention</h1>
                         <p class="text-gray-400 text-md">Pings the specified role when a ticket is created</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="false">FILL WITH ROLES</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { supportrole }, guild: { roles } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="false" selected={supportrole == 'false'}>No mention</option>
+                                        <option value="everyone" selected={supportrole == 'everyone'}>@ everyone</option>
+                                        <option value="here" selected={supportrole == 'here'}>@ here</option>
+                                        {roles.map((r: obj) => { return (<option value={r.id} selected={supportrole == r.id}>@ {r.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                 </div>
                 <h1 class="font-bold tracking-tight text-white text-4xl" id="moderation">Moderation</h1>
@@ -320,7 +450,14 @@ export default component$(() => {
                             <button data-action="decrement" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-l-lg cursor-pointer">
                                 -
                             </button>
-                            <input type="number" class="text-sm text-center w-full bg-gray-700 placeholder-gray-400 text-white focus:bg-gray-600 focus:ring ring-indigo-600" value="0" />
+                            <Resource
+                                value={GuildData}
+                                onResolved={({ srvconfig: { msgshortener } }) => {
+                                    return (
+                                        <input type="number" class="text-sm text-center w-full bg-gray-700 placeholder-gray-400 text-white focus:bg-gray-600 focus:ring ring-indigo-600" value={msgshortener} />
+                                    )
+                                }}
+                            />
                             <button data-action="increment" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-r-lg cursor-pointer">
                                 +
                             </button>
@@ -329,15 +466,29 @@ export default component$(() => {
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Mute Command</h1>
                         <p class="text-gray-400 text-md">Select a role to give when muting or use Discord's timeout feature</p>
-                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                            <option value="timeout">Use Discord's timeout feature</option>
-                            <option value="false">FILL WITH ROLES</option>
-                        </select>
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { mutecmd }, guild: { roles } }) => {
+                                return (
+                                    <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <option value="timeout" selected={mutecmd == 'timeout'}>Use Discord's timeout feature</option>
+                                        {roles.map((r: obj) => { return (<option value={r.id} selected={mutecmd == r.id}>@ {r.name}</option>) })}
+                                    </select>
+                                )
+                            }}
+                        />
                     </div>
                     <div class="bg-gray-800 rounded-2xl p-6">
                         <h1 class="font-bold tracking-tight text-white text-2xl">Disabled Commands</h1>
                         <p class="text-gray-400 text-md">Disable certain commands from Cactie separated by commas</p>
-                        <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="Specify commands to disable, no spaces" />
+                        <Resource
+                            value={GuildData}
+                            onResolved={({ srvconfig: { disabledcmds } }) => {
+                                return (
+                                    <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="Specify commands to disable, no spaces" value={disabledcmds == 'false' ? '' : disabledcmds} />
+                                )
+                            }}
+                        />
                     </div>
                 </div>
                 <h1 class="font-bold tracking-tiught text-white text-4xl" id="reactionroles">Reaction Roles</h1>
