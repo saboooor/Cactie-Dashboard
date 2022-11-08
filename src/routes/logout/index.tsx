@@ -1,39 +1,43 @@
-import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import type { DocumentHead, RequestHandler } from "@builder.io/qwik-city";
 
-import fs from 'fs';
-import YAML from 'yaml';
-const { dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
+import fs from "fs";
+import YAML from "yaml";
+const { dashboard } = YAML.parse(fs.readFileSync("./config.yml", "utf8"));
 
 export const onGet: RequestHandler = async ({ request, response }) => {
   const cookieJSON: any = {};
-  const cookiesArray = request.headers.get('cookie')?.split('; ');
+  const cookiesArray = request.headers.get("cookie")?.split("; ");
   cookiesArray?.forEach((cookie: string) => {
-      const values = cookie.split('=');
-      cookieJSON[values[0]] = values[1];
+    const values = cookie.split("=");
+    cookieJSON[values[0]] = values[1];
   });
 
-  const sid = cookieJSON['connect.sid'];
+  const sid = cookieJSON["connect.sid"];
 
-  response.headers.set('Set-Cookie', `connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;expires=Thu, 01 Jan 1970 00:00:00 UTC;`);
+  response.headers.set(
+    "Set-Cookie",
+    `connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;expires=Thu, 01 Jan 1970 00:00:00 UTC;`
+  );
 
   console.log(`${sessions[sid].tag} logged out`);
 
   delete sessions[sid];
-  if (dashboard.debug) fs.writeFileSync('./sessions.json', JSON.stringify(sessions));
+  if (dashboard.debug)
+    fs.writeFileSync("./sessions.json", JSON.stringify(sessions));
 
-  throw response.redirect('/');
+  throw response.redirect("/");
 };
 
 export const head: DocumentHead = {
-  title: 'Login',
+  title: "Login",
   meta: [
     {
-      name: 'description',
-      content: 'Login to the dashboard using Discord'
+      name: "description",
+      content: "Login to the dashboard using Discord",
     },
     {
-      property: 'og:description',
-      content: 'Login to the dashboard using Discord'
-    }
-  ]
-}
+      property: "og:description",
+      content: "Login to the dashboard using Discord",
+    },
+  ],
+};

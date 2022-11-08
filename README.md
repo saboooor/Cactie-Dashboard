@@ -1,4 +1,5 @@
 # Cactie Dashboard
+
 <p align="center">
   <img src="https://cactie.smhsmh.club/assets/images/Cactie.webp" width="20%" alt="Cactie">
 </p>
@@ -12,4 +13,5 @@ This is source code for Cactie's Dashboard
 ![Discord Bots](https://top.gg/api/widget/upvotes/765287593762881616.svg)
 
 ### Contributors
+
 ![Contributors](https://contrib.rocks/image?repo=saboooor/cactie)
