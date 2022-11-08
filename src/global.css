@@ -11,9 +11,9 @@
 @tailwind utilities;
 
 @layer base {
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"] {
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number'] {
     -webkit-appearance: none;
     -moz-appearance: textfield !important;
     appearance: none;
@@ -22,12 +22,8 @@
 }
 
 @layer utilities {
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
 }
 
 html {
@@ -35,9 +31,7 @@ html {
   background-color: hsl(231deg, 39%, 11%);
 }
 
-* {
-  scroll-behavior: smooth;
-}
+* { scroll-behavior: smooth; }
 *::-webkit-scrollbar {
   appearance: none;
   -webkit-appearance: none;

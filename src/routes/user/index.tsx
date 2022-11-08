@@ -1,6 +1,6 @@
 // File: src/routes/product/[skuId]/details/index.tsx
-import type { DocumentHead, RequestHandler } from "@builder.io/qwik-city";
-import getAuth from "../../auth";
+import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import getAuth from '../../auth';
 
 export interface UserInfo {
   tag: string;
@@ -10,27 +10,23 @@ export interface UserInfo {
 
 export const onGet: RequestHandler<UserInfo> = async ({ request }) => {
   const auth = getAuth(request);
-  return auth
-    ? {
-        tag: auth.tag,
-        pfp: auth.pfp,
-        accent: auth.accent,
-      }
-    : null;
+  return auth ? {
+    tag: auth.tag,
+    pfp: auth.pfp,
+    accent: auth.accent,
+  } : null;
 };
 
 export const head: DocumentHead = {
-  title: "User",
+  title: 'User',
   meta: [
     {
-      name: "description",
-      content:
-        "Info for the current logged in user. Will be null if the user is not logged in.",
+      name: 'description',
+      content: 'Info for the current logged in user. Will be null if the user is not logged in.'
     },
     {
-      property: "og:description",
-      content:
-        "Info for the current logged in user. Will be null if the user is not logged in.",
-    },
-  ],
-};
+      property: 'og:description',
+      content: 'Info for the current logged in user. Will be null if the user is not logged in.'
+    }
+  ]
+}
