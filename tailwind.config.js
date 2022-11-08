@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 const gray = {
-  50:  "hsl(220deg, 20%, 98%)",
+  50: "hsl(220deg, 20%, 98%)",
   100: "hsl(230deg, 14%, 96%)",
   200: "hsl(230deg, 13%, 91%)",
   300: "hsl(226deg, 12%, 84%)",

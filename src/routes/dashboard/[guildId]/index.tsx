@@ -529,14 +529,19 @@ export default component$(() => {
           <div class="bg-gray-800 rounded-2xl p-6">
             <Resource
               value={GuildData}
-              onResolved={({ srvconfig: { auditlogs }, guild: { channels } }) => {
+              onResolved={({
+                srvconfig: { auditlogs },
+                guild: { channels },
+              }) => {
                 auditlogs = JSON.parse(auditlogs);
                 if (auditlogs.logs?.all) {
                   return (
                     <>
-                      <h1 class="font-bold tracking-tight text-white text-2xl">There's no more audit logs to add!</h1>
+                      <h1 class="font-bold tracking-tight text-white text-2xl">
+                        There's no more audit logs to add!
+                      </h1>
                     </>
-                  )
+                  );
                 }
                 return (
                   <>
@@ -544,7 +549,9 @@ export default component$(() => {
                       <option value="all">All Logs</option>
                       {!auditlogs.logs?.member && (
                         <>
-                          <option value="member">All Member-Related Logs</option>
+                          <option value="member">
+                            All Member-Related Logs
+                          </option>
                           {!auditlogs.logs?.memberjoin && (
                             <option value="memberjoin">Member Joined</option>
                           )}
@@ -555,29 +562,45 @@ export default component$(() => {
                       )}
                       {!auditlogs.logs?.message && (
                         <>
-                          <option value="message">All Message-Related Logs</option>
+                          <option value="message">
+                            All Message-Related Logs
+                          </option>
                           {!auditlogs.logs?.messagedelete && (
-                            <option value="messagedelete">Message Deleted</option>
+                            <option value="messagedelete">
+                              Message Deleted
+                            </option>
                           )}
                           {!auditlogs.logs?.messagedeletebulk && (
-                            <option value="messagedeletebulk">Messages Bulk-Deleted</option>
+                            <option value="messagedeletebulk">
+                              Messages Bulk-Deleted
+                            </option>
                           )}
                           {!auditlogs.logs?.messageupdate && (
-                            <option value="messageupdate">Message Edited</option>
+                            <option value="messageupdate">
+                              Message Edited
+                            </option>
                           )}
                         </>
                       )}
                       {!auditlogs.logs?.channel && (
                         <>
-                          <option value="channel">All Channel-Related Logs</option>
+                          <option value="channel">
+                            All Channel-Related Logs
+                          </option>
                           {!auditlogs.logs?.channelcreate && (
-                            <option value="channelcreate">Channel Created</option>
+                            <option value="channelcreate">
+                              Channel Created
+                            </option>
                           )}
                           {!auditlogs.logs?.channeldelete && (
-                            <option value="channeldelete">Channel Deleted</option>
+                            <option value="channeldelete">
+                              Channel Deleted
+                            </option>
                           )}
                           {!auditlogs.logs?.channelupdate && (
-                            <option value="channelupdate">Channel Updated</option>
+                            <option value="channelupdate">
+                              Channel Updated
+                            </option>
                           )}
                         </>
                       )}
@@ -585,13 +608,19 @@ export default component$(() => {
                         <>
                           <option value="voice">All Voice-Related Logs</option>
                           {!auditlogs.logs?.voicejoin && (
-                            <option value="voicejoin">Joined Voice Channel</option>
+                            <option value="voicejoin">
+                              Joined Voice Channel
+                            </option>
                           )}
                           {!auditlogs.logs?.voiceleave && (
-                            <option value="voiceleave">Left Voice Channel</option>
+                            <option value="voiceleave">
+                              Left Voice Channel
+                            </option>
                           )}
                           {!auditlogs.logs?.voicemove && (
-                            <option value="voicemove">Moved Voice Channels</option>
+                            <option value="voicemove">
+                              Moved Voice Channels
+                            </option>
                           )}
                           {!auditlogs.logs?.voicedeafen && (
                             <option value="voicedeafen">Voice Deafened</option>
