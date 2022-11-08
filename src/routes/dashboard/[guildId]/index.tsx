@@ -629,8 +629,11 @@ export default component$(() => {
               const tiles = Object.keys(auditlogs.logs ?? {}).map((log) => {
                 return (
                   <div class="bg-gray-800 rounded-2xl p-6">
-                    <h1 class="font-bold tracking-tight text-white text-2xl">
+                    <h1 class="float-left font-bold tracking-tight text-white text-2xl">
                       {log}
+                    </h1>
+                    <h1 class="float-right font-bold tracking-tight text-red-400 text-2xl">
+                      X
                     </h1>
                     <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                       <option
