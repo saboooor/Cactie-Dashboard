@@ -529,99 +529,98 @@ export default component$(() => {
           <div class="bg-gray-800 rounded-2xl p-6">
             <Resource
               value={GuildData}
-              onResolved={({ srvconfig: { auditlogs } }) => {
+              onResolved={({ srvconfig: { auditlogs }, guild: { channels } }) => {
                 auditlogs = JSON.parse(auditlogs);
+                if (auditlogs.logs?.all) {
+                  return (
+                    <>
+                      <h1 class="font-bold tracking-tight text-white text-2xl">There's no more audit logs to add!</h1>
+                    </>
+                  )
+                }
                 return (
-                  <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                    {!auditlogs.logs?.all && (
+                  <>
+                    <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                       <option value="all">All Logs</option>
-                    )}
-                    {!auditlogs.logs?.member && (
-                      <option value="member">All Member-Related Logs</option>
-                    )}
-                    {!auditlogs.logs?.member && !auditlogs.logs?.memberjoin && (
-                      <option value="memberjoin">Member Joined</option>
-                    )}
-                    {!auditlogs.logs?.member &&
-                      !auditlogs.logs?.memberleave && (
-                        <option value="memberleave">Member Left</option>
+                      {!auditlogs.logs?.member && (
+                        <>
+                          <option value="member">All Member-Related Logs</option>
+                          {!auditlogs.logs?.memberjoin && (
+                            <option value="memberjoin">Member Joined</option>
+                          )}
+                          {!auditlogs.logs?.memberleave && (
+                            <option value="memberleave">Member Left</option>
+                          )}
+                        </>
                       )}
-                    {!auditlogs.logs?.message && (
-                      <option value="message">All Message-Related Logs</option>
-                    )}
-                    {!auditlogs.logs?.message &&
-                      !auditlogs.logs?.messagedelete && (
-                        <option value="messagedelete">Message Deleted</option>
+                      {!auditlogs.logs?.message && (
+                        <>
+                          <option value="message">All Message-Related Logs</option>
+                          {!auditlogs.logs?.messagedelete && (
+                            <option value="messagedelete">Message Deleted</option>
+                          )}
+                          {!auditlogs.logs?.messagedeletebulk && (
+                            <option value="messagedeletebulk">Messages Bulk-Deleted</option>
+                          )}
+                          {!auditlogs.logs?.messageupdate && (
+                            <option value="messageupdate">Message Edited</option>
+                          )}
+                        </>
                       )}
-                    {!auditlogs.logs?.message &&
-                      !auditlogs.logs?.messagedeletebulk && (
-                        <option value="messagedeletebulk">
-                          Messages Bulk-Deleted
-                        </option>
+                      {!auditlogs.logs?.channel && (
+                        <>
+                          <option value="channel">All Channel-Related Logs</option>
+                          {!auditlogs.logs?.channelcreate && (
+                            <option value="channelcreate">Channel Created</option>
+                          )}
+                          {!auditlogs.logs?.channeldelete && (
+                            <option value="channeldelete">Channel Deleted</option>
+                          )}
+                          {!auditlogs.logs?.channelupdate && (
+                            <option value="channelupdate">Channel Updated</option>
+                          )}
+                        </>
                       )}
-                    {!auditlogs.logs?.message &&
-                      !auditlogs.logs?.messageupdate && (
-                        <option value="messageupdate">Message Edited</option>
+                      {!auditlogs.logs?.voice && (
+                        <>
+                          <option value="voice">All Voice-Related Logs</option>
+                          {!auditlogs.logs?.voicejoin && (
+                            <option value="voicejoin">Joined Voice Channel</option>
+                          )}
+                          {!auditlogs.logs?.voiceleave && (
+                            <option value="voiceleave">Left Voice Channel</option>
+                          )}
+                          {!auditlogs.logs?.voicemove && (
+                            <option value="voicemove">Moved Voice Channels</option>
+                          )}
+                          {!auditlogs.logs?.voicedeafen && (
+                            <option value="voicedeafen">Voice Deafened</option>
+                          )}
+                          {!auditlogs.logs?.voicemute && (
+                            <option value="voicemute">Voice Muted</option>
+                          )}
+                        </>
                       )}
-                    {!auditlogs.logs?.channel && (
-                      <option value="channel">All Channel-Related Logs</option>
-                    )}
-                    {!auditlogs.logs?.channel &&
-                      !auditlogs.logs?.channelcreate && (
-                        <option value="channelcreate">Channel Created</option>
-                      )}
-                    {!auditlogs.logs?.channel &&
-                      !auditlogs.logs?.channeldelete && (
-                        <option value="channeldelete">Channel Deleted</option>
-                      )}
-                    {!auditlogs.logs?.channel &&
-                      !auditlogs.logs?.channelupdate && (
-                        <option value="channelupdate">Channel Updated</option>
-                      )}
-                    {!auditlogs.logs?.voice && (
-                      <option value="voice">All Voice-Related Logs</option>
-                    )}
-                    {!auditlogs.logs?.voice && !auditlogs.logs?.voicejoin && (
-                      <option value="voicejoin">Joined Voice Channel</option>
-                    )}
-                    {!auditlogs.logs?.voice && !auditlogs.logs?.voiceleave && (
-                      <option value="voiceleave">Left Voice Channel</option>
-                    )}
-                    {!auditlogs.logs?.voice && !auditlogs.logs?.voicemove && (
-                      <option value="voicemove">Moved Voice Channels</option>
-                    )}
-                    {!auditlogs.logs?.voice && !auditlogs.logs?.voicedeafen && (
-                      <option value="voicedeafen">Voice Deafened</option>
-                    )}
-                    {!auditlogs.logs?.voice && !auditlogs.logs?.voicemute && (
-                      <option value="voicemute">Voice Muted</option>
-                    )}
-                  </select>
+                    </select>
+                    <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                      <option value="false" selected>
+                        Use Default Channel
+                      </option>
+                      {channels
+                        .filter((c: obj) => c.type == ChannelType.GuildText)
+                        .map((c: obj) => {
+                          return <option value={c.id}># {c.name}</option>;
+                        })}
+                    </select>
+                    <div class="rounded-md shadow">
+                      <a class="flex w-full items-center justify-center rounded-lg border border-transparent bg-lime-600 p-2.5 text-sm font-bold text-gray-200 hover:bg-lime-500">
+                        Add Audit Log
+                      </a>
+                    </div>
+                  </>
                 );
               }}
             />
-            <Resource
-              value={GuildData}
-              onResolved={({ guild: { channels } }) => {
-                return (
-                  <select class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mb-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
-                    <option value="false" selected>
-                      Use Default Channel
-                    </option>
-                    {channels
-                      .filter((c: obj) => c.type == ChannelType.GuildText)
-                      .map((c: obj) => {
-                        return <option value={c.id}># {c.name}</option>;
-                      })}
-                  </select>
-                );
-              }}
-            />
-            <div class="rounded-md shadow">
-              <a class="flex w-full items-center justify-center rounded-lg border border-transparent bg-lime-600 p-2.5 text-sm font-bold text-gray-200 hover:bg-lime-500">
-                Add Audit Log
-              </a>
-            </div>
           </div>
           <Resource
             value={GuildData}
