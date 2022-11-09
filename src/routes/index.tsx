@@ -3,13 +3,13 @@ import type { DocumentHead } from '@builder.io/qwik-city';
 
 export default component$(() => {
   return (
-    <section class="flex mx-auto max-w-6xl px-6 items-center" style="min-height: calc(100vh - 64px);">
-      <div class="text-center sm:text-left justify-start" style="filter: drop-shadow(0 5rem 10rem rgba(79, 70, 229, 1));">
+    <section class="flex mx-auto max-w-6xl px-6 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div class="text-center sm:text-left justify-start" style={{ filter: 'drop-shadow(0 5rem 10rem rgba(79, 70, 229, 1))' }}>
         <div class="flex sm:hidden relative justify-center align-center sm:ml-auto mb-10" style="width: 100%;">
-          <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style="left: 45%"></div>
-          <div class="absolute top-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-2000" style="right: 50%"></div>
-          <div class="absolute bottom-5 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-4000" style="left: 40%"></div>
-          <img class="rounded-full z-10 animate-float ease-in-out" src={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} style="max-width: 40%" alt={client.user!.username} />
+          <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style={{ left: '45%' }}></div>
+          <div class="absolute top-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-2000" style={{ right: '50%' }}></div>
+          <div class="absolute bottom-5 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-4000" style={{ left: '40%' }}></div>
+          <img class="rounded-full z-10 animate-float ease-in-out" src={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} style={{ maxWidth: '40%' }} alt={client.user!.username} />
         </div>
         <h1 class="font-bold tracking-tight text-white text-5xl">
           The last <span class="text-blue-400">Discord</span> bot you need, <span class="text-green-200">{client.user!.username}</span>.
@@ -40,7 +40,7 @@ export default component$(() => {
           </div>
         </div>
       </div>
-      <div class="hidden sm:flex relative justify-end align-center sm:ml-auto" style="max-width: 50%;">
+      <div class="hidden sm:flex relative justify-end align-center sm:ml-auto" style={{ maxWidth: '50%' }}>
         <div class="absolute top-10 left-10 w-72 h-72 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
         <div class="absolute top-10 right-10 w-72 h-72 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
         <div class="absolute bottom-5 left-32 w-72 h-72 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
