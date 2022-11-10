@@ -624,9 +624,9 @@ export default component$(() => {
                                                 </div>
                                                 <div class="ml-4">
                                                     <h1 class="font-bold tracking-tight text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
-                                                    <p class="text-sm">
-                                                        {rr.type == 'switch' ? 'Adds role by reacting / Removes role by unreacting' : 'Adds / Removes role by reacting'}<br />
-                                                        {rr.silent == 'true' && 'Keeps quiet when reacted'}
+                                                    <p class="text-xs sm:text-sm">
+                                                        {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
+                                                        {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
                                                     </p>
                                                 </div>
                                                 <div class="ml-auto">
