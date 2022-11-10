@@ -90,7 +90,7 @@ export default component$(() => {
                     onResolved={({ guild }) => {
                         return (
                             <p class="flex items-center p-5 text-base font-bold rounded-2xl mb-6 bg-gray-800 text-white">
-                                <img class="w-10 h-10 rounded-full" src={guild.iconURL ?? undefined} alt={guild.name} ></img>
+                                {guild.iconURL && <img class="w-10 h-10 rounded-full" src={guild.iconURL} alt={guild.name} />}
                                 <span class="flex-1 ml-3 text-lg">{guild.name}</span>
                             </p>
                         )
@@ -618,12 +618,19 @@ export default component$(() => {
                                     const rolelist = rrRoles.map(rr => {
                                         const role = roles.find(r => r.id == rr.roleId);
                                         return (
-                                            <div class={`bg-gray-600 rounded-2xl p-4 pl-0 grid grid-cols-6`}>
+                                            <div class="group bg-gray-600 hover:bg-gray-500 rounded-2xl p-4 px-6 flex items-center w-full">
                                                 <div>
-                                                    {rr.emojiUrl ? <img src={rr.emojiUrl} class="px-4"/> : <p class="text-4xl text-center w-full">{rr.emojiId}</p>}
+                                                    {rr.emojiUrl ? <img src={rr.emojiUrl} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                                 </div>
-                                                <div class="col-span-5">
-                                                    <h1 class="font-bold tracking-tight text-white text-lg" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'}</h1>
+                                                <div class="ml-4">
+                                                    <h1 class="font-bold tracking-tight text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
+                                                    <p class="text-sm">
+                                                        {rr.type == 'switch' ? 'Adds role by reacting / Removes role by unreacting' : 'Adds / Removes role by reacting'}<br />
+                                                        {rr.silent == 'true' && 'Keeps quiet when reacted'}
+                                                    </p>
+                                                </div>
+                                                <div class="ml-auto">
+                                                    <h1 class="font-bold text-xl">•••</h1>
                                                 </div>
                                             </div>
                                         )
