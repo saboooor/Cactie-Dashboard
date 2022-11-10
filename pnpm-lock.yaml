@@ -1,8 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@builder.io/qwik': 0.12.1
-  '@builder.io/qwik-city': 0.0.118
+  '@builder.io/qwik': 0.13.0-dev20221109155930
+  '@builder.io/qwik-city': 0.0.120
   '@tailwindcss/line-clamp': 0.4.2
   '@types/eslint': 8.4.10
   '@types/node': latest
@@ -12,19 +12,19 @@ specifiers:
   discord-api-types: 0.37.17
   discord.js: 14.6.0
   eslint: 8.27.0
-  eslint-plugin-qwik: 0.12.1
+  eslint-plugin-qwik: 0.13.0-dev20221109155930
   mariadb: ^3.0.2
   postcss: 8.4.18
-  tailwindcss: 3.2.2
+  tailwindcss: 3.2.3
   typescript: 4.8.4
   vite: 3.2.3
   vite-tsconfig-paths: 3.5.2
   yaml: 2.1.3
 
 devDependencies:
-  '@builder.io/qwik': 0.12.1
-  '@builder.io/qwik-city': 0.0.118
-  '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.2
+  '@builder.io/qwik': 0.13.0-dev20221109155930
+  '@builder.io/qwik-city': 0.0.120
+  '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.3
   '@types/eslint': 8.4.10
   '@types/node': 18.11.9
   '@typescript-eslint/eslint-plugin': 5.42.1_2udltptbznfmezdozpdoa2aemq
@@ -33,10 +33,10 @@ devDependencies:
   discord-api-types: 0.37.17
   discord.js: 14.6.0
   eslint: 8.27.0
-  eslint-plugin-qwik: 0.12.1_eslint@8.27.0
+  eslint-plugin-qwik: 0.13.0-dev20221109155930_eslint@8.27.0
   mariadb: 3.0.2
   postcss: 8.4.18
-  tailwindcss: 3.2.2_postcss@8.4.18
+  tailwindcss: 3.2.3_postcss@8.4.18
   typescript: 4.8.4
   vite: 3.2.3_@types+node@18.11.9
   vite-tsconfig-paths: 3.5.2_vite@3.2.3
@@ -44,8 +44,8 @@ devDependencies:
 
 packages:
 
-  /@builder.io/qwik-city/0.0.118:
-    resolution: {integrity: sha512-vkc20xK3HUr6rviVpDeOwbzCfo6QTjZWBL9oyGYcYLfqqC1gvvuc+zf548APAwbTQa+4/7pzJCNMVixvDyD/4g==}
+  /@builder.io/qwik-city/0.0.120:
+    resolution: {integrity: sha512-DieTUR5ll7d0STI+cX9O/1erP5WM2oW+MUAaA8X30BtSOR/JVD/7fcXvMfd50v83Menh7cM4Fkane3Z01VDlHA==}
     dependencies:
       '@mdx-js/mdx': 2.1.5
       '@types/mdx': 2.0.3
@@ -55,8 +55,8 @@ packages:
       - supports-color
     dev: true
 
-  /@builder.io/qwik/0.12.1:
-    resolution: {integrity: sha512-ePxm9tr6qa+cNySuIhXOElozkkqdRfyPvEPEV659QJSq704C031/VC0S2lqqvKsc9+ZogBlejGuYWLmtRrsT6w==}
+  /@builder.io/qwik/0.13.0-dev20221109155930:
+    resolution: {integrity: sha512-0ujz2DxFILQQENTMDI7IdsKPq5/LPc0aHG9beb1jVUMMJnazpXJ79kMKR92jkSN1b5c7WJ/Qu2k2uHJxry7OTQ==}
     engines: {node: '>=16'}
     hasBin: true
     dev: true
@@ -219,12 +219,12 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: true
 
-  /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.2.2:
+  /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.2.3:
     resolution: {integrity: sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==}
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.2.2_postcss@8.4.18
+      tailwindcss: 3.2.3_postcss@8.4.18
     dev: true
 
   /@tokenizer/token/0.3.0:
@@ -1002,8 +1002,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-plugin-qwik/0.12.1_eslint@8.27.0:
-    resolution: {integrity: sha512-Hp0b3CT9UodRz3kvYXz6ckryooHp7C60g6riRpvGX6lpMWrOJaqfhmIKHWgRi9/Xhm8awdI9NcaeIa7t34CNtg==}
+  /eslint-plugin-qwik/0.13.0-dev20221109155930_eslint@8.27.0:
+    resolution: {integrity: sha512-C0P6MLybFCmBPPAWqXJ/CCHfZVmvI5R6eAg+UEVx+nEgqyqXBq4RrmazpLFn4X+apdOWJBZLD84DM7gHbMVtgg==}
     engines: {node: '>=16'}
     peerDependencies:
       eslint: '>= 8'
@@ -2481,8 +2481,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /tailwindcss/3.2.2_postcss@8.4.18:
-    resolution: {integrity: sha512-c2GtSdqg+harR4QeoTmex0Ngfg8IIHNeLQH5yr2B9uZbZR1Xt1rYbjWOWTcj3YLTZhrmZnPowoQDbSRFyZHQ5Q==}
+  /tailwindcss/3.2.3_postcss@8.4.18:
+    resolution: {integrity: sha512-Xt9D4PK4zuuQCEB8bwK9JUCKmTgUwyac/6b0/42Vqhgl6YJkep+Wf5wq+5uXYfmrupdAD0YY2NY1hyZp1HjRrg==}
     engines: {node: '>=12.13.0'}
     hasBin: true
     peerDependencies:

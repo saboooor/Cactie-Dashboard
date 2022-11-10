@@ -617,7 +617,6 @@ export default component$(() => {
                                     const rrRoles = reactionroles.raw.filter(r => r.messageId == message);
                                     const rolelist = rrRoles.map(rr => {
                                         const role = roles.find(r => r.id == rr.roleId);
-                                        console.log(role?.color);
                                         return (
                                             <div class={`bg-gray-600 rounded-2xl p-4 pl-0 grid grid-cols-6`}>
                                                 <div>
