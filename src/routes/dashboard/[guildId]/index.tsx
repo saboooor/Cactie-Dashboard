@@ -624,7 +624,7 @@ export default component$(() => {
                                                         {rr.emojiUrl ? <img src={rr.emojiUrl} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                                     </div>
                                                     <div class="ml-4">
-                                                        <h1 class="font-bold tracking-tight text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
+                                                        <h1 class="font-bold tracking-tight text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
                                                         <p class="hidden sm:flex">
                                                             {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
                                                             {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
