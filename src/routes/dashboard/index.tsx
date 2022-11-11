@@ -28,7 +28,7 @@ export const onGet: RequestHandler<APIPartialGuild[]> = async ({ url, request, r
 };
 
 export default component$(() => {
-  const GuildList = useEndpoint<APIPartialGuild[]>();
+  const GuildList = useEndpoint<typeof onGet>();
   return (
     <section class="mx-auto max-w-screen-2xl px-6 pt-12 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div class="text-center" style={{ filter: 'drop-shadow(0 0 2rem rgba(79, 70, 229, 1));' }}>

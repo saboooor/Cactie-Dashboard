@@ -41,12 +41,7 @@ interface obj {
     color?: string;
 }
 
-export const onGet: RequestHandler<guildData> = async ({ url, params, request, response }) => {
-  const auth = getAuth(request);
-  if (!auth) {
-    response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
-    throw response.redirect('/login');
-  }
+const getData = async ({ params, response }: any) => {
   const guild = client.guilds.cache.get(params.guildId);
   if (!guild) throw response.redirect(`/dashboard?error=guild_not_found`);
   const guildJSON: any = guild.toJSON();
@@ -76,10 +71,35 @@ export const onGet: RequestHandler<guildData> = async ({ url, params, request, r
   }
 
   return { srvconfig: await db.getData('settings', { guildId: params.guildId }), reactionroles, guild: guildJSON };
+}
+
+export const onGet: RequestHandler<guildData> = async ({ url, params, request, response }) => {
+    const auth = getAuth(request);
+    if (!auth) {
+      response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
+      throw response.redirect('/login');
+    }
+    return getData({ params, response })
+};
+
+export const onPatch: RequestHandler<guildData> = async ({ url, params, request, response }) => {
+    const auth = getAuth(request);
+    if (!auth) {
+      response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
+      throw response.redirect('/login');
+    }
+
+    const body = await request.json();
+
+    if (body.srvconfig) {
+        await db.setData('settings', { guildId: params.guildId }, body.srvconfig);
+    }
+
+    return await getData({ params, response })
 };
 
 export default component$(() => {
-    const GuildData = useEndpoint<guildData>();
+    const GuildData = useEndpoint<typeof onGet>();
     return (
         <>
             <section class="grid gap-5 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-12" style={{ minHeight: 'calc(100vh - 64px)' }}>
@@ -147,7 +167,7 @@ export default component$(() => {
                                 value={GuildData}
                                 onResolved={({ srvconfig: { prefix } }) => {
                                     return (
-                                        <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The bot's prefix" value={prefix} />
+                                        <input type="text" class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The bot's prefix" value={prefix} name="prefix" />
                                     )
                                 }}
                             />
@@ -160,7 +180,7 @@ export default component$(() => {
                                             value={GuildData}
                                             onResolved={({ srvconfig: { reactions } }) => {
                                                 return (
-                                                    <input type="checkbox" value="" checked={reactions == 'true'} id="reactions" class="sr-only peer"/>
+                                                    <input type="checkbox" value="" checked={reactions == 'true'} id="reactions" class="sr-only peer" name="reactions" />
                                                 )
                                             }}
                                         />
@@ -178,7 +198,7 @@ export default component$(() => {
                                 value={GuildData}
                                 onResolved={({ srvconfig: { language } }) => {
                                     return (
-                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="language">
                                             <option value="false" selected={language == 'false'}>Use the server default</option>
                                             <option value="English" selected={language == 'English'}>English</option>
                                             <option value="Portuguese" selected={language == 'Portuguese'}>Portuguese</option>
@@ -199,7 +219,7 @@ export default component$(() => {
                                 value={GuildData}
                                 onResolved={({ srvconfig: { suggestchannel }, guild: { channels } }) => {
                                     return (
-                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="suggestchannel">
                                             <option value="false" selected={suggestchannel == 'false'}>Same channel as user</option>
                                             {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={suggestchannel == c.id}># {c.name}</option>) })}
                                         </select>
@@ -215,7 +235,7 @@ export default component$(() => {
                                             value={GuildData}
                                             onResolved={({ srvconfig: { suggestthreads } }) => {
                                                 return (
-                                                    <input type="checkbox" value="" checked={suggestthreads == 'true'} id="suggestthreads" class="sr-only peer"/>
+                                                    <input type="checkbox" value="" checked={suggestthreads == 'true'} id="suggestthreads" class="sr-only peer" name="suggestthreads" />
                                                 )
                                             }}
                                         />
@@ -233,7 +253,7 @@ export default component$(() => {
                                 value={GuildData}
                                 onResolved={({ srvconfig: { pollchannel }, guild: { channels } }) => {
                                     return (
-                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="pollchannel">
                                             <option value="false" selected={pollchannel == 'false'}>Same channel as user</option>
                                             {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={pollchannel == c.id}># {c.name}</option>) })}
                                         </select>
@@ -252,7 +272,7 @@ export default component$(() => {
                                 onResolved={({ srvconfig: { joinmessage } }) => {
                                     joinmessage = JSON.parse(joinmessage);
                                     return (
-                                        <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone joins">
+                                        <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone joins" name="joinmessage.message">
                                             {joinmessage.message}
                                         </textarea>
                                     )
@@ -265,7 +285,7 @@ export default component$(() => {
                                 onResolved={({ srvconfig: { joinmessage }, guild: { channels } }) => {
                                     joinmessage = JSON.parse(joinmessage);
                                     return (
-                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="joinmessage.channel">
                                             <option value="false" selected={joinmessage.channel == 'false'}>Use system channel</option>
                                             {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={joinmessage.channel == c.id}># {c.name}</option>) })}
                                         </select>
@@ -281,7 +301,7 @@ export default component$(() => {
                                 onResolved={({ srvconfig: { leavemessage } }) => {
                                     leavemessage = JSON.parse(leavemessage);
                                     return (
-                                        <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone leaves">
+                                        <textarea class="text-sm rounded-lg w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" placeholder="The content of the message sent when someone leaves" name="leavemessage.message">
                                             {leavemessage.message}
                                         </textarea>
                                     )
@@ -294,7 +314,7 @@ export default component$(() => {
                                 onResolved={({ srvconfig: { leavemessage }, guild: { channels } }) => {
                                     leavemessage = JSON.parse(leavemessage);
                                     return (
-                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
+                                        <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="leavemessage.channel">
                                             <option value="false" selected={leavemessage.channel == 'false'}>Use system channel</option>
                                             {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={leavemessage.channel == c.id}># {c.name}</option>) })}
                                         </select>
@@ -306,7 +326,7 @@ export default component$(() => {
                             <h1 class="font-bold tracking-tight text-white text-2xl">Max PP Size</h1>
                             <p class="text-gray-400 text-md">The maximum pp size for the boner commands</p>
                             <div class="flex w-28 h-9 mt-2.5">
-                                <button data-action="decrement" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-l-lg cursor-pointer">
+                                <button data-action="decrement" onClick$={updateNumInput} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-l-lg cursor-pointer">
                                     -
                                 </button>
                                 <Resource
@@ -317,7 +337,7 @@ export default component$(() => {
                                         )
                                     }}
                                 />
-                                <button data-action="increment" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-r-lg cursor-pointer">
+                                <button data-action="increment" onClick$={updateNumInput} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-r-lg cursor-pointer">
                                     +
                                 </button>
                             </div>
@@ -557,18 +577,18 @@ export default component$(() => {
                             <h1 class="font-bold tracking-tight text-white text-2xl">Message Shortener</h1>
                             <p class="text-gray-400 text-md">The amount of lines in a message to shorten into a link. To disable, set to 0</p>
                             <div class="flex w-28 h-9 mt-2.5">
-                                <button data-action="decrement" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-l-lg cursor-pointer">
+                                <button data-action="decrement" onClick$={(event) => { updateNumInput(event); GuildData.refresh(); }} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-l-lg cursor-pointer">
                                     -
                                 </button>
                                 <Resource
                                     value={GuildData}
                                     onResolved={({ srvconfig: { msgshortener } }) => {
                                         return (
-                                            <input type="number" class="text-sm text-center w-full bg-gray-700 placeholder-gray-400 text-white focus:bg-gray-600 focus:ring ring-indigo-600" value={msgshortener} />
+                                            <input type="number" class="text-sm text-center w-full bg-gray-700 placeholder-gray-400 text-white focus:bg-gray-600 focus:ring ring-indigo-600" value={msgshortener} name="msgshortener" />
                                         )
                                     }}
                                 />
-                                <button data-action="increment" onClick$={(element) => console.log(element)} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-r-lg cursor-pointer">
+                                <button data-action="increment" onClick$={updateNumInput} class="bg-gray-600 text-white text-2xl hover:bg-gray-500 h-full w-20 rounded-r-lg cursor-pointer">
                                     +
                                 </button>
                             </div>
@@ -731,6 +751,28 @@ export const closeContextMenu = $((event: any) => {
     const contextmenu = document.getElementById('contextmenu')!;
     if (event.target.id != 'rrdelete' && (contextmenu.contains(event.target) || event.target.innerText == '•••' || contextmenu.style.display == 'none')) return;
     contextmenu.style.display = 'none';
+});
+
+export const updateNumInput = $(async (event: any) => {
+    const input = event.target.parentElement.getElementsByTagName('input')[0];
+    let newValue = input.value;
+    if (event.target.innerText == '-') newValue--;
+    else newValue++;
+    const json = {
+        srvconfig: {
+            [input.name]: newValue,
+        },
+    };
+    const req = await fetch(window.location.pathname, {
+		method: 'PATCH',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(json),
+	});
+	const res = await req.json();
+	return;
 });
 
 export const head: DocumentHead<guildData> = ({ data: { guild } }) => {
