@@ -601,14 +601,14 @@ export default component$(() => {
                             />
                         </div>
                     </div>
-                    <h1 class="font-bold tracking-tight text-white text-4xl float-left" id="reactionroles">Reaction Roles</h1>
-                    <div class="rounded-md shadow float-right">
+                    <h1 class="font-bold tracking-tight text-white text-4xl md:float-left" id="reactionroles">Reaction Roles</h1>
+                    <div class="rounded-md shadow mt-4 md:float-right md:mt-0">
                         <a class="flex w-full items-center justify-center rounded-lg border border-transparent bg-indigo-600 p-2.5 text-sm font-bold text-gray-200 hover:bg-indigo-500">
                             Create Reaction Role
                         </a>
                     </div>
                     <br/><br/>
-                    <div class="grid gap-5 py-10">
+                    <div class="grid gap-5 pb-10 md:pt-10">
                         <Resource
                             value={GuildData}
                             onResolved={({ guild: { channels, roles }, reactionroles }) => {
@@ -625,7 +625,7 @@ export default component$(() => {
                                                     </div>
                                                     <div class="ml-4">
                                                         <h1 class="font-bold tracking-tight text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
-                                                        <p class="text-xs sm:text-sm">
+                                                        <p class="hidden sm:flex">
                                                             {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
                                                             {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
                                                         </p>
@@ -638,8 +638,8 @@ export default component$(() => {
                                         })
                                         return (
                                             <div class="bg-gray-700 rounded-2xl p-4">
-                                                <h1 class="font-bold tracking-tight text-white text-xl float-left" id="reactionroles">Message # {message ?? 'Message Not Found'}</h1>
-                                                <a class="text-indigo-400 text-md font-bold hover:text-indigo-300 float-right">
+                                                <h1 class="font-bold tracking-tight text-white text-xl md:float-left" id="reactionroles">Message # {message ?? 'Message Not Found'}</h1>
+                                                <a class="text-indigo-400 text-md font-bold hover:text-indigo-300 mt-4 md:float-right md:mt-0">
                                                     Create Here
                                                 </a>
                                                 <br/><br/>
@@ -651,8 +651,8 @@ export default component$(() => {
                                     })
                                     return (
                                         <div class="bg-gray-800 rounded-2xl p-4">
-                                            <h1 class="font-bold tracking-tight text-white text-2xl float-left" id="reactionroles"># {channel?.name ?? 'Channel Not Found.'}</h1>
-                                            <a class="text-indigo-400 text-md font-bold hover:text-indigo-300 float-right">
+                                            <h1 class="font-bold tracking-tight text-white text-2xl md:float-left" id="reactionroles"># {channel?.name ?? 'Channel Not Found.'}</h1>
+                                            <a class="text-indigo-400 text-md font-bold hover:text-indigo-300 mt-4 md:float-right md:mt-0">
                                                 Create Here
                                             </a>
                                             <br/><br/>
@@ -702,7 +702,7 @@ export default component$(() => {
                         </a>
                     </li>
                     <li>
-                        <a class="flex flex-1 items-center p-2 text-sm rounded-lg text-red-400 hover:bg-gray-700 cursor-pointer" onClick$={closeContextMenu}>
+                        <a id="rrdelete" class="flex flex-1 items-center p-2 text-sm rounded-lg text-red-400 hover:bg-gray-700 cursor-pointer" onClick$={closeContextMenu}>
                             Delete
                         </a>
                     </li>
@@ -720,15 +720,16 @@ export const openContextMenu = $((event: any, rr: reactionRoleRaw) => {
     rrRole.value = rr.roleId;
     rrSwitch.value = rr.type;
     rrSilent.checked = rr.silent == 'true';
-    contextmenu.style.top = `${event.pageY}px`;
-    contextmenu.style.left = `${event.pageX}px`;
     contextmenu.style.display = 'flex';
+    contextmenu.style.top = `${event.pageY}px`;
+    const offset = event.pageX + contextmenu.clientWidth > document.body.clientWidth ? contextmenu.clientWidth : 0; 
+    contextmenu.style.left = `${event.pageX - offset}px`;
     document.addEventListener("click", closeContextMenu);
 });
 
 export const closeContextMenu = $((event: any) => {
     const contextmenu = document.getElementById('contextmenu')!;
-    if (contextmenu.contains(event.target) || contextmenu.style.display == 'none') return;
+    if (event.target.id != 'rrdelete' && (contextmenu.contains(event.target) || event.target.innerText == '•••' || contextmenu.style.display == 'none')) return;
     contextmenu.style.display = 'none';
 });
 
