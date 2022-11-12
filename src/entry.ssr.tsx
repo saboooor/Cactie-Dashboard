@@ -28,14 +28,14 @@ declare global {
 	var client: Client;
 	var dashboardUrl: string;
 	var sessions: any;
-	var sleep: (ms: number) => {};
+	var sleep: { (ms: number): Promise<undefined> };
 	var db: {
 		con: Connection;
 		createData(table: string, body: any): Promise<any>;
 		delData(table: string, where: any): Promise<any>;
 		getData(table: string, where: any, options?: any): Promise<any>;
 		setData(table: string, where: any, body: any): Promise<any>;
-	}
+	};
 }
 
 if (dashboard.debug && !fs.existsSync('./sessions.json')) fs.writeFileSync('./sessions.json', '{}');
@@ -67,7 +67,8 @@ global.client = new Client({
 	},
 });
 
-global.sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 
 await client.login(con.token);
 

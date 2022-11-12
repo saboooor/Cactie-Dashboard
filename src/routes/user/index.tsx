@@ -14,6 +14,8 @@ export const onGet: RequestHandler<UserInfo> = async ({ request }) => {
     tag: auth.tag,
     pfp: auth.pfp,
     accent: auth.accent,
+    guilds: auth.guildsdata,
+    expires_on: auth.expires_in
   } : null;
 };
 
