@@ -13,7 +13,7 @@ export const onGet: RequestHandler = async ({ url, request, response }) => {
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=${client.user!.id}` + `&redirect_uri=${`${dashboard.domain}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
+    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=${bot.id}` + `&redirect_uri=${`${dashboard.domain}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
     throw response.redirect(oAuth2URL);
   }
 
@@ -22,7 +22,7 @@ export const onGet: RequestHandler = async ({ url, request, response }) => {
       const tokenResponseData = await fetch('https://discord.com/api/v10/oauth2/token', {
         method: 'POST',
         body: new URLSearchParams({
-          client_id: client.user!.id,
+          client_id: bot.id,
           client_secret: dashboard.clientSecret,
           code,
           grant_type: 'authorization_code',

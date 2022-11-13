@@ -1,6 +1,6 @@
 // File: src/routes/product/[skuId]/details/index.tsx
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import getAuth from '../../auth';
+import getAuth from '~/auth';
 
 export interface UserInfo {
   tag: string;
