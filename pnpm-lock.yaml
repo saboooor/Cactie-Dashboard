@@ -18,7 +18,7 @@ specifiers:
   tailwindcss: 3.2.4
   typescript: 4.8.4
   vite: 3.2.3
-  vite-tsconfig-paths: 3.5.2
+  vite-tsconfig-paths: 3.6.0
   yaml: 2.1.3
 
 devDependencies:
@@ -39,7 +39,7 @@ devDependencies:
   tailwindcss: 3.2.4_postcss@8.4.19
   typescript: 4.8.4
   vite: 3.2.3_@types+node@18.11.9
-  vite-tsconfig-paths: 3.5.2_vite@3.2.3
+  vite-tsconfig-paths: 3.6.0_vite@3.2.3
   yaml: 2.1.3
 
 packages:
@@ -2736,8 +2736,8 @@ packages:
       vfile-message: 3.1.2
     dev: true
 
-  /vite-tsconfig-paths/3.5.2_vite@3.2.3:
-    resolution: {integrity: sha512-xJMgHA2oJ28QCG2f+hXrcqzo7IttrSRK4A//Tp94CfuX5eetOx33qiwXHUdi3FwkHP2ocpxHuvE45Ix67gwEmQ==}
+  /vite-tsconfig-paths/3.6.0_vite@3.2.3:
+    resolution: {integrity: sha512-UfsPYonxLqPD633X8cWcPFVuYzx/CMNHAjZTasYwX69sXpa4gNmQkR0XCjj82h7zhLGdTWagMjC1qfb9S+zv0A==}
     peerDependencies:
       vite: '>2.0.0-0'
     dependencies:
