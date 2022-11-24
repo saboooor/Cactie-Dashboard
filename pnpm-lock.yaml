@@ -9,7 +9,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': 5.42.1
   '@typescript-eslint/parser': 5.42.1
   autoprefixer: 10.4.13
-  discord-api-types: 0.37.17
+  discord-api-types: 0.37.20
   discord.js: 14.6.0
   eslint: 8.27.0
   eslint-plugin-qwik: 0.13.1
@@ -30,7 +30,7 @@ devDependencies:
   '@typescript-eslint/eslint-plugin': 5.42.1_2udltptbznfmezdozpdoa2aemq
   '@typescript-eslint/parser': 5.42.1_rmayb2veg2btbq6mbmnyivgasy
   autoprefixer: 10.4.13_postcss@8.4.19
-  discord-api-types: 0.37.17
+  discord-api-types: 0.37.20
   discord.js: 14.6.0
   eslint: 8.27.0
   eslint-plugin-qwik: 0.13.1_eslint@8.27.0
@@ -71,7 +71,7 @@ packages:
     dependencies:
       '@discordjs/util': 0.1.0
       '@sapphire/shapeshift': 3.7.0
-      discord-api-types: 0.37.17
+      discord-api-types: 0.37.20
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.1
       tslib: 2.4.0
@@ -90,7 +90,7 @@ packages:
       '@discordjs/util': 0.1.0
       '@sapphire/async-queue': 1.5.0
       '@sapphire/snowflake': 3.2.2
-      discord-api-types: 0.37.17
+      discord-api-types: 0.37.20
       file-type: 18.0.0
       tslib: 2.4.0
       undici: 5.11.0
@@ -742,8 +742,8 @@ packages:
       path-type: 4.0.0
     dev: true
 
-  /discord-api-types/0.37.17:
-    resolution: {integrity: sha512-5ZIw1VtkmToBy8ziketjHkZnW1FoLevyXdK/TslNFLozijug2RnB3MyBNtSGzML1c72koU3neeGkvFZ8OiU0tQ==}
+  /discord-api-types/0.37.20:
+    resolution: {integrity: sha512-uAO+55E11rMkYR36/paE1vKN8c2bZa1mgrIaiQIBgIZRKZTDIGOZB+8I5eMRPFJcGxrg16riUu+0aTu2JQEPew==}
     dev: true
 
   /discord.js/14.6.0:
@@ -756,7 +756,7 @@ packages:
       '@discordjs/util': 0.1.0
       '@sapphire/snowflake': 3.2.2
       '@types/ws': 8.5.3
-      discord-api-types: 0.37.17
+      discord-api-types: 0.37.20
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       tslib: 2.4.0
