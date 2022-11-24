@@ -1,21 +1,30 @@
 import { Resource, component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import type { APIPartialGuild } from 'discord-api-types/v10';
+import type { APIPartialGuild, RESTRateLimit, RESTError } from 'discord-api-types/v10';
 import { useEndpoint } from "@builder.io/qwik-city";
 import getAuth from '../../auth';
+import { PermissionsBitField } from 'discord.js';
 
-interface Guild extends APIPartialGuild {
-  iconURL: string;
-  mutual: any;
-}
-
-export const onGet: RequestHandler<Guild[]> = async ({ url, request, response }) => {
+export const onGet: RequestHandler<APIPartialGuild[]> = async ({ url, request, response }) => {
   const auth = getAuth(request);
   if (!auth) {
     response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
     throw response.redirect('/login');
   }
-  return auth.guildsdata;
+  const res = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
+    headers: {
+      authorization: `${auth.token_type} ${auth.access_token}`,
+    },
+  })
+  let GuildList: RESTError | RESTRateLimit | APIPartialGuild[] = await res.json();
+  if ('retry_after' in GuildList) {
+    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`)
+    await sleep(GuildList.retry_after);
+    throw response.redirect(url.href);
+  }
+  if ('code' in GuildList) throw response.redirect(`/dashboard?error=${GuildList.code}`);
+  GuildList = GuildList.filter((guild: any) => new PermissionsBitField(guild.permissions).has(PermissionsBitField.Flags.ManageGuild));
+  return GuildList;
 };
 
 export default component$(() => {
@@ -36,9 +45,10 @@ export default component$(() => {
         onRejected={() => <p class="mt-5 text-2xl text-red-500">Error</p>}
         onResolved={(guilds) => {
           const guildElements = guilds.map(guild => {
+            const guildFromClient = client.guilds.cache.get(guild.id);
             return (
-              <a class={`sm:hover:bg-gray-800 p-8 rounded-2xl text-gray-400 hover:text-white sm:hover:drop-shadow-2xl${guild.mutual ? '' : ' grayscale'}`} href={guild.mutual ? `/dashboard/${guild.id}` : `/invite?guild=${guild.id}`}>
-                <img class="rounded-full m-auto w-32 h-32" src={guild.iconURL} alt={guild.name}/>
+              <a class={`sm:hover:bg-gray-800 p-8 rounded-2xl text-gray-400 hover:text-white sm:hover:drop-shadow-2xl${guildFromClient ? '' : ' grayscale'}`} href={guildFromClient ? `/dashboard/${guild.id}` : `/invite?guild=${guild.id}`}>
+                <img class="rounded-full m-auto w-32 h-32" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name}/>
                 <p class="mt-10 text-2xl overflow-hidden text-ellipsis line-clamp-1">{guild.name}</p>
               </a>
             )

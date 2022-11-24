@@ -2,7 +2,7 @@ import { component$, useClientEffect$ } from '@builder.io/qwik';
 
 export default component$(() => {
 	useClientEffect$(async () => {
-    const res = await fetch('/api/user');
+    const res = await fetch('/user');
     const json = await res.json();
     if (!json) document.getElementById('loggedout')?.classList.replace('hidden', 'flex');
     else {
@@ -33,8 +33,8 @@ export default component$(() => {
             </div>
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
               <a href="/" class="pointer-events-auto text-gray-300 bg-gray-900 hover:bg-gray-800 hover:text-white hover:drop-shadow-2xl pl-2 pr-3 py-2 rounded-full text-sm font-medium flex items-center">
-                <img class="h-8 w-8 mr-3 rounded-full" src={bot.webp} alt="Cactie" />
-                {bot.username}
+                <img class="h-8 w-8 mr-3 rounded-full" src={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} alt="Cactie" />
+                {client.user!.username}
               </a>
             </div>
             <div class="flex-1 items-center hidden justify-center sm:flex">

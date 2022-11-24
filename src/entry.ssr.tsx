@@ -26,11 +26,6 @@ import mysql from './mysql';
 
 declare global {
 	var client: Client;
-	var bot: {
-		id: string;
-		username: string;
-		webp: string;
-	};
 	var dashboardUrl: string;
 	var sessions: any;
 	var sleep: { (ms: number): Promise<undefined> };
@@ -76,17 +71,11 @@ global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 
 await client.login(con.token);
-global.bot = {
-	id: client.user!.id,
-	username: client.user!.username,
-	webp: `/assets/images/${client.user!.username.replace(/ /g, '')}.webp`,
-}
 
 await mysql(client);
 
-client.on('ready', () => {
-	console.log(`Bot started, dashboard at ${dashboard.domain}`);
-});
+client.on('ready', () => console.log(`Bot started, dashboard at ${dashboard.domain}`));
+
 export default function (opts: RenderToStreamOptions) {
   // Render the elements
   return renderToStream(<Root />, {

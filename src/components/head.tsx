@@ -10,14 +10,14 @@ export const RouterHead = component$(() => {
 
   return (
     <>
-      <title>{bot.username} - {head.title}</title>
-      <meta content={`${bot.username} - ${head.title}`} property="og:title" />
+      <title>{client.user!.username} - {head.title}</title>
+      <meta content={`${client.user!.username} - ${head.title}`} property="og:title" />
 
       <link rel="canonical" href={loc.href} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="icon" href={bot.webp} />
+      <link rel="icon" href={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} />
       <meta content={loc.href} property="og:url" />
-      <meta content={bot.webp} property="og:image" />
+      <meta content={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} property="og:image" />
 
       {head.meta.map((m) => (
         <meta {...m} />
