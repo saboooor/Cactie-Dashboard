@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@builder.io/qwik': 0.14.1
-  '@builder.io/qwik-city': 0.0.127
+  '@builder.io/qwik-city': 0.0.128
   '@tailwindcss/line-clamp': 0.4.2
   '@types/eslint': 8.4.10
   '@types/node': latest
@@ -23,7 +23,7 @@ specifiers:
 
 devDependencies:
   '@builder.io/qwik': 0.14.1
-  '@builder.io/qwik-city': 0.0.127
+  '@builder.io/qwik-city': 0.0.128
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
   '@types/eslint': 8.4.10
   '@types/node': 18.11.11
@@ -44,8 +44,8 @@ devDependencies:
 
 packages:
 
-  /@builder.io/qwik-city/0.0.127:
-    resolution: {integrity: sha512-YvB4MZ8Hm+B+L9SQMKibcqe23EbQuRHUQ9IfZ6aUWgWKA2fMYDIcU/XO9nLtjUabr23Y5ALpx1Ak2Mu9WAe/7g==}
+  /@builder.io/qwik-city/0.0.128:
+    resolution: {integrity: sha512-IgE2nZuoyRGRpsQ9HwbWV8IaaP9rWZGgi1hSzXJLCW2GrVfB49aNph3lQYDeoBOdvUSIucfGbUXFLn7215JOFA==}
     dependencies:
       '@mdx-js/mdx': 2.1.5
       '@types/mdx': 2.0.3
