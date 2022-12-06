@@ -24,7 +24,7 @@
     "@typescript-eslint/eslint-plugin": "5.45.1",
     "@typescript-eslint/parser": "5.45.1",
     "autoprefixer": "10.4.13",
-    "discord-api-types": "0.37.20",
+    "discord-api-types": "0.37.21",
     "discord.js": "14.6.0",
     "eslint": "8.28.0",
     "eslint-plugin-qwik": "0.14.1",
