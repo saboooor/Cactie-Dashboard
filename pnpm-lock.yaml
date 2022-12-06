@@ -12,7 +12,7 @@ specifiers:
   discord-api-types: 0.37.21
   discord.js: 14.6.0
   eslint: 8.29.0
-  eslint-plugin-qwik: 0.14.1
+  eslint-plugin-qwik: 0.15.2
   mariadb: ^3.0.2
   postcss: 8.4.19
   tailwindcss: 3.2.4
@@ -33,7 +33,7 @@ devDependencies:
   discord-api-types: 0.37.21
   discord.js: 14.6.0
   eslint: 8.29.0
-  eslint-plugin-qwik: 0.14.1_eslint@8.29.0
+  eslint-plugin-qwik: 0.15.2_eslint@8.29.0
   mariadb: 3.0.2
   postcss: 8.4.19
   tailwindcss: 3.2.4_postcss@8.4.19
@@ -1002,8 +1002,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-plugin-qwik/0.14.1_eslint@8.29.0:
-    resolution: {integrity: sha512-cxwhUgsAxRehnZBcvdT08KWjY1yjmaNHKp4U8njC9fWUEH2qBDEileWVS3QSN+hnVHADPS2BvOvWBg+0wEuIcg==}
+  /eslint-plugin-qwik/0.15.2_eslint@8.29.0:
+    resolution: {integrity: sha512-Urx815iGUeS/tZuGorQtK65y+0qWi2hEABQULQvoQ6UQwycg8sM0yiaS4lnfecNdkkVHIA5ekNPSkGiG2PuMQw==}
     engines: {node: '>=16'}
     peerDependencies:
       eslint: '>= 8'
