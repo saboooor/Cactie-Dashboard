@@ -2,7 +2,6 @@ import { Resource, component$, $ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import { useEndpoint } from "@builder.io/qwik-city";
 import getAuth from '../../../auth';
-import { ChannelType } from 'discord.js';
 
 interface reactionRoleRaw {
     guildId: string;
@@ -28,8 +27,10 @@ interface guildData {
     guild: {
         name: string;
         iconURL: string;
-        channels: obj[];
-        roles: obj[];
+        mutual: {
+            channels: obj[];
+            roles: obj[];    
+        }
     };
     srvconfig: any;
     reactionroles: reactionRoles;
@@ -41,45 +42,39 @@ interface obj {
     color?: string;
 }
 
-const getData = async ({ params, response }: any) => {
-  const guild = client.guilds.cache.get(params.guildId);
-  if (!guild) throw response.redirect(`/dashboard?error=guild_not_found`);
-  const guildJSON: any = guild.toJSON();
-  guildJSON.channels = guild.channels.cache.map(c => { return { name: c.name, id: c.id, type: c.type }; });
-  guildJSON.roles = guild.roles.cache.map(r => { return { name: r.name, id: r.id, color: `#${r.color.toString(16)}` }; });
-
-  const reactionroles: reactionRoles = {
-    raw: await db.getData('reactionroles', { guildId: params.guildId }, { all: true, nocreate: true }),
-    channels: [],
-  };
-
-  for (const i in reactionroles.raw) {
-    const emoji = client.emojis.cache.get(reactionroles.raw[i].emojiId);
-    reactionroles.raw[i].emojiUrl = emoji?.url;
-
-    if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
-    const channelInfo: reactionRoleChannel = {
-        id: reactionroles.raw[i].channelId,
-        messages: [],
-    };
-    const channelreactionroles: reactionRoleRaw[] = reactionroles.raw.filter(r => r.channelId == channelInfo.id);
-    for (const i2 in channelreactionroles) {
-        if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
-        channelInfo.messages.push(channelreactionroles[i2].messageId);
-    }
-    reactionroles.channels.push(channelInfo);
-  }
-
-  return { srvconfig: await db.getData('settings', { guildId: params.guildId }), reactionroles, guild: guildJSON };
-}
-
 export const onGet: RequestHandler<guildData> = async ({ url, params, request, response }) => {
     const auth = getAuth(request);
     if (!auth) {
       response.headers.set('Set-Cookie', `redirect.url=${url.href}`);
       throw response.redirect('/login');
     }
-    return getData({ params, response })
+
+    const guild = auth.guildsdata.find((g: any) => g.id == params.guildId && g.mutual);
+    if (!guild) throw response.redirect('/dashboard?error=GUILDNOTFOUND');
+
+    const reactionroles: reactionRoles = {
+      raw: await db.getData('reactionroles', { guildId: guild.id }, { all: true, nocreate: true }),
+      channels: [],
+    };
+  
+    for (const i in reactionroles.raw) {
+      // const emoji = client.emojis.cache.get(reactionroles.raw[i].emojiId);
+      //reactionroles.raw[i].emojiUrl = emoji?.url;
+  
+      if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
+      const channelInfo: reactionRoleChannel = {
+          id: reactionroles.raw[i].channelId,
+          messages: [],
+      };
+      const channelreactionroles: reactionRoleRaw[] = reactionroles.raw.filter(r => r.channelId == channelInfo.id);
+      for (const i2 in channelreactionroles) {
+          if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
+          channelInfo.messages.push(channelreactionroles[i2].messageId);
+      }
+      reactionroles.channels.push(channelInfo);
+    }
+    
+    return { srvconfig: await db.getData('settings', { guildId: guild.id }), reactionroles, guild };
 };
 
 export const onPatch: RequestHandler<guildData> = async ({ url, params, request, response }) => {
@@ -94,8 +89,6 @@ export const onPatch: RequestHandler<guildData> = async ({ url, params, request,
     if (body.srvconfig) {
         await db.setData('settings', { guildId: params.guildId }, body.srvconfig);
     }
-
-    return await getData({ params, response })
 };
 
 export default component$(() => {
@@ -217,11 +210,11 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">This is where suggestions are made</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { suggestchannel }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { suggestchannel }, guild: { mutual: { channels } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="suggestchannel">
                                             <option value="false" selected={suggestchannel == 'false'}>Same channel as user</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={suggestchannel == c.id}># {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 0).map((c: obj) => { return (<option value={c.id} selected={suggestchannel == c.id}># {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -251,11 +244,11 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">This is where polls are made</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { pollchannel }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { pollchannel }, guild: { mutual: { channels } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="pollchannel">
                                             <option value="false" selected={pollchannel == 'false'}>Same channel as user</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={pollchannel == c.id}># {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 0).map((c: obj) => { return (<option value={c.id} selected={pollchannel == c.id}># {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -282,12 +275,12 @@ export default component$(() => {
                             <p class="font-bold text-white text-lg pt-2.5">The channel to post in</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { joinmessage }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { joinmessage }, guild: { mutual: { channels } } }) => {
                                     joinmessage = JSON.parse(joinmessage);
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="joinmessage.channel">
                                             <option value="false" selected={joinmessage.channel == 'false'}>Use system channel</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={joinmessage.channel == c.id}># {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 0).map((c: obj) => { return (<option value={c.id} selected={joinmessage.channel == c.id}># {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -311,12 +304,12 @@ export default component$(() => {
                             <p class="font-bold text-white text-lg pt-2.5">The channel to post in</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { leavemessage }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { leavemessage }, guild: { mutual: { channels } } }) => {
                                     leavemessage = JSON.parse(leavemessage);
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600" name="leavemessage.channel">
                                             <option value="false" selected={leavemessage.channel == 'false'}>Use system channel</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={leavemessage.channel == c.id}># {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 0).map((c: obj) => { return (<option value={c.id} selected={leavemessage.channel == c.id}># {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -350,12 +343,12 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">This is where audit logs without a channel specified will be posted</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { auditlogs }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { auditlogs }, guild: { mutual: { channels } } }) => {
                                     auditlogs = JSON.parse(auditlogs);
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                                             <option value="false" selected={auditlogs.channel == 'false'}>No channel specified.</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={auditlogs.channel == c.id}># {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 0).map((c: obj) => { return (<option value={c.id} selected={auditlogs.channel == c.id}># {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -364,7 +357,7 @@ export default component$(() => {
                         <div class="bg-gray-800 rounded-2xl p-5">
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { auditlogs }, guild: { channels }, }) => {
+                                onResolved={({ srvconfig: { auditlogs }, guild: { mutual: { channels } }, }) => {
                                     auditlogs = JSON.parse(auditlogs);
                                     if (auditlogs.logs?.all) {
                                         return (
@@ -442,7 +435,7 @@ export default component$(() => {
                                                     <option value="false" selected>Use Default Channel</option>
                                                 }
                                                 {channels
-                                                .filter((c: obj) => c.type == ChannelType.GuildText)
+                                                .filter((c: obj) => c.type == 0)
                                                 .map((c: obj) => {
                                                     return <option value={c.id}># {c.name}</option>;
                                                 })}
@@ -459,7 +452,7 @@ export default component$(() => {
                         </div>
                         <Resource
                             value={GuildData}
-                            onResolved={({ guild: { channels }, srvconfig: { auditlogs } }) => {
+                            onResolved={({ guild: { mutual: { channels } }, srvconfig: { auditlogs } }) => {
                                 auditlogs = JSON.parse(auditlogs);
                                 const tiles = Object.keys(auditlogs.logs ?? {}).map((log) => {
                                     return (
@@ -475,7 +468,7 @@ export default component$(() => {
                                                 <option value="false" selected={auditlogs.logs[log].channel == "false"}>
                                                     Use Default Channel
                                                 </option>
-                                                {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => {
+                                                {channels.filter((c: obj) => c.type == 0).map((c: obj) => {
                                                     return (
                                                         <option value={c.id} selected={auditlogs.logs[log].channel == c.id}>
                                                             # {c.name}
@@ -513,11 +506,11 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">The category where tickets will appear</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { ticketcategory }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { ticketcategory }, guild: { mutual: { channels } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                                             <option value="false" selected={ticketcategory == 'false'}>No category</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildCategory).map((c: obj) => { return (<option value={c.id} selected={ticketcategory == c.id}>&gt; {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 4).map((c: obj) => { return (<option value={c.id} selected={ticketcategory == c.id}>&gt; {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -528,11 +521,11 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">The channel where transcripts will appear</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { ticketlogchannel }, guild: { channels } }) => {
+                                onResolved={({ srvconfig: { ticketlogchannel }, guild: { mutual: { channels } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                                             <option value="false" selected={ticketlogchannel == 'false'}>No logs</option>
-                                            {channels.filter((c: obj) => c.type == ChannelType.GuildText).map((c: obj) => { return (<option value={c.id} selected={ticketlogchannel == c.id}># {c.name}</option>) })}
+                                            {channels.filter((c: obj) => c.type == 0).map((c: obj) => { return (<option value={c.id} selected={ticketlogchannel == c.id}># {c.name}</option>) })}
                                         </select>
                                     )
                                 }}
@@ -543,7 +536,7 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">The role that may access tickets</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { supportrole }, guild: { roles } }) => {
+                                onResolved={({ srvconfig: { supportrole }, guild: { mutual: { roles } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                                             <option value="false" selected={supportrole == 'false'}>Only Administrators</option>
@@ -558,7 +551,7 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">Pings the specified role when a ticket is created</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { supportrole }, guild: { roles } }) => {
+                                onResolved={({ srvconfig: { supportrole }, guild: { mutual: { roles } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                                             <option value="false" selected={supportrole == 'false'}>No mention</option>
@@ -598,7 +591,7 @@ export default component$(() => {
                             <p class="text-gray-400 text-md">Select a role to give when muting or use Discord's timeout feature</p>
                             <Resource
                                 value={GuildData}
-                                onResolved={({ srvconfig: { mutecmd }, guild: { roles } }) => {
+                                onResolved={({ srvconfig: { mutecmd }, guild: { mutual: { roles } } }) => {
                                     return (
                                         <select class="text-sm rounded-lg max-w-full p-2.5 bg-gray-700 placeholder-gray-400 text-white mt-2.5 focus:bg-gray-600 focus:ring ring-indigo-600">
                                             <option value="timeout" selected={mutecmd == 'timeout'}>Use Discord's timeout feature</option>
@@ -631,7 +624,7 @@ export default component$(() => {
                     <div class="grid gap-5 pb-10 md:pt-10">
                         <Resource
                             value={GuildData}
-                            onResolved={({ guild: { channels, roles }, reactionroles }) => {
+                            onResolved={({ guild: { mutual: { channels, roles } }, reactionroles }) => {
                                 const reactionrolelist = reactionroles.channels.map(rrChannel => {
                                     const channel = channels.find(c => c.id == rrChannel.id);
                                     const messagelist = rrChannel.messages.map(message => {
@@ -697,7 +690,7 @@ export default component$(() => {
                     <li>
                         <Resource
                             value={GuildData}
-                            onResolved={({ guild: { roles } }) => {
+                            onResolved={({ guild: { mutual: { roles } } }) => {
                                 return (
                                     <select id="rrrole" class="text-sm rounded-lg w-48 p-1.5 placeholder-gray-400 bg-gray-800 hover:bg-gray-700 focus:ring ring-indigo-600">
                                         {roles.map((r: obj) => { return (<option value={r.id}>@ {r.name}</option>) })}
@@ -763,7 +756,7 @@ export const updateNumInput = $(async (event: any) => {
             [input.name]: newValue,
         },
     };
-    const req = await fetch(window.location.pathname, {
+    await fetch(window.location.pathname, {
 		method: 'PATCH',
 		headers: {
 			'Accept': 'application/json',
@@ -771,7 +764,6 @@ export const updateNumInput = $(async (event: any) => {
 		},
 		body: JSON.stringify(json),
 	});
-	const res = await req.json();
 	return;
 });
 

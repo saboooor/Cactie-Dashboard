@@ -18,6 +18,17 @@ export default defineConfig(() => {
                 target: "es2022"
             }
         },
+        preview: {
+            headers: {
+                'Cache-Control': 'public, max-age=600',
+            },
+            hmr: {
+                clientPort: dashboard.port
+            },
+            port: dashboard.port,
+            strictPort: true,
+            host: "0.0.0.0"
+        },
         server: {
             hmr: {
                 clientPort: dashboard.domain.endsWith(`:${dashboard.port}`) ? dashboard.port : 443

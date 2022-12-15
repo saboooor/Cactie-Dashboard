@@ -2,10 +2,9 @@ import mariadb from 'mariadb';
 import { readFileSync } from 'fs';
 
 import YAML from 'yaml';
-import { Client } from 'discord.js';
 const { mysql } = YAML.parse(readFileSync('./config.yml', 'utf8'));
 
-export default async (client: Client) => {
+export default async () => {
 	// Create a connection to the database
 	const con = await mariadb.createConnection(mysql);
 
@@ -19,8 +18,6 @@ export default async (client: Client) => {
 			console.log(`Created ${table}: ${JSON.stringify(body)}`);
 		}
 		catch (err) {
-			const channel: any = client.channels.cache.get('830013224753561630');
-            await channel.send({ content: `<@&839158574138523689> ${err}` });
 			console.error(`Error creating ${table}: ${err}`);
 		}
 	};
@@ -34,8 +31,6 @@ export default async (client: Client) => {
 			console.log(`${table} deleted where ${JSON.stringify(where)}!`);
 		}
 		catch (err) {
-			const channel: any = client.channels.cache.get('830013224753561630');
-            await channel.send({ content: `<@&839158574138523689> ${err}` });
 			console.error(`Error deleting ${table} where ${JSON.stringify(where)}: ${err}`);
 		}
 	};

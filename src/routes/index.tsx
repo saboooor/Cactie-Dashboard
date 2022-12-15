@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import type { DocumentHead } from '@builder.io/qwik-city';
+import { DocumentHead, Link } from '@builder.io/qwik-city';
 
 export default component$(() => {
   return (
@@ -9,10 +9,10 @@ export default component$(() => {
           <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style={{ left: '45%' }}></div>
           <div class="absolute top-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-2000" style={{ right: '50%' }}></div>
           <div class="absolute bottom-5 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-4000" style={{ left: '40%' }}></div>
-          <img class="rounded-full z-10 animate-float ease-in-out" src={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} style={{ maxWidth: '40%' }} alt={client.user!.username} />
+          <img class="rounded-full z-10 animate-float ease-in-out" src={bot.webp} style={{ maxWidth: '40%' }} alt={bot.username} />
         </div>
         <h1 class="font-bold tracking-tight text-white text-5xl">
-          The last <span class="text-blue-400">Discord</span> bot you need, <span class="text-green-200">{client.user!.username}</span>.
+          The last <span class="text-blue-400">Discord</span> bot you need, <span class="text-green-200">{bot.username}</span>.
         </h1>
         <p class="mt-5 text-2xl text-gray-400">
           Moderation, Fun, Music, Utilities, and More!
@@ -29,9 +29,9 @@ export default component$(() => {
         </div>
         <div class="mt-3 flex justify-center sm:justify-start">
           <div class="rounded-md shadow">
-            <a href="/dashboard" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-gray-800 px-8 py-3 text-base font-medium text-gray-200 hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
+            <Link href="/dashboard" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-gray-800 px-8 py-3 text-base font-medium text-gray-200 hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
               Dashboard
-            </a>
+            </Link>
           </div>
           <div class="mt-0 ml-3 rounded-md shadow">
             <a href="#" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-gray-800 px-8 py-3 text-base font-medium text-gray-200 hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
@@ -44,7 +44,7 @@ export default component$(() => {
         <div class="absolute top-10 left-10 w-72 h-72 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
         <div class="absolute top-10 right-10 w-72 h-72 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
         <div class="absolute bottom-5 left-32 w-72 h-72 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
-        <img class="rounded-full z-10 animate-float ease-in-out" src={`/assets/images/${client.user!.username.replace(/ /g, '')}.webp`} alt={client.user!.username} />
+        <img class="rounded-full z-10 animate-float ease-in-out" src={bot.webp} alt={bot.username} />
       </div>
     </section>
   );
