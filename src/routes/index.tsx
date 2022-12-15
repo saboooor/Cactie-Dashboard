@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import { DocumentHead, Link } from '@builder.io/qwik-city';
+import { DocumentHead } from '@builder.io/qwik-city';
 
 export default component$(() => {
   return (
@@ -29,9 +29,9 @@ export default component$(() => {
         </div>
         <div class="mt-3 flex justify-center sm:justify-start">
           <div class="rounded-md shadow">
-            <Link href="/dashboard" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-gray-800 px-8 py-3 text-base font-medium text-gray-200 hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
+            <a href="/dashboard" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-gray-800 px-8 py-3 text-base font-medium text-gray-200 hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
               Dashboard
-            </Link>
+            </a>
           </div>
           <div class="mt-0 ml-3 rounded-md shadow">
             <a href="#" class="flex w-full items-center justify-center rounded-xl sm:rounded-3xl border border-transparent bg-gray-800 px-8 py-3 text-base font-medium text-gray-200 hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
