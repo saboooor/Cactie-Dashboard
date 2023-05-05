@@ -1,7 +1,13 @@
 import { component$ } from '@builder.io/qwik';
 import { type DocumentHead, Link } from '@builder.io/qwik-city';
 
-import pfp from '~/components/images/Cactie.png'
+// @ts-ignore
+import iconAVIF from '~/components/images/Cactie.png?avif';
+// @ts-ignore
+import iconWEBP from '~/components/images/Cactie.png?webp';
+// @ts-ignore
+import { src as icon } from '~/components/images/Cactie.png?metadata';
+
 import { HappyOutline, LogoDiscord, SettingsOutline } from 'qwik-ionicons';
 
 export default component$(() => {
@@ -12,7 +18,18 @@ export default component$(() => {
           <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style={{ left: '45%' }}></div>
           <div class="absolute top-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-2000" style={{ right: '50%' }}></div>
           <div class="absolute bottom-5 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-4000" style={{ left: '40%' }}></div>
-          <img class="rounded-full z-10 animate-float ease-in-out" src={pfp} style={{ maxWidth: '40%' }} alt="Cactie" />
+          <picture>
+            <source srcSet={iconAVIF} type="image/avif" />
+            <source srcSet={iconWEBP} type="image/webp" />
+            <img
+              src={icon}
+              class="z-10 animate-float ease-in-out"
+              alt="Cactie"
+              loading="eager"
+              decoding="async"
+              style={{ maxWidth: '40%' }}
+            />
+          </picture>
         </div>
         <h1 class="font-bold text-white text-5xl">
           The last <span class="text-blue-400">Discord</span> bot you need, <span class="text-green-200">Cactie</span>.
@@ -50,7 +67,17 @@ export default component$(() => {
         <div class="absolute top-10 left-10 w-72 h-72 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
         <div class="absolute top-10 right-10 w-72 h-72 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
         <div class="absolute bottom-5 left-32 w-72 h-72 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
-        <img class="rounded-full z-10 animate-float ease-in-out" src={pfp} alt="Cactie" />
+        <picture>
+          <source srcSet={iconAVIF} type="image/avif" />
+          <source srcSet={iconWEBP} type="image/webp" />
+          <img
+            src={icon}
+            class="z-10 animate-float ease-in-out"
+            alt="Cactie"
+            loading="eager"
+            decoding="async"
+          />
+        </picture>
       </div>
     </section>
   );

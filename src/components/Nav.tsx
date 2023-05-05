@@ -2,7 +2,12 @@ import { component$, Slot } from '@builder.io/qwik';
 import { Link, useNavigate } from '@builder.io/qwik-city';
 
 import { LogoDiscord, LogoGithub, Menu, SettingsOutline, ReaderOutline, HappyOutline, PersonCircleOutline } from 'qwik-ionicons';
-import pfp from '~/components/images/Cactie.png'
+// @ts-ignore
+import iconAVIF from '~/components/images/Cactie.png?avif&width=40&height=40';
+// @ts-ignore
+import iconWEBP from '~/components/images/Cactie.png?webp&width=40&height=40';
+// @ts-ignore
+import { src as icon } from '~/components/images/Cactie.png?metadata&width=40&height=40';
 
 export default component$(({ user }: any) => {
   return (
@@ -84,7 +89,17 @@ export const Brand = component$(() => {
   return (
     <div class="flex flex-1 items-center justify-start">
       <Link href="/" class="transition ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white drop-shadow-2xl px-3 pt-3 pb-2 rounded-lg text-lg flex items-center whitespace-nowrap">
-        <img class="h-10 w-10 mr-3" src={pfp} alt="Cactie" />
+        <picture>
+          <source srcSet={iconAVIF} type="image/avif" />
+          <source srcSet={iconWEBP} type="image/webp" />
+          <img
+            src={icon}
+            class="h-10 w-10 mr-3"
+            alt="Cactie"
+            loading="eager"
+            decoding="async"
+          />
+        </picture>
         <span class="flex sm:hidden md:flex">Cactie</span>
       </Link>
     </div>

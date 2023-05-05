@@ -1,4 +1,5 @@
 {
+  "domain": "http://localhost:5173",
   "clientSecret": "a",
   "port": 5173
 }

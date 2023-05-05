@@ -6,8 +6,8 @@ import Nav from '~/components/Nav';
 export const useUser = routeLoader$(({ request }) => {
   const auth = getAuth(request);
   if (!auth) return null;
-  const { tag, pfp, accent } = auth;
-  return { tag, pfp, accent };
+  const { pfp, accent } = auth;
+  return { pfp, accent };
 });
 
 export default component$(() => {

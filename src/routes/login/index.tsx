@@ -1,13 +1,13 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import crypto from 'crypto';
 
-import { clientSecret } from '~/config.json';
+import { domain, clientSecret } from '~/config.json';
 
 export const onGet: RequestHandler = async ({ url, request, redirect, headers }) => {
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=765287593762881616` + `&redirect_uri=${`${url.origin}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
+    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=765287593762881616` + `&redirect_uri=${`${domain}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
     throw redirect(302, oAuth2URL);
   }
 
@@ -21,7 +21,7 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers })
           client_secret: clientSecret,
           code,
           grant_type: 'authorization_code',
-          redirect_uri: `${url.origin}/login`,
+          redirect_uri: `${domain}/login`,
           scope: 'identify',
         }),
         headers: {
@@ -34,7 +34,6 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers })
       const userdata = await res.json();
       sessions[sid] = {
         ...oauthData,
-        tag: `${userdata.username}#${userdata.discriminator}`,
         pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
         accent: userdata.banner_color,
         expires_in: (Date.now() + oauthData.expires_in),

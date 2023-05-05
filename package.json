@@ -31,6 +31,7 @@
     "discord-api-types": "^0.37.41",
     "eslint": "8.39.0",
     "eslint-plugin-qwik": "1.0.0",
+    "imagetools-core": "^4.0.1",
     "postcss": "^8.4.23",
     "prettier": "2.8.8",
     "qwik-ionicons": "^1.0.5",
@@ -38,6 +39,7 @@
     "typescript": "5.0.4",
     "undici": "5.22.0",
     "vite": "4.3.4",
+    "vite-imagetools": "4.0.19",
     "vite-tsconfig-paths": "4.2.0"
   }
 }
