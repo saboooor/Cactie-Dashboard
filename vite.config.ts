@@ -12,10 +12,20 @@ export default defineConfig(() => {
       headers: {
         'Cache-Control': 'public, max-age=600',
       },
-      port
+      hmr: {
+          clientPort: port
+      },
+      port,
+      strictPort: true,
+      host: "0.0.0.0"
     },
     server: {
-      port
+      hmr: {
+          clientPort: port
+      },
+      port,
+      strictPort: true,
+      host: "0.0.0.0"
     }
   };
 });
