@@ -1,26 +1,37 @@
 import { component$ } from '@builder.io/qwik';
-import { QwikCity, RouterOutlet, ServiceWorkerRegister } from '@builder.io/qwik-city';
-import { RouterHead } from './components/head';
+import { QwikCityProvider, RouterOutlet, ServiceWorkerRegister } from '@builder.io/qwik-city';
+import { RouterHead } from './components/router-head/router-head';
 
 import './global.css';
 
+/* eslint-disable no-var */
+declare global {
+	var sessions: any;
+  var sleep: { (ms: number): Promise<undefined> };
+}
+/* eslint-enable no-var */
+global.sessions = {};
+global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export default component$(() => {
   /**
-   * The root of a QwikCity site always start with the <QwikCity> component,
+   * The root of a QwikCity site always start with the <QwikCityProvider> component,
    * immediately followed by the document's <head> and <body>.
    *
    * Dont remove the `<head>` and `<body>` elements.
    */
+
   return (
-    <QwikCity>
+    <QwikCityProvider>
       <head>
         <meta charSet="utf-8" />
+        <link rel="manifest" href="/manifest.json" />
         <RouterHead />
       </head>
       <body class="bg-gray-900 text-gray-300">
         <RouterOutlet />
         <ServiceWorkerRegister />
       </body>
-    </QwikCity>
+    </QwikCityProvider>
   );
 });

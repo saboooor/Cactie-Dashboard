@@ -1,28 +1,27 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import crypto from 'crypto';
 
-import fs from 'fs';
-import YAML from 'yaml';
-const { dashboard } = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
+import { clientSecret } from '~/config.json';
 
-export const onGet: RequestHandler = async ({ url, request, response }) => {
+export const onGet: RequestHandler = async ({ url, request, redirect, headers }) => {
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=${bot.id}` + `&redirect_uri=${`${dashboard.domain}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
-    throw response.redirect(oAuth2URL);
+    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=765287593762881616` + `&redirect_uri=${`${url.origin}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
+    throw redirect(302, oAuth2URL);
   }
 
   if (code) {
     try {
+      console.log(url);
       const tokenResponseData = await fetch('https://discord.com/api/v10/oauth2/token', {
         method: 'POST',
         body: new URLSearchParams({
-          client_id: bot.id,
-          client_secret: dashboard.clientSecret,
+          client_id: '765287593762881616',
+          client_secret: clientSecret,
           code,
           grant_type: 'authorization_code',
-          redirect_uri: `${dashboard.domain}/login`,
+          redirect_uri: `${url.origin}/login`,
           scope: 'identify',
         }),
         headers: {
@@ -31,52 +30,16 @@ export const onGet: RequestHandler = async ({ url, request, response }) => {
       });
       const oauthData = await tokenResponseData.json();
       const sid = crypto.randomBytes(32).toString('hex');
-
-      let userres = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
-      let userdata = await userres.json();
-      if ('retry_after' in userdata) {
-        console.log(`userdata: ${userdata.message}, retrying after ${userdata.retry_after}ms`)
-        await global.sleep(Math.ceil(userdata.retry_after));
-        userres = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
-        userdata = await userres.json();
-      }
-      if ('code' in userdata) throw response.redirect(`/dashboard?error=${userdata.code}`);
-
-      let guildsres = await fetch(`https://discord.com/api/v10/users/@me/guilds`, { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
-      let guildsdata = await guildsres.json();
-      if ('retry_after' in guildsdata) {
-        console.log(`guildsdata: ${guildsdata.message}, retrying after ${guildsdata.retry_after}ms`)
-        await sleep(Math.ceil(guildsdata.retry_after));
-        guildsres = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
-        guildsdata = await userres.json();
-      }
-      if ('code' in guildsdata) throw response.redirect(`/dashboard?error=${guildsdata.code}`);
-      guildsdata = guildsdata
-        //.filter((guild: any) => new PermissionsBitField(guild.permissions).has(PermissionsBitField.Flags.ManageGuild))
-        .map((g: any) => {
-          g = {
-            id: g.id,
-            name: g.name,
-            iconURL: `https://cdn.discordapp.com/icons/${g.id}/${g.icon}`
-          }
-
-          const extraJSON: any = {};
-          return {
-            ...g,
-            mutual: extraJSON
-          }
-        });
-
+      const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
+      const userdata = await res.json();
       sessions[sid] = {
         ...oauthData,
         tag: `${userdata.username}#${userdata.discriminator}`,
         pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
         accent: userdata.banner_color,
         expires_in: (Date.now() + oauthData.expires_in),
-        guildsdata
       };
-      if (dashboard.debug) fs.writeFileSync('./sessions.json', JSON.stringify(sessions));
-      response.headers.set('Set-Cookie', `connect.sid=${sid}`);
+      headers.set('Set-Cookie', `connect.sid=${sid}`);
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401
@@ -89,7 +52,7 @@ export const onGet: RequestHandler = async ({ url, request, response }) => {
         cookieJSON[values[0]] = values[1];
     });
     const href = cookieJSON['redirect.url'];
-    throw response.redirect(href ?? '/');
+    throw redirect(302, href ?? '/');
   }
 };
 

@@ -1,41 +1,20 @@
-import { defineConfig } from "vite";
-import { qwikVite } from "@builder.io/qwik/optimizer";
-import { qwikCity } from "@builder.io/qwik-city/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-
-import { readFileSync } from "fs";
-import YAML from "yaml";
-const { dashboard } = YAML.parse(readFileSync("./config.yml", "utf8"));
+import { defineConfig } from 'vite';
+import { qwikVite } from '@builder.io/qwik/optimizer';
+import { qwikCity } from '@builder.io/qwik-city/vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { port } from './src/config.json'
 
 export default defineConfig(() => {
-    return {
-        plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
-        build: {
-            target: "es2022"
-        },
-        optimizeDeps: {
-            esbuildOptions: {
-                target: "es2022"
-            }
-        },
-        preview: {
-            headers: {
-                'Cache-Control': 'public, max-age=600',
-            },
-            hmr: {
-                clientPort: dashboard.port
-            },
-            port: dashboard.port,
-            strictPort: true,
-            host: "0.0.0.0"
-        },
-        server: {
-            hmr: {
-                clientPort: dashboard.domain.endsWith(`:${dashboard.port}`) ? dashboard.port : 443
-            },
-            port: dashboard.port,
-            strictPort: true,
-            host: "0.0.0.0"
-        }
-    };
+  return {
+    plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
+    preview: {
+      headers: {
+        'Cache-Control': 'public, max-age=600',
+      },
+      port
+    },
+    server: {
+      port
+    }
+  };
 });

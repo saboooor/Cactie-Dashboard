@@ -1,24 +1,29 @@
 /** @type {import('tailwindcss').Config} */
 
 const gray = {
-   50: "hsl(220deg, 20%, 98%)",
-  100: "hsl(230deg, 14%, 96%)",
-  200: "hsl(230deg, 13%, 91%)",
-  300: "hsl(226deg, 12%, 84%)",
-  400: "hsl(228deg, 11%, 65%)",
-  500: "hsl(230deg,  9%, 46%)",
-  600: "hsl(225deg, 14%, 34%)",
-  700: "hsl(227deg, 19%, 27%)",
-  800: "hsl(225deg, 28%, 17%)",
-  900: "hsl(231deg, 39%, 11%)"
+  50: "hsl(0deg, 0%, 95%)",
+ 100: "hsl(0deg, 0%, 85%)",
+ 200: "hsl(0deg, 0%, 75%)",
+ 300: "hsl(0deg, 0%, 65%)",
+ 400: "hsl(0deg, 0%, 55%)",
+ 500: "hsl(0deg, 0%, 45%)",
+ 600: "hsl(0deg, 0%, 35%)",
+ 700: "hsl(0deg, 0%, 25%)",
+ 800: "hsl(0deg, 0%, 15%)",
+ 900: "hsl(0deg, 0%, 5%)"
 };
 
-
+const luminescent = {
+ 700: "#F0CCFB",
+ 800: "#E6AAF7",
+ 900: "#CB6CE6",
+};
+ 
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      colors: { gray },
+      colors: { gray, luminescent },
       animation: {
         blob: "blob 16s infinite",
         float: "float 6s infinite"
@@ -38,21 +43,7 @@ module.exports = {
             transform: "translate(0px, 0px) scale(1)"
           }
         },
-        float: {
-          "0%": {
-            transform: "translatey(0px);"
-          },
-          "50%": {
-            transform: "translatey(-20px);"
-          },
-          "100%": {
-            transform: "translatey(0px);"
-          }
-        }
       }
     },
   },
-  plugins: [
-    require('@tailwindcss/line-clamp'),
-  ],
 };
