@@ -62,7 +62,7 @@ export default component$(() => {
           to open the dashboard for
         </p>
       </div>
-      <div class="flex flex-wrap justify-evenly gap-10 sm:gap-5 my-12">
+      <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
         {
           GuildList.value.filter(guild => guild.mutual).map(guild => {
             return (
@@ -90,7 +90,7 @@ export default component$(() => {
           These servers don't have Cactie yet! Select a server to invite Cactie to.
         </p>
       </div>
-      <div class="flex flex-wrap justify-evenly gap-10 sm:gap-5 my-12">
+      <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
         {
           GuildList.value.filter(guild => !guild.mutual).map(guild => {
             return (
