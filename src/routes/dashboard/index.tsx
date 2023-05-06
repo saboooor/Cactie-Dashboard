@@ -55,23 +55,23 @@ export default component$(() => {
   return (
     <section class="mx-auto max-w-screen-2xl px-6 pt-12 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div class="text-center">
-        <h1 class="font-bold tracking-tight text-white text-5xl">
+        <h1 class="font-bold text-white text-4xl sm:text-5xl md:text-6xl">
           Select a <span class="text-luminescent-900" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Server</span>.
         </h1>
-        <p class="mt-5 text-2xl text-gray-500">
+        <p class="mt-5 text-xl sm:text-2xl md:text-3xl text-gray-500">
           to open the dashboard for
         </p>
       </div>
-      <div class="flex flex-wrap justify-evenly mt-12">
+      <div class="flex flex-wrap justify-evenly gap-10 sm:gap-5 my-12">
         {
           GuildList.value.filter(guild => guild.mutual).map(guild => {
             return (
-              <div key={guild.id} class="relative rounded-xl group hover:-translate-y-4 hover:scale-105 transition-all duration-300 max-w-xs">
-                <div class="m-auto p-8">
+              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-300 w-14 sm:w-48">
+                <div class="m-auto sm:p-8">
                   <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="rounded-full m-auto"/>
-                  <p class="mt-10 text-2xl overflow-hidden text-ellipsis line-clamp-1 text-center break-all">{guild.name}</p>
+                  <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
-                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 group-hover:backdrop-blur-sm duration-300">
+                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm duration-300">
                   <a href={`/dashboard/${guild.id}`} class="flex flex-col justify-center transition duration-200 hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
                     <SettingsOutline width="24" class="fill-current" />
                     Settings
@@ -82,16 +82,24 @@ export default component$(() => {
           })
         }
       </div>
-      <div class="flex flex-wrap justify-evenly mt-12">
+      <div class="text-center sm:hidden">
+        <h1 class="font-bold text-white text-4xl sm:text-5xl md:text-6xl">
+          More <span class="text-luminescent-900" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Servers</span>.
+        </h1>
+        <p class="mt-5 text-xl sm:text-2xl md:text-3xl text-gray-500">
+          These servers don't have Cactie yet! Select a server to invite Cactie to.
+        </p>
+      </div>
+      <div class="flex flex-wrap justify-evenly gap-10 sm:gap-5 my-12">
         {
           GuildList.value.filter(guild => !guild.mutual).map(guild => {
             return (
-              <div key={guild.id} class="relative rounded-xl group hover:-translate-y-4 hover:scale-105 transition-all duration-300 max-w-xs">
-                <div class="m-auto p-8">
+              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-300 w-14 sm:w-48">
+                <div class="m-auto sm:p-8">
                   <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="rounded-full m-auto w-32 grayscale group-hover:grayscale-0 group-hover:saturate-150 transition duration-500"/>
-                  <p class="mt-10 text-2xl overflow-hidden text-ellipsis line-clamp-1 text-center break-all">{guild.name}</p>
+                  <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
-                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 group-hover:backdrop-blur-sm duration-300">
+                <div class="sm:grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm duration-300">
                   <a href={`/invite?guild=${guild.id}`} class="flex flex-col justify-center transition duration-200 hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
                     <HappyOutline width="24" class="fill-current" />
                     Invite
