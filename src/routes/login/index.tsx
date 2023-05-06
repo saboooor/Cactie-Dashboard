@@ -13,7 +13,6 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers })
 
   if (code) {
     try {
-      console.log(url);
       const tokenResponseData = await fetch('https://discord.com/api/v10/oauth2/token', {
         method: 'POST',
         body: new URLSearchParams({
