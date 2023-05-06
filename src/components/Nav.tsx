@@ -54,7 +54,7 @@ export default component$(({ user }: any) => {
           const classList = document.getElementById('mobile-menu')?.classList;
           if (classList?.contains('hidden')) classList.replace('hidden', 'flex');
           else classList?.replace('flex', 'hidden');
-        }} class="transition ease-in-out hover:bg-gray-800 hover:text-white px-4 py-2 rounded-lg text-3xl sm:hidden">
+        }} class="transition ease-in-out hover:bg-gray-800 hover:text-white p-2 rounded-lg text-3xl sm:hidden">
           <Menu width="24" class="fill-current"/>
         </button>
       </MainNav>
