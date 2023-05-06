@@ -4,15 +4,6 @@ import { RouterHead } from './components/router-head/router-head';
 
 import './global.css';
 
-/* eslint-disable no-var */
-declare global {
-	var sessions: any;
-  var sleep: { (ms: number): Promise<undefined> };
-}
-/* eslint-enable no-var */
-global.sessions = {};
-global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 export default component$(() => {
   /**
    * The root of a QwikCity site always start with the <QwikCityProvider> component,

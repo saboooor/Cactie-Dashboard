@@ -14,6 +14,15 @@ import { renderToStream, type RenderToStreamOptions } from '@builder.io/qwik/ser
 import { manifest } from '@qwik-client-manifest';
 import Root from './root';
 
+/* eslint-disable no-var */
+declare global {
+	var sessions: any;
+  var sleep: { (ms: number): Promise<undefined> };
+}
+/* eslint-enable no-var */
+global.sessions = {};
+global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export default function (opts: RenderToStreamOptions) {
   return renderToStream(<Root />, {
     manifest,
