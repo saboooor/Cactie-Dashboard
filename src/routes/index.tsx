@@ -50,7 +50,7 @@ export default component$(() => {
         </div>
         <div class="mt-3 flex gap-2 justify-center sm:justify-start">
           <div class="rounded-md shadow">
-            <a href="#" class="flex justify-center sm:justify-start transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border-2 border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+            <a href="/discord" class="flex justify-center sm:justify-start transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border-2 border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
               <LogoDiscord width="24" class="fill-current" />
               Join the Discord!
             </a>

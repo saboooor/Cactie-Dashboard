@@ -1,5 +1,5 @@
 import { component$, Slot } from '@builder.io/qwik';
-import { Link, useNavigate } from '@builder.io/qwik-city';
+import { Link, useLocation } from '@builder.io/qwik-city';
 
 import { LogoDiscord, LogoGithub, Menu, SettingsOutline, ReaderOutline, HappyOutline, PersonCircleOutline } from 'qwik-ionicons';
 // @ts-ignore
@@ -21,14 +21,14 @@ export default component$(({ user }: any) => {
           <ReaderOutline width="24" class="fill-current" />
           Legal
         </NavButton>
-        <NavButton href="/invite" extraClass="hidden sm:flex gap-3">
+        <NavButton external href="/invite" extraClass="hidden sm:flex gap-3">
           <HappyOutline width="24" class="fill-current" />
           Invite
         </NavButton>
-        <NavButton external icon href="https://github.com/saboooor/Cactie" title="GitHub" extraClass="hidden sm:flex">
+        <NavButton external icon href="/github" title="GitHub" extraClass="hidden sm:flex">
           <LogoGithub width="24" class="fill-green-100" />
         </NavButton>
-        <NavButton icon href="/discord" title="Discord" extraClass="hidden sm:flex">
+        <NavButton external icon href="/discord" title="Discord" extraClass="hidden sm:flex">
           <LogoDiscord width="24" class="fill-indigo-200" />
         </NavButton>
         {user && 
@@ -58,15 +58,15 @@ export default component$(({ user }: any) => {
           <ReaderOutline width="24" class="fill-current" />
           Legal
         </NavButton>
-        <NavButton href="/invite" extraClass="flex gap-3">
+        <NavButton external href="/invite" extraClass="flex gap-3">
           <HappyOutline width="24" class="fill-current" />
           Invite
         </NavButton>
         <div class="flex flex-row">
-          <NavButton external icon href="https://github.com/saboooor/Cactie" title="GitHub" extraClass="flex sm:hidden">
+          <NavButton external icon href="/github" title="GitHub" extraClass="flex sm:hidden">
             <LogoGithub width="24" class="fill-green-100" />
           </NavButton>
-          <NavButton icon href="/discord" title="Discord" extraClass="flex sm:hidden">
+          <NavButton external icon href="/discord" title="Discord" extraClass="flex sm:hidden">
             <LogoDiscord width="24" class="fill-indigo-200" />
           </NavButton>
         </div>
@@ -86,21 +86,26 @@ export const Nav = component$(() => {
 });
 
 export const Brand = component$(() => {
+  const location = useLocation();
   return (
     <div class="flex flex-1 items-center justify-start">
-      <Link href="/" class="transition ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white drop-shadow-2xl px-3 pt-3 pb-2 rounded-lg text-lg flex items-center whitespace-nowrap">
+      <Link href="/" class="transition ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white drop-shadow-2xl px-3 pt-3 pb-2 rounded-lg text-lg flex gap-3 items-center whitespace-nowrap">
         <picture>
           <source srcSet={iconAVIF} type="image/avif" />
           <source srcSet={iconWEBP} type="image/webp" />
           <img
             src={icon}
-            class="h-10 w-10 mr-3"
+            class="h-10 w-10"
             alt="Cactie"
             loading="eager"
             decoding="async"
           />
         </picture>
         <span class="flex sm:hidden md:flex">Cactie</span>
+        <svg class={`animate-spin h-5 w-5 text-white ${location.isNavigating ? '' : 'hidden'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
       </Link>
     </div>
   );
@@ -128,7 +133,6 @@ export const MobileNav = component$(() => {
 });
 
 export const NavButton = component$(({ href, title, icon, external, extraClass, style }: any) => {
-  const nav = useNavigate();
   return <>
     {external &&
       <a href={href} title={title} style={style} class={`group transition ease-in-out ${extraClass} hover:bg-gray-800 hover:text-white ${icon ? 'text-3xl px-2' : 'px-4'} py-2 rounded-lg  items-center`}>
@@ -136,9 +140,9 @@ export const NavButton = component$(({ href, title, icon, external, extraClass, 
       </a>
     }
     {!external &&
-      <button onClick$={() => { document.getElementById('mobile-menu')?.classList.replace('flex', 'hidden'); nav(href); }} title={title} style={style} class={`group transition ease-in-out ${extraClass} hover:bg-gray-800 hover:text-white ${icon ? 'text-3xl px-2' : 'px-4'} py-2 rounded-lg items-center`}>
+      <Link href={href} onClick$={async () => { document.getElementById('mobile-menu')?.classList.replace('flex', 'hidden'); }} title={title} style={style} class={`group transition ease-in-out ${extraClass} hover:bg-gray-800 hover:text-white ${icon ? 'text-3xl px-2' : 'px-4'} py-2 rounded-lg items-center`}>
         <Slot />
-      </button>
+      </Link>
     }
   </>;
 });
