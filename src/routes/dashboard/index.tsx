@@ -1,7 +1,8 @@
 import { component$ } from '@builder.io/qwik';
-import { type DocumentHead, routeLoader$, type RequestHandler } from '@builder.io/qwik-city';
+import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import { routeLoader$ } from '@builder.io/qwik-city';
 import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
-import { PermissionsBitField } from 'discord.js';
+import { PermissionFlagsBits } from 'discord-api-types/v10';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
 import getAuth from '~/components/functions/auth';
 
@@ -44,7 +45,7 @@ export const useGuilds = routeLoader$(async ({ request, url, redirect, env }) =>
   }
   if ('code' in GuildList) throw redirect(302, `/dashboard?error=${GuildList.code}`);
   if ('code' in BotGuildList) throw redirect(302, `/dashboard?error=${BotGuildList.code}`);
-  GuildList = GuildList.filter(guild => new PermissionsBitField(BigInt(guild.permissions!)).has(PermissionsBitField.Flags.ManageGuild));
+  GuildList = GuildList.filter(guild => (BigInt(guild.permissions!) & PermissionFlagsBits.ManageGuild) === PermissionFlagsBits.ManageGuild);
   GuildList.forEach(guild => guild.mutual = BotGuildList.some(botguild => botguild.id == guild.id));
   return GuildList;
 });
