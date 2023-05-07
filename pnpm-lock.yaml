@@ -16,6 +16,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.1.0
     version: 20.1.0
+  '@types/uuid':
+    specifier: ^9.0.1
+    version: 9.0.1
   '@typescript-eslint/eslint-plugin':
     specifier: 5.59.2
     version: 5.59.2(@typescript-eslint/parser@5.59.2)(eslint@8.40.0)(typescript@5.0.4)
@@ -64,6 +67,9 @@ devDependencies:
   undici:
     specifier: 5.22.0
     version: 5.22.0
+  uuid:
+    specifier: ^9.0.0
+    version: 9.0.0
   vite:
     specifier: 4.3.5
     version: 4.3.5(@types/node@20.1.0)
@@ -75,7 +81,7 @@ devDependencies:
     version: 4.2.0(typescript@5.0.4)(vite@4.3.5)
   wrangler:
     specifier: latest
-    version: 2.18.0
+    version: 2.19.0
 
 packages:
 
@@ -1032,6 +1038,10 @@ packages:
 
   /@types/unist@2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
+    dev: true
+
+  /@types/uuid@9.0.1:
+    resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
     dev: true
 
   /@types/ws@8.5.4:
@@ -4084,6 +4094,11 @@ packages:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: true
 
+  /uuid@9.0.0:
+    resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
+    hasBin: true
+    dev: true
+
   /uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
@@ -4220,8 +4235,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /wrangler@2.18.0:
-    resolution: {integrity: sha512-e+WJ019AbioAf9u4YiOxjrfKqzOP8K3kDAM9v+lGQa+WKsae/UVcMb3Hn5iMIlIt2fc622WefZfuSNRpkAzrSA==}
+  /wrangler@2.19.0:
+    resolution: {integrity: sha512-/XykXkD7dtvBMWq2p84V/aHhkifZA15+HBD7nm/pV62s6MJrJ+DWd1QJB7CF2D7DqknBLxdWpmmZB6YCo0BtMw==}
     engines: {node: '>=16.13.0'}
     hasBin: true
     dependencies:

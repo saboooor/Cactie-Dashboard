@@ -1,5 +1,5 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import crypto from 'crypto';
+import { v4 } from 'uuid';
 
 export const onGet: RequestHandler = async ({ url, request, redirect, headers, env }) => {
   const code = url.searchParams.get('code');
@@ -26,7 +26,7 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers, e
         },
       });
       const oauthData = await tokenResponseData.json();
-      const sid = crypto.randomBytes(32).toString('hex');
+      const sid = v4();
       const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
       const userdata = await res.json();
       sessions[sid] = {
