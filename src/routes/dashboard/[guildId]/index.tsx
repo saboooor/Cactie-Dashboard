@@ -70,7 +70,7 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
 
 export default component$(() => {
   const guildData = useData();
-  const { guild, channels, roles, srvconfig } = guildData.value;
+  const { guild, srvconfig } = guildData.value;
   return (
     <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6 sm:pt-12 min-h-[calc(100lvh-80px)]">
         <MenuIndex guild={guild}>
