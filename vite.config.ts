@@ -3,26 +3,22 @@ import { qwikVite } from '@builder.io/qwik/optimizer';
 import { qwikCity } from '@builder.io/qwik-city/vite';
 import { imagetools } from "vite-imagetools";
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { port } from './src/config.json'
 
 export default defineConfig(() => {
+  const port = Number(process.env.VITE_PORT) ?? 5173;
   return {
     plugins: [qwikCity(), qwikVite(), tsconfigPaths(), imagetools()],
     preview: {
       headers: {
         'Cache-Control': 'public, max-age=600',
       },
-      hmr: {
-          clientPort: port
-      },
+      hmr: { clientPort: port },
       port,
       strictPort: true,
       host: "0.0.0.0"
     },
     server: {
-      hmr: {
-          clientPort: port
-      },
+      hmr: { clientPort: port },
       port,
       strictPort: true,
       host: "0.0.0.0"

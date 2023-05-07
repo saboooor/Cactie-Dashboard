@@ -1,13 +1,11 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import crypto from 'crypto';
 
-import { domain, clientSecret } from '~/config.json';
-
-export const onGet: RequestHandler = async ({ url, request, redirect, headers }) => {
+export const onGet: RequestHandler = async ({ url, request, redirect, headers, env }) => {
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=765287593762881616` + `&redirect_uri=${`${domain}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
+    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=765287593762881616` + `&redirect_uri=${`${env.get('DOMAIN')}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
     throw redirect(302, oAuth2URL);
   }
 
@@ -17,10 +15,10 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers })
         method: 'POST',
         body: new URLSearchParams({
           client_id: '765287593762881616',
-          client_secret: clientSecret,
+          client_secret: env.get('CLIENT_SECRET')!,
           code,
           grant_type: 'authorization_code',
-          redirect_uri: `${domain}/login`,
+          redirect_uri: `${env.get('DOMAIN')}/login`,
           scope: 'identify',
         }),
         headers: {

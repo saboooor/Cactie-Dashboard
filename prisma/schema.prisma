@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ticketdata {
+  guildId     String
+  channelId   String
+  opener      String
+  resolved    String
+  users       String
+  voiceticket String?
+
+  @@unique([guildId, channelId])
+}
+
+model settings {
+  guildId         String @id
+  prefix          String
+  reactions       String
+  leavemessage    String?
+  joinmessage     String?
+  maxppsize       Int
+  tickets         String
+  disabledcmds    String?
+  auditlogs       String?
+  suggestionchannel String?
+  suggestthreads  String
+  pollchannel     String?
+  logchannel      String?
+  ticketlogchannel String?
+  ticketcategory  String?
+  supportrole     String?
+  ticketmention   String
+  mutecmd         String
+  msgshortener    Int
+  djrole          String?
+}
+
+model reactionroles {
+  guildId   String
+  channelId String
+  messageId String
+  emojiId   String
+  roleId    String
+  type      String
+  silent    String
+
+  @@unique([guildId, channelId, messageId, emojiId, roleId])
+}
+
+model memberdata {
+  memberId    String @id
+  guildId     String
+  mutedUntil  String?
+  bannedUntil String?
+  warns       String?
+
+  @@unique([memberId, guildId])
+}
+
+model lastvoted {
+  userId    String @id
+  timestamp String
+}

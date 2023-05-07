@@ -4,7 +4,6 @@ import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { PermissionsBitField } from 'discord.js';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
 import getAuth from '~/components/functions/auth';
-import { token } from '~/config.json';
 
 interface Guild extends APIGuild {
   id: string;
@@ -19,7 +18,7 @@ export const onGet: RequestHandler = async ({ request, url, cookie, redirect }) 
   }
 };
 
-export const useGuilds = routeLoader$(async ({ request, url, redirect }) => {
+export const useGuilds = routeLoader$(async ({ request, url, redirect, env }) => {
   const auth = getAuth(request);
   const clientres = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
     headers: {
@@ -28,7 +27,7 @@ export const useGuilds = routeLoader$(async ({ request, url, redirect }) => {
   })
   const botres = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
     headers: {
-      authorization: `Bot ${token}`,
+      authorization: `Bot ${env.get('BOT_TOKEN')}`,
     },
   })
   let GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
