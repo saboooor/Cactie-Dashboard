@@ -9,7 +9,7 @@ import iconWEBP from '~/components/images/Cactie.png?webp&width=40&height=40';
 // @ts-ignore
 import { src as icon } from '~/components/images/Cactie.png?metadata&width=40&height=40';
 
-import Luminescent from '~/components/images/Luminescent';
+import Luminescent from '~/components/icons/Luminescent';
 
 export default component$(({ user }: any) => {
   return (
@@ -40,12 +40,12 @@ export default component$(({ user }: any) => {
             </div>
           </div>
         </NavButton>
-        {user && 
+        {user &&
           <NavButton external icon href="/logout" title="Log out" style={{ backgroundColor: user.accent }}>
             <img src={user.pfp} class="rounded-full h-6 w-6" />
           </NavButton>
         }
-        {!user && 
+        {!user &&
           <NavButton external icon href="/login" title="Login">
             <PersonCircleOutline width="24" class="fill-luminescent-700" />
           </NavButton>

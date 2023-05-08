@@ -88,11 +88,11 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
-      content: 'A bot that does stuff ig'
+      content: 'A bot that does stuff ig',
     },
     {
       property: 'og:description',
-      content: 'A bot that does stuff ig'
-    }
-  ]
-}
+      content: 'A bot that does stuff ig',
+    },
+  ],
+};

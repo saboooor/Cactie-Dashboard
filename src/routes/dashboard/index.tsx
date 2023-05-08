@@ -21,25 +21,25 @@ export const onGet: RequestHandler = async ({ request, url, cookie, redirect }) 
 
 export const useGuilds = routeLoader$(async ({ request, url, redirect, env }) => {
   const auth = getAuth(request);
-  const clientres = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
+  const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `${auth.token_type} ${auth.access_token}`,
     },
-  })
-  const botres = await fetch(`https://discord.com/api/v10/users/@me/guilds`, {
+  });
+  const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bot ${env.get('BOT_TOKEN')}`,
     },
-  })
+  });
   let GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
   const BotGuildList: RESTError | RESTRateLimit | Guild[] = await botres.json();
   if ('retry_after' in GuildList) {
-    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`)
+    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`);
     await sleep(GuildList.retry_after);
     throw redirect(302, url.href);
   }
   if ('retry_after' in BotGuildList) {
-    console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after}ms`)
+    console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after}ms`);
     await sleep(BotGuildList.retry_after);
     throw redirect(302, url.href);
   }
@@ -78,7 +78,7 @@ export default component$(() => {
                   </a>
                 </div>
               </div>
-            )
+            );
           })
         }
       </div>
@@ -106,7 +106,7 @@ export default component$(() => {
                   </a>
                 </div>
               </div>
-            )
+            );
           })
         }
       </div>
@@ -119,11 +119,11 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
-      content: 'The Cactie Dashboard'
+      content: 'The Cactie Dashboard',
     },
     {
       property: 'og:description',
-      content: 'The Cactie Dashboard'
-    }
-  ]
-}
+      content: 'The Cactie Dashboard',
+    },
+  ],
+};

@@ -5,7 +5,7 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers, e
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
-    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + `?client_id=765287593762881616` + `&redirect_uri=${`${env.get('DOMAIN')}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds'
+    const oAuth2URL = 'https://discord.com/api/v10/oauth2/authorize' + '?client_id=765287593762881616' + `&redirect_uri=${`${env.get('DOMAIN')}/login`.replace(/\//g, '%2F').replace(/:/g, '%3A')}` + '&response_type=code' + '&scope=identify guilds';
     throw redirect(302, oAuth2URL);
   }
 
@@ -27,7 +27,7 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers, e
       });
       const oauthData = await tokenResponseData.json();
       const sid = v4();
-      const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } })
+      const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
       const userdata = await res.json();
       sessions[sid] = {
         ...oauthData,
@@ -44,8 +44,8 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers, e
     const cookieJSON: any = {};
     const cookiesArray = request.headers.get('cookie')?.split('; ');
     cookiesArray?.forEach((cookie: string) => {
-        const values = cookie.split('=');
-        cookieJSON[values[0]] = values[1];
+      const values = cookie.split('=');
+      cookieJSON[values[0]] = values[1];
     });
     const href = cookieJSON['redirect.url'];
     throw redirect(302, href ?? '/');
@@ -57,11 +57,11 @@ export const head: DocumentHead = {
   meta: [
     {
       name: 'description',
-      content: 'Login to the dashboard using Discord'
+      content: 'Login to the dashboard using Discord',
     },
     {
       property: 'og:description',
-      content: 'Login to the dashboard using Discord'
-    }
-  ]
-}
+      content: 'Login to the dashboard using Discord',
+    },
+  ],
+};
