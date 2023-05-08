@@ -4,7 +4,7 @@ import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'di
 import { ChannelType } from 'discord-api-types/v10';
 import getAuth from '~/components/functions/auth';
 import { MenuIndex, MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/edge';
 import TextInput from '~/components/elements/TextInput';
 import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
