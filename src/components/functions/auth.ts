@@ -1,13 +1,8 @@
+import type { Cookie } from '@builder.io/qwik-city';
 import { PrismaClient } from '@prisma/client/edge';
 
-export default async function getAuth(request: any) {
-  const cookieJSON: any = {};
-  const cookiesArray = request.headers.get('cookie')?.split('; ');
-  cookiesArray?.forEach((cookie: string) => {
-    const values = cookie.split('=');
-    cookieJSON[values[0]] = values[1];
-  });
-  const sid = cookieJSON['session-id'];
+export default async function getAuth(cookie: Cookie) {
+  const sid = cookie.get('sessionid')?.value;
   if (!sid) return null;
   const prisma = new PrismaClient();
   const session = await prisma.sessions.findUnique({

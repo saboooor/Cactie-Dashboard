@@ -17,10 +17,10 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const onGet: RequestHandler = async ({ request, url, cookie, redirect }) => {
-  const auth = await getAuth(request);
+export const onGet: RequestHandler = async ({ url, cookie, redirect }) => {
+  const auth = await getAuth(cookie);
   if (!auth) {
-    cookie.set('redirect.url', url.href);
+    cookie.set('redirecturl', url.href, { path: '/' });
     throw redirect(302, '/login');
   }
 };

@@ -12,16 +12,16 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const onGet: RequestHandler = async ({ request, url, cookie, redirect }) => {
-  const auth = await getAuth(request);
+export const onGet: RequestHandler = async ({ url, cookie, redirect }) => {
+  const auth = await getAuth(cookie);
   if (auth === null) {
-    cookie.set('redirect.url', url.href);
+    cookie.set('redirecturl', url.href, { path: '/' });
     throw redirect(302, '/login');
   }
 };
 
-export const useGuilds = routeLoader$(async ({ request, url, redirect, env }) => {
-  const auth = await getAuth(request);
+export const useGuilds = routeLoader$(async ({ url, cookie, redirect, env }) => {
+  const auth = await getAuth(cookie);
   const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bearer ${auth?.accessToken}`,

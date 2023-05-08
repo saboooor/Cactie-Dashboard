@@ -2,7 +2,7 @@ import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import { v4 } from 'uuid';
 import { PrismaClient } from '@prisma/client/edge';
 
-export const onGet: RequestHandler = async ({ url, request, redirect, headers, env }) => {
+export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
   const code = url.searchParams.get('code');
   if (!code) {
     console.log('Redirected user to login page');
@@ -42,19 +42,13 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers, e
           accent: userdata.banner_color,
         },
       });
-      headers.set('Set-Cookie', `session-id=${sid}`);
+      cookie.set('session-id', sid, { path: '/' });
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401
       console.error(error);
     }
-    const cookieJSON: any = {};
-    const cookiesArray = request.headers.get('cookie')?.split('; ');
-    cookiesArray?.forEach((cookie: string) => {
-      const values = cookie.split('=');
-      cookieJSON[values[0]] = values[1];
-    });
-    const href = cookieJSON['redirect.url'];
+    const href = cookie.get('redirecturl')?.value;
     throw redirect(302, href ?? '/');
   }
 };
