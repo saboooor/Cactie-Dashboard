@@ -10,6 +10,7 @@ import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
   id: string;
@@ -17,7 +18,7 @@ interface Guild extends APIGuild {
 }
 
 export const onGet: RequestHandler = async ({ request, url, cookie, redirect }) => {
-  const auth = getAuth(request);
+  const auth = await getAuth(request);
   if (!auth) {
     cookie.set('redirect.url', url.href);
     throw redirect(302, '/login');

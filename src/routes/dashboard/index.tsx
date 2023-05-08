@@ -5,6 +5,7 @@ import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
 import getAuth from '~/components/functions/auth';
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
   id: string;
@@ -12,18 +13,18 @@ interface Guild extends APIGuild {
 }
 
 export const onGet: RequestHandler = async ({ request, url, cookie, redirect }) => {
-  const auth = getAuth(request);
-  if (!auth) {
+  const auth = await getAuth(request);
+  if (auth === null) {
     cookie.set('redirect.url', url.href);
     throw redirect(302, '/login');
   }
 };
 
 export const useGuilds = routeLoader$(async ({ request, url, redirect, env }) => {
-  const auth = getAuth(request);
+  const auth = await getAuth(request);
   const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
-      authorization: `${auth.token_type} ${auth.access_token}`,
+      authorization: `Bearer ${auth?.accessToken}`,
     },
   });
   const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {

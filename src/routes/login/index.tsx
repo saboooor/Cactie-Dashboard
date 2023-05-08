@@ -1,5 +1,6 @@
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import { v4 } from 'uuid';
+import { PrismaClient } from '@prisma/client/edge';
 
 export const onGet: RequestHandler = async ({ url, request, redirect, headers, env }) => {
   const code = url.searchParams.get('code');
@@ -29,13 +30,19 @@ export const onGet: RequestHandler = async ({ url, request, redirect, headers, e
       const sid = v4();
       const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
       const userdata = await res.json();
-      sessions[sid] = {
-        ...oauthData,
-        pfp: `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}`,
-        accent: userdata.banner_color,
-        expires_in: (Date.now() + oauthData.expires_in),
-      };
-      headers.set('Set-Cookie', `connect.sid=${sid}`);
+      const prisma = new PrismaClient();
+      await prisma.sessions.create({
+        data: {
+          sessionId: sid,
+          accessToken: oauthData.access_token,
+          refreshToken: oauthData.refresh_token,
+          expiresAt: new Date(Date.now() + oauthData.expires_in),
+          scope: oauthData.scope,
+          pfp: userdata.id ? `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}` : undefined,
+          accent: userdata.banner_color,
+        },
+      });
+      headers.set('Set-Cookie', `session-id=${sid}`);
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401

@@ -70,3 +70,13 @@ model lastvoted {
   userId    String @id
   timestamp String
 }
+
+model sessions {
+  sessionId    String @id
+  accessToken String?
+  refreshToken String?
+  expiresAt DateTime?
+  scope String?
+  pfp String?
+  accent String?
+}
