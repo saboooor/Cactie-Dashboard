@@ -3,8 +3,8 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import getAuth from '~/components/functions/auth';
 import Nav from '~/components/Nav';
 
-export const useUser = routeLoader$(async ({ cookie }) => {
-  const auth = await getAuth(cookie);
+export const useUser = routeLoader$(async ({ cookie, env }) => {
+  const auth = await getAuth(cookie, env);
   if (!auth) return null;
   const { pfp, accent } = auth;
   return { pfp, accent };

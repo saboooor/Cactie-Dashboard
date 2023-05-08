@@ -17,8 +17,8 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const onGet: RequestHandler = async ({ url, cookie, redirect }) => {
-  const auth = await getAuth(cookie);
+export const onGet: RequestHandler = async ({ url, cookie, redirect, env }) => {
+  const auth = await getAuth(cookie, env);
   if (!auth) {
     cookie.set('redirecturl', url.href, { path: '/' });
     throw redirect(302, '/login');
@@ -65,7 +65,7 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
   }
   if ('code' in roles) throw redirect(302, `/dashboard?error=${roles.code}&message=${roles.message}`);
 
-  const prisma = new PrismaClient();
+  const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } });
   const srvconfig = await prisma.settings.findUnique({
     where: {
       guildId: params.guildId,

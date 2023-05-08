@@ -30,7 +30,7 @@ export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
       const sid = v4();
       const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
       const userdata = await res.json();
-      const prisma = new PrismaClient();
+      const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } });
       await prisma.sessions.create({
         data: {
           sessionId: sid,
