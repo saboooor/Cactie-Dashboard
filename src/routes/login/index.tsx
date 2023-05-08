@@ -42,7 +42,7 @@ export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
           accent: userdata.banner_color,
         },
       });
-      cookie.set('session-id', sid, { path: '/' });
+      cookie.set('sessionid', sid, { path: '/' });
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401
