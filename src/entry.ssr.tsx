@@ -20,8 +20,8 @@ declare global {
   var sleep: { (ms: number): Promise<undefined> };
 }
 /* eslint-enable no-var */
-global.sessions = {};
-global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+window.global.sessions = {};
+window.global.global.sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function (opts: RenderToStreamOptions) {
   return renderToStream(<Root />, {

@@ -15,13 +15,9 @@ import qwikCityPlan from '@qwik-city-plan';
 import { manifest } from '@qwik-client-manifest';
 import render from './entry.ssr';
 
-/* eslint-disable no-var */
 declare global {
   interface QwikCityPlatform extends PlatformCloudflarePages {}
-	var sessions: any;
-  var sleep: { (ms: number): Promise<undefined> };
 }
-/* eslint-enable no-var */
 
 const fetch = createQwikCity({ render, qwikCityPlan, manifest });
 
