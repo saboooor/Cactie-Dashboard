@@ -1,4 +1,4 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, $ } from '@builder.io/qwik';
 import { type DocumentHead, routeLoader$, type RequestHandler } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
@@ -73,12 +73,33 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
     },
   });
 
-  return { guild, channels, roles, srvconfig };
+  const reactionroles = {
+    raw: await prisma.reactionroles.findMany({ where: { guildId: params.guildId } }),
+    channels: [] as any[],
+  };
+
+  for (const i in reactionroles.raw) {
+    const emojiId = reactionroles.raw[i].emojiId.match(/(\d*)/)![0];
+    if (emojiId != '') reactionroles.raw[i].emojiId = `https://cdn.discordapp.com/emojis/${emojiId}`;
+    if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
+    const channelInfo = {
+      id: reactionroles.raw[i].channelId,
+      name: channels.find(c => c.id == reactionroles.raw[i].channelId)?.name,
+      messages: [] as any[],
+    };
+    const channelreactionroles = reactionroles.raw.filter(r => r.channelId == channelInfo.id);
+    for (const i2 in channelreactionroles) {
+      if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
+      channelInfo.messages.push(channelreactionroles[i2].messageId);
+    }
+    reactionroles.channels.push(channelInfo);
+  }
+  return { guild, channels, roles, srvconfig, reactionroles };
 });
 
 export default component$(() => {
   const guildData = useData();
-  const { guild, channels, roles, srvconfig } = guildData.value;
+  const { guild, channels, roles, srvconfig, reactionroles } = guildData.value;
   return (
     <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6 sm:pt-12 min-h-[calc(100lvh-80px)]">
       <MenuIndex guild={guild}>
@@ -388,7 +409,7 @@ export default component$(() => {
                   )}
                 </RawSelectInput>
                 <Button color="primary">
-                      Add Audit Log
+                  Add Audit Log
                 </Button>
               </div>
             </div>
@@ -398,7 +419,7 @@ export default component$(() => {
                   return (
                     <div key={i} class="flex-1 flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-6 gap-4">
                       <div class="flex items-start flex-1">
-                        <h1 class="flex-1 justify-start font-bold tracking-tight text-white text-2xl">
+                        <h1 class="flex-1 justify-start font-bold text-white text-2xl">
                           {log}
                         </h1>
                         <Close width="36" class="fill-red-400" />
@@ -416,9 +437,109 @@ export default component$(() => {
             </div>
           </div>;
         })()}
+        <div class="flex">
+          <MenuTitle extraClass="flex-1">Reaction Roles</MenuTitle>
+          <Button color="primary">
+            Create Reaction Role
+          </Button>
+        </div>
+        <div class="flex flex-col gap-6 py-10">
+          {
+            reactionroles.channels.map(channel => (
+              <div key={channel.id} class="flex-1 flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-4 gap-4">
+                <div class="flex items-start flex-1">
+                  <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+                    # {channel?.name ?? 'Channel Not Found.'}
+                  </h1>
+                  <Button color="primary" small>
+                    Create Here
+                  </Button>
+                </div>
+                <div class='flex flex-col gap-4'>
+                  {
+                    channel.messages.map((messageId: string) => (
+                      <div key={messageId} class="flex-1 flex flex-col bg-gray-900/50 border-2 border-gray-700 rounded-xl p-4 gap-4">
+                        <div class="flex items-start flex-1">
+                          <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+                            Message # {messageId}
+                          </h1>
+                          <Button color="primary" small>
+                            Create Here
+                          </Button>
+                        </div>
+                        <div class='flex flex-wrap gap-4'>
+                          {
+                            reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
+                              const role = roles.find(r => r.id == rr.roleId);
+
+                              return <div key={rr.roleId} class="flex-1 min-w-max flex bg-gray-800 rounded-xl p-4 gap-4" onContextMenu$={(event) => openContextMenu(event, rr)} preventdefault:contextmenu>
+                                <div>
+                                  {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
+                                </div>
+                                <div class="ml-4">
+                                  <h1 class="font-bold text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
+                                  <p class="hidden sm:flex">
+                                    {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
+                                    {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
+                                  </p>
+                                </div>
+                              </div>;
+                            })
+                          }
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div class="hidden flex-col gap-2 py-3 px-2 rounded-xl bg-gray-900/50 backdrop-blur-lg border-2 border-gray-800 drop-shadow-lg absolute top-0" id="contextmenu" preventdefault:contextmenu>
+        <RawSelectInput id="rrrole" name="rrrole" extraClass="text-sm bg-transparent hover:bg-gray-800">
+          {roles.map(r =>
+            <option value={r.id} key={r.id}>{`@ ${r.name}`}</option>,
+          )}
+        </RawSelectInput>
+        <RawSelectInput id="rrswitch" name="rrswitch" extraClass="text-sm bg-transparent hover:bg-gray-800">
+          <option value="switch">Add by reacting / Remove by unreacting</option>
+          <option value="toggle">Add / Remove by reacting</option>
+        </RawSelectInput>
+        <a class="flex items-center py-2 px-3 pr-1">
+          <span class="flex-1">
+            Silent
+          </span>
+          <Toggle nolabel id="rrsilent" />
+        </a>
+        <a id="rrdelete" class="flex items-center py-2 px-3 rounded-md transition text-red-400 hover:bg-gray-800 cursor-pointer" onClick$={closeContextMenu}>
+          Delete
+        </a>
       </div>
     </section>
   );
+});
+
+export const openContextMenu = $((event: any, rr: any) => {
+  const contextmenu = document.getElementById('contextmenu')!;
+  const rrRole: any = document.getElementById('rrrole')!;
+  const rrSwitch: any = document.getElementById('rrswitch')!;
+  const rrSilent: any = document.getElementById('rrsilent')!;
+  rrRole.value = rr.roleId;
+  rrSwitch.value = rr.type;
+  rrSilent.checked = rr.silent == 'true';
+  contextmenu.style.display = 'flex';
+  const Yoffset = event.pageY + contextmenu.clientHeight > document.body.clientHeight ? contextmenu.clientHeight : 0;
+  contextmenu.style.top = `${event.pageY - Yoffset}px`;
+  const Xoffset = event.pageX + contextmenu.clientWidth > document.body.clientWidth ? contextmenu.clientWidth : 0;
+  contextmenu.style.left = `${event.pageX - Xoffset}px`;
+  document.addEventListener('click', closeContextMenu);
+});
+
+export const closeContextMenu = $((event: any) => {
+  const contextmenu = document.getElementById('contextmenu')!;
+  if (event.target.id != 'rrdelete' && (contextmenu.contains(event.target) || event.target.innerText == '•••' || contextmenu.style.display == 'none')) return;
+  contextmenu.style.display = 'none';
 });
 
 export const head: DocumentHead = {

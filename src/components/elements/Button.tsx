@@ -15,7 +15,7 @@ const classes = {
 export const Button = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
-    <button {...props} class={`transition ease-in-out text-lg ${color} text-gray-50 rounded-md px-3 py-2 ${props.extraClass}`}>
+    <button {...props} class={`transition ease-in-out ${color} text-gray-50 rounded-md ${props.small ? 'text-sm px-2 py-1' : props.big ? 'text-xl px-6 py-3' : 'text-lg px-4 py-2'} ${props.extraClass}`}>
       <Slot />
     </button>
   );
@@ -29,7 +29,7 @@ export const SPAButton = component$((props: any) => {
   const nav = useNavigate();
   return (
     <div class="flex flex-cols">
-      <button {...props} onClick$={async () => { store.loading = true; await nav(props.href); store.loading = false; }} class={`transition ease-in-out text-lg ${color} text-gray-50 rounded-md px-3 py-2 ${props.extraClass}`}>
+      <button {...props} onClick$={async () => { store.loading = true; await nav(props.href); store.loading = false; }} class={`transition ease-in-out ${color} text-gray-50 rounded-md ${props.small ? 'text-sm px-2 py-1' : props.big ? 'text-xl px-6 py-3' : 'text-lg px-4 py-2'} ${props.extraClass}`}>
         <div class="flex items-center">
           <Slot /> <LoadingIcon extraClass={`${!store.loading && 'hidden'}`}/>
         </div>
@@ -41,7 +41,7 @@ export const SPAButton = component$((props: any) => {
 export const ExternalButton = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
-    <a {...props} class={`transition ease-in-out text-lg ${color} text-gray-50 rounded-md px-3 py-2 ${props.extraClass}`}>
+    <a {...props} class={`transition ease-in-out ${color} text-gray-50 rounded-md ${props.small ? 'text-sm px-2 py-1' : props.big ? 'text-xl px-6 py-3' : 'text-lg px-4 py-2'} ${props.extraClass}`}>
       <Slot />
     </a>
   );
