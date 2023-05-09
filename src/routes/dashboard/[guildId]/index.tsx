@@ -78,7 +78,7 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
 
 export default component$(() => {
   const guildData = useData();
-  const { guild, channels, srvconfig } = guildData.value;
+  const { guild, channels, roles, srvconfig } = guildData.value;
   return (
     <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6 sm:pt-12 min-h-[calc(100lvh-80px)]">
       <MenuIndex guild={guild}>
@@ -230,8 +230,8 @@ export default component$(() => {
           </div>
         </div>
         <MenuTitle>Ticket System</MenuTitle>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+        <div class="flex flex-wrap gap-6 py-10">
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Mode</h1>
             <SelectInput id="tickets" name="tickets" label="This is how the bot will handle tickets">
               <option value="false" selected={srvconfig?.tickets == 'false'}>Disable Tickets</option>
@@ -239,23 +239,67 @@ export default component$(() => {
               <option value="reactions" selected={srvconfig?.tickets == 'reactions'}>Use reactions</option>
             </SelectInput>
           </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Category</h1>
-            <SelectInput id="ticketcategory" name="ticketcategory" label="The category where tickets will appear" extraClass="mb-4">
+            <SelectInput id="ticketcategory" name="ticketcategory" label="The category where tickets will appear">
               <option value="false" selected={srvconfig?.ticketcategory == 'false'}>No Category</option>
               {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.ticketcategory == c.id}>{`> ${c.name}`}</option>,
               )}
             </SelectInput>
           </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Log Channel</h1>
-            <SelectInput id="ticketlogchannel" name="ticketlogchannel" label="The channel where transcripts will appear" extraClass="mb-4">
+            <SelectInput id="ticketlogchannel" name="ticketlogchannel" label="The channel where transcripts will appear">
               <option value="false" selected={srvconfig?.ticketlogchannel == 'false'}>Don't send transcripts</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.ticketlogchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
+          </div>
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Access Role</h1>
+            <SelectInput id="supportrole" name="supportrole" label="The role that may access tickets">
+              <option value="false" selected={srvconfig?.supportrole == 'false'}>Only Administrators</option>
+              {roles.map(r =>
+                <option value={r.id} key={r.id} selected={srvconfig?.supportrole == r.id}>{`@ ${r.name}`}</option>,
+              )}
+            </SelectInput>
+          </div>
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Mention</h1>
+            <SelectInput id="ticketmention" name="ticketmention" label="Pings the specified role when a ticket is created">
+              <option value="false" selected={srvconfig?.ticketmention == 'false'}>No mention</option>
+              <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'}>@ everyone</option>
+              <option value="here" selected={srvconfig?.ticketmention == 'here'}>@ here</option>
+              {roles.map(r =>
+                <option value={r.id} key={r.id} selected={srvconfig?.ticketmention == r.id}>{`@ ${r.name}`}</option>,
+              )}
+            </SelectInput>
+          </div>
+        </div>
+        <MenuTitle>Moderation</MenuTitle>
+        <div class="flex flex-wrap gap-6 py-10">
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Message Shortener</h1>
+            <NumberInput input value={srvconfig?.msgshortener} name="msgshortener" id="msgshortener">
+              The amount of lines in a message to shorten into a link. To disable, set to 0
+            </NumberInput>
+          </div>
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Mute Command</h1>
+            <SelectInput id="ticketcategory" name="ticketcategory" label="Select a role to give when muting or use Discord's timeout feature">
+              <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'}>Use Discord's timeout feature</option>
+              {roles.map(r =>
+                <option value={r.id} key={r.id} selected={srvconfig?.mutecmd == r.id}>{`@ ${r.name}`}</option>,
+              )}
+            </SelectInput>
+          </div>
+          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Disabled Commands</h1>
+            <TextInput name="disabledcmds" value={srvconfig?.disabledcmds == 'false' ? '' : srvconfig?.disabledcmds} placeholder="Specify commands to disable, no spaces">
+              Disable certain commands from Cactie separated by commas
+            </TextInput>
           </div>
         </div>
         <MenuTitle>Audit Logs</MenuTitle>
@@ -352,7 +396,7 @@ export default component$(() => {
               {
                 Object.keys(auditlogs.logs).map((log, i) => {
                   return (
-                    <div key={i} class="flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-6 gap-4">
+                    <div key={i} class="flex-1 flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-6 gap-4">
                       <div class="flex items-start flex-1">
                         <h1 class="flex-1 justify-start font-bold tracking-tight text-white text-2xl">
                           {log}

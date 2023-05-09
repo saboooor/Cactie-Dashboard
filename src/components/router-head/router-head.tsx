@@ -25,7 +25,7 @@ export const RouterHead = component$(() => {
     <>
       <title>{`Cactie: ${head.title}`}</title>
       <meta content={`Cactie: ${head.title}`} property="og:title"/>
-      <meta content="#E6AAF7" name="theme-color"/>
+      <meta content="#0D0D0D" name="theme-color"/>
 
       <link rel="canonical" href={loc.url.href} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
