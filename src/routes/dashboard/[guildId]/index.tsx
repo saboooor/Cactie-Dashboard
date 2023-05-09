@@ -1,4 +1,4 @@
-import { component$, $ } from '@builder.io/qwik';
+import { component$, $, useStore } from '@builder.io/qwik';
 import { type DocumentHead, routeLoader$, type RequestHandler } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
@@ -100,6 +100,11 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
 export default component$(() => {
   const guildData = useData();
   const { guild, channels, roles, srvconfig, reactionroles } = guildData.value;
+
+  const store = useStore({
+    modal: false,
+  });
+
   return (
     <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6 sm:pt-12 min-h-[calc(100lvh-80px)]">
       <MenuIndex guild={guild}>
@@ -439,7 +444,7 @@ export default component$(() => {
         })()}
         <div class="flex">
           <MenuTitle extraClass="flex-1">Reaction Roles</MenuTitle>
-          <Button color="primary">
+          <Button color="primary" onClick$={() => store.modal = !store.modal}>
             Create Reaction Role
           </Button>
         </div>
@@ -451,7 +456,7 @@ export default component$(() => {
                   <h1 class="flex-1 justify-start font-bold text-white text-2xl">
                     # {channel?.name ?? 'Channel Not Found.'}
                   </h1>
-                  <Button color="primary" small>
+                  <Button color="primary" small onClick$={() => store.modal = !store.modal}>
                     Create Here
                   </Button>
                 </div>
@@ -463,7 +468,7 @@ export default component$(() => {
                           <h1 class="flex-1 justify-start font-bold text-white text-2xl">
                             Message # {messageId}
                           </h1>
-                          <Button color="primary" small>
+                          <Button color="primary" small onClick$={() => store.modal = !store.modal}>
                             Create Here
                           </Button>
                         </div>
@@ -516,8 +521,8 @@ export default component$(() => {
           Delete
         </a>
       </div>
-      <div class="relative z-10">
-        <div class="fixed inset-0 z-10 bg-gray-900/30 transition overflow-y-auto">
+      <div class={`relative z-10 ${store.modal ? '' : 'pointer-events-none'}`}>
+        <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
           <div class="flex min-h-full max-h-full items-start justify-center p-4 pt-24 text-center sm:items-center">
             <div class="rounded-lg bg-gray-900/50 backdrop-blur-lg text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
               <h1 class="flex-1 justify-start font-bold text-white text-2xl">
@@ -556,7 +561,7 @@ export default component$(() => {
                 <Button color="primary" extraClass="flex-1 sm:flex-initial">
                   Create
                 </Button>
-                <Button extraClass="flex-1 sm:flex-initial">
+                <Button extraClass="flex-1 sm:flex-initial" onClick$={() => store.modal = !store.modal}>
                   Cancel
                 </Button>
               </div>
