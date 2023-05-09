@@ -105,6 +105,34 @@ export default component$(() => {
             Reactions
           </MenuItem>
         </MenuCategory>
+        <MenuCategory name="TICKET SYSTEM">
+          <MenuItem href="#">
+            Mode
+          </MenuItem>
+          <MenuItem href="#">
+            Category
+          </MenuItem>
+          <MenuItem href="#">
+            Log Channel
+          </MenuItem>
+          <MenuItem href="#">
+            Access Role
+          </MenuItem>
+          <MenuItem href="#">
+            Mention
+          </MenuItem>
+        </MenuCategory>
+        <MenuCategory name="MODERATION">
+          <MenuItem href="#">
+            Message Shortener
+          </MenuItem>
+          <MenuItem href="#">
+            Mute Command
+          </MenuItem>
+          <MenuItem href="#">
+            Disabled Commands
+          </MenuItem>
+        </MenuCategory>
         <MenuItem href="#audit">
             Audit Logs
         </MenuItem>
@@ -123,7 +151,7 @@ export default component$(() => {
           </div>
           <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Suggestions</h1>
-            <SelectInput id="suggestionchannel" name="suggestionchannel" label="Channel to make suggestions in" value={srvconfig?.suggestionchannel} extraClass="mb-4">
+            <SelectInput id="suggestionchannel" name="suggestionchannel" label="Channel to make suggestions in" extraClass="mb-4">
               <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.suggestionchannel == c.id}>{`# ${c.name}`}</option>,
@@ -137,7 +165,7 @@ export default component$(() => {
           </div>
           <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Polls</h1>
-            <SelectInput id="pollchannel" name="pollchannel" label="Channel to make polls in" value={srvconfig?.pollchannel}>
+            <SelectInput id="pollchannel" name="pollchannel" label="Channel to make polls in">
               <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.pollchannel == c.id}>{`# ${c.name}`}</option>,
@@ -199,6 +227,35 @@ export default component$(() => {
               </Toggle>
               <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
             </div>
+          </div>
+        </div>
+        <MenuTitle>Ticket System</MenuTitle>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
+          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Mode</h1>
+            <SelectInput id="tickets" name="tickets" label="This is how the bot will handle tickets">
+              <option value="false" selected={srvconfig?.tickets == 'false'}>Disable Tickets</option>
+              <option value="buttons" selected={srvconfig?.tickets == 'buttons'}>Use buttons</option>
+              <option value="reactions" selected={srvconfig?.tickets == 'reactions'}>Use reactions</option>
+            </SelectInput>
+          </div>
+          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Category</h1>
+            <SelectInput id="ticketcategory" name="ticketcategory" label="The category where tickets will appear" extraClass="mb-4">
+              <option value="false" selected={srvconfig?.ticketcategory == 'false'}>No Category</option>
+              {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
+                <option value={c.id} key={c.id} selected={srvconfig?.ticketcategory == c.id}>{`> ${c.name}`}</option>,
+              )}
+            </SelectInput>
+          </div>
+          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            <h1 class="font-bold text-white text-2xl mb-2">Log Channel</h1>
+            <SelectInput id="ticketlogchannel" name="ticketlogchannel" label="The channel where transcripts will appear" extraClass="mb-4">
+              <option value="false" selected={srvconfig?.ticketlogchannel == 'false'}>Don't send transcripts</option>
+              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                <option value={c.id} key={c.id} selected={srvconfig?.ticketlogchannel == c.id}>{`# ${c.name}`}</option>,
+              )}
+            </SelectInput>
           </div>
         </div>
         <MenuTitle>Audit Logs</MenuTitle>
