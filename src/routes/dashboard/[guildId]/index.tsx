@@ -516,6 +516,55 @@ export default component$(() => {
           Delete
         </a>
       </div>
+      <div class="relative z-10">
+        <div class="fixed inset-0 z-10 bg-gray-900/30 transition overflow-y-auto">
+          <div class="flex min-h-full max-h-full items-start justify-center p-4 pt-24 text-center sm:items-center">
+            <div class="rounded-lg bg-gray-900/50 backdrop-blur-lg text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
+              <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+                Create Reaction Role
+              </h1>
+              <div class="flex flex-col my-4 gap-4">
+                <div class="flex flex-col sm:flex-row gap-4">
+                  <TextInput id="rrcreateemoji" name="rrcreateemoji" value="😃">
+                    The emoji to react with
+                  </TextInput>
+                  <div class="flex-1">
+                    <SelectInput id="rrcreaterole" name="rrcreaterole" label="The role to be given">
+                      {roles.map(r =>
+                        <option value={r.id} key={r.id}>{`@ ${r.name}`}</option>,
+                      )}
+                    </SelectInput>
+                  </div>
+                </div>
+                <SelectInput id="rrcreatechannel" name="rrcreatechannel" label="Select the channel the reaction role will be in">
+                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                    <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                  )}
+                </SelectInput>
+                <TextInput id="rrcreatemessage" name="rrcreatemessage" placeholder="1105427534889353317">
+                  The Id of the message you want to create the reaction role in
+                </TextInput>
+                <SelectInput id="rrcreateswitch" name="rrcreateswitch" label="Reaction role behavior">
+                  <option value="switch">Add by reacting / Remove by unreacting</option>
+                  <option value="toggle">Add / Remove by reacting</option>
+                </SelectInput>
+                <Toggle id="rrcreatesilent">
+                  Silent
+                </Toggle>
+              </div>
+              <div class="flex flex-row-reverse gap-3">
+                <Button color="primary" extraClass="flex-1 sm:flex-initial">
+                  Create
+                </Button>
+                <Button extraClass="flex-1 sm:flex-initial">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
   );
 });
