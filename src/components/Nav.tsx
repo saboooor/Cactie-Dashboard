@@ -7,7 +7,7 @@ import iconAVIF from '~/components/images/Cactie.png?avif&width=96&height=96';
 // @ts-ignore
 import iconWEBP from '~/components/images/Cactie.png?webp&width=96&height=96';
 // @ts-ignore
-import { src as icon } from '~/components/images/Cactie.png?metadata&width=96&height=96';
+import icon from '~/components/images/Cactie.png?width=96&height=96';
 
 import Luminescent from '~/components/icons/Luminescent';
 

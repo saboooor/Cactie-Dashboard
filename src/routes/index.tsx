@@ -6,7 +6,7 @@ import iconAVIF from '~/components/images/Cactie.png?avif';
 // @ts-ignore
 import iconWEBP from '~/components/images/Cactie.png?webp';
 // @ts-ignore
-import { src as icon } from '~/components/images/Cactie.png?metadata';
+import icon from '~/components/images/Cactie.png';
 
 import { HappyOutline, LogoDiscord, SettingsOutline } from 'qwik-ionicons';
 
