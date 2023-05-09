@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import { routeLoader$, Link } from '@builder.io/qwik-city';
 import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
@@ -73,10 +73,10 @@ export default component$(() => {
                   <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
                 <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm duration-300">
-                  <a href={`/dashboard/${guild.id}`} class="flex flex-col justify-center transition duration-200 hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
+                  <Link href={`/dashboard/${guild.id}`} class="flex flex-col justify-center transition duration-200 hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
                     <SettingsOutline width="24" class="fill-current" />
                     Settings
-                  </a>
+                  </Link>
                 </div>
               </div>
             );

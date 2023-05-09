@@ -16,7 +16,7 @@ model ticketdata {
   opener      String
   resolved    String
   users       String
-  voiceticket String?
+  voiceticket String
 
   @@unique([guildId, channelId])
 }
@@ -25,23 +25,23 @@ model settings {
   guildId         String @id
   prefix          String
   reactions       String
-  leavemessage    String?
-  joinmessage     String?
+  leavemessage    String
+  joinmessage     String
   maxppsize       Int
   tickets         String
-  disabledcmds    String?
-  auditlogs       String?
-  suggestionchannel String?
+  disabledcmds    String
+  auditlogs       String
+  suggestionchannel String
   suggestthreads  String
-  pollchannel     String?
-  logchannel      String?
-  ticketlogchannel String?
-  ticketcategory  String?
-  supportrole     String?
+  pollchannel     String
+  logchannel      String
+  ticketlogchannel String
+  ticketcategory  String
+  supportrole     String
   ticketmention   String
   mutecmd         String
   msgshortener    Int
-  djrole          String?
+  djrole          String
 }
 
 model reactionroles {
@@ -77,6 +77,6 @@ model sessions {
   refreshToken String?
   expiresAt DateTime?
   scope String?
-  pfp String?
+  pfp String
   accent String?
 }

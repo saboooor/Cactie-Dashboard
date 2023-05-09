@@ -86,16 +86,11 @@ export default component$(() => {
             Prefix
           </MenuItem>
           <MenuItem href="#">
-            Reactions
-          </MenuItem>
-          <MenuItem href="#">
             Suggestions
           </MenuItem>
           <MenuItem href="#">
             Polls
           </MenuItem>
-        </MenuCategory>
-        <MenuCategory name="MISCELLANEOUS">
           <MenuItem href="#">
             Join Message
           </MenuItem>
@@ -104,6 +99,9 @@ export default component$(() => {
           </MenuItem>
           <MenuItem href="#">
             Max PP Size
+          </MenuItem>
+          <MenuItem href="#">
+            Reactions
           </MenuItem>
         </MenuCategory>
         <MenuItem href="#audit">
@@ -115,7 +113,7 @@ export default component$(() => {
       </MenuIndex>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4">
         <MenuTitle>General Settings</MenuTitle>
-        <div class="grid sm:grid-cols-2 gap-6 py-10">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
           <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Prefix</h1>
             <TextInput name="prefix" value={srvconfig?.prefix} placeholder="The bot's prefix">
@@ -123,19 +121,11 @@ export default component$(() => {
             </TextInput>
           </div>
           <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <Toggle id="reactions" name="reactions" checked={srvconfig?.reactions == 'true'}>
-              <span class="text-2xl font-bold">
-                Reactions
-              </span>
-            </Toggle>
-            <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
-          </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Suggestions</h1>
             <SelectInput id="suggestionchannel" name="suggestionchannel" label="Channel to make suggestions in" value={srvconfig?.suggestionchannel} extraClass="mb-4">
-              <option value="false">Same channel as user</option>
+              <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                <option value={c.id} key={c.id} selected={srvconfig?.suggestionchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
             <Toggle id="suggestthreads" name="suggestthreads" checked={srvconfig?.suggestthreads == 'true'}>
@@ -147,32 +137,67 @@ export default component$(() => {
           <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
             <h1 class="font-bold text-white text-2xl mb-2">Polls</h1>
             <SelectInput id="pollchannel" name="pollchannel" label="Channel to make polls in" value={srvconfig?.pollchannel}>
-              <option value="false">Same channel as user</option>
+              <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                <option value={c.id} key={c.id} selected={srvconfig?.pollchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
           </div>
-        </div>
-        <MenuTitle>Miscellaneous</MenuTitle>
-        <div class="grid sm:grid-cols-3 gap-6 py-10">
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Join Message</h1>
-            <TextInput big name="joinmessage" value={srvconfig?.joinmessage} placeholder="The content of the message sent when someone joins">
-              The message when someone joins the server
-            </TextInput>
-          </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Leave Message</h1>
-            <TextInput big name="leavemessage" value={srvconfig?.leavemessage} placeholder="The content of the message sent when someone leaves">
-              The message when someone leaves the server
-            </TextInput>
-          </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Max PP Size</h1>
-            <NumberInput input value={srvconfig?.maxppsize} name="maxppsize" id="maxppsize">
-              The maximum size for the boner command
-            </NumberInput>
+          {(() => {
+            const joinmessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
+            return (
+              <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+                <h1 class="font-bold text-white text-2xl mb-2">Join Message</h1>
+                <TextInput big id="joinmessage-message" name="joinmessage.message" value={joinmessage.message} placeholder="The content of the message sent when someone joins">
+                    The message when someone joins the server
+                </TextInput>
+                <p class="mt-2 mb-4">
+                  Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
+                </p>
+                <SelectInput id="joinmessage-channel" name="joinmessage.channel" label="Channel to send the message in">
+                  <option value="false" selected={joinmessage.channel == 'false'}>System Channel</option>
+                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                    <option value={c.id} key={c.id} selected={joinmessage.channel == c.id}>{`# ${c.name}`}</option>,
+                  )}
+                </SelectInput>
+              </div>
+            );
+          })()}
+          {(() => {
+            const leavemessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
+            return (
+              <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+                <h1 class="font-bold text-white text-2xl mb-2">Leave Message</h1>
+                <TextInput big id="leavemessage-message" name="leavemessage.message" value={leavemessage.message} placeholder="The content of the message sent when someone leaves">
+                  The message when someone leaves the server
+                </TextInput>
+                <p class="mt-2 mb-4">
+                  Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
+                </p>
+                <SelectInput id="leavemessage-channel" name="leavemessage.channel" label="Channel to send the message in">
+                  <option value="false" selected={leavemessage.channel == 'false'}>System Channel</option>
+                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                    <option value={c.id} key={c.id} selected={leavemessage.channel == c.id}>{`# ${c.name}`}</option>,
+                  )}
+                </SelectInput>
+              </div>
+            );
+          })()}
+          <div class="grid gap-6">
+            <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+              <h1 class="font-bold text-white text-2xl mb-2">Max PP Size</h1>
+              <NumberInput input value={srvconfig?.maxppsize} name="maxppsize" id="maxppsize">
+                The maximum size for the boner command
+              </NumberInput>
+            </div>
+            <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+              <Toggle id="reactions" name="reactions" checked={srvconfig?.reactions == 'true'}>
+                <span class="text-2xl font-bold">
+                  Reactions
+                </span>
+              </Toggle>
+              <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
+            </div>
           </div>
         </div>
         <MenuTitle>Audit Logs</MenuTitle>
@@ -182,91 +207,87 @@ export default component$(() => {
             <div class="flex flex-col sm:flex-row gap-6 py-10">
               <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
                 <h1 class="font-bold text-white text-2xl mb-2">Default Channel</h1>
-                <SelectInput id="auditlogs-channel" name="auditlogs.channel" label="This is where audit logs without a channel specified will be posted" value={auditlogs.channel}>
-                  <option value="false">No channel specified.</option>
+                <SelectInput id="auditlogs-channel" name="auditlogs.channel">
+                  <option value="false" selected={auditlogs.channel == 'false'}>No channel specified.</option>
                   {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                    <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                    <option value={c.id} key={c.id} selected={auditlogs.channel == c.id}>{`# ${c.name}`}</option>,
                   )}
                 </SelectInput>
               </div>
               <div class="flex flex-col gap-2 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-                {
-                  <>
-                    <RawSelectInput id="new-log" label="Create a new log" value={auditlogs.channel}>
-                      <option value="all">All Logs</option>
-                      {!auditlogs.logs?.member && (
-                        <>
-                          <option value="member">All Member-Related Logs</option>
-                          {!auditlogs.logs?.memberjoin && (
-                            <option value="memberjoin">Member Joined</option>
-                          )}
-                          {!auditlogs.logs?.memberleave && (
-                            <option value="memberleave">Member Left</option>
-                          )}
-                        </>
+                <RawSelectInput id="new-log">
+                  <option value="all">All Logs</option>
+                  {!auditlogs.logs?.member && (
+                    <>
+                      <option value="member">All Member-Related Logs</option>
+                      {!auditlogs.logs?.memberjoin && (
+                        <option value="memberjoin">Member Joined</option>
                       )}
-                      {!auditlogs.logs?.message && (
-                        <>
-                          <option value="message">All Message-Related Logs</option>
-                          {!auditlogs.logs?.messagedelete && (
-                            <option value="messagedelete">Message Deleted</option>
-                          )}
-                          {!auditlogs.logs?.messagedeletebulk && (
-                            <option value="messagedeletebulk">Messages Bulk-Deleted</option>
-                          )}
-                          {!auditlogs.logs?.messageupdate && (
-                            <option value="messageupdate">Message Edited</option>
-                          )}
-                        </>
+                      {!auditlogs.logs?.memberleave && (
+                        <option value="memberleave">Member Left</option>
                       )}
-                      {!auditlogs.logs?.channel && (
-                        <>
-                          <option value="channel">All Channel-Related Logs</option>
-                          {!auditlogs.logs?.channelcreate && (
-                            <option value="channelcreate">Channel Created</option>
-                          )}
-                          {!auditlogs.logs?.channeldelete && (
-                            <option value="channeldelete">Channel Deleted</option>
-                          )}
-                          {!auditlogs.logs?.channelupdate && (
-                            <option value="channelupdate">Channel Updated</option>
-                          )}
-                        </>
+                    </>
+                  )}
+                  {!auditlogs.logs?.message && (
+                    <>
+                      <option value="message">All Message-Related Logs</option>
+                      {!auditlogs.logs?.messagedelete && (
+                        <option value="messagedelete">Message Deleted</option>
                       )}
-                      {!auditlogs.logs?.voice && (
-                        <>
-                          <option value="voice">All Voice-Related Logs</option>
-                          {!auditlogs.logs?.voicejoin && (
-                            <option value="voicejoin">Voice Channel</option>
-                          )}
-                          {!auditlogs.logs?.voiceleave && (
-                            <option value="voiceleave">Left Voice Channel</option>
-                          )}
-                          {!auditlogs.logs?.voicemove && (
-                            <option value="voicemove">Moved Voice Channels</option>
-                          )}
-                          {!auditlogs.logs?.voicedeafen && (
-                            <option value="voicedeafen">Voice Deafened</option>
-                          )}
-                          {!auditlogs.logs?.voicemute && (
-                            <option value="voicemute">Voice Muted</option>
-                          )}
-                        </>
+                      {!auditlogs.logs?.messagedeletebulk && (
+                        <option value="messagedeletebulk">Messages Bulk-Deleted</option>
                       )}
-                    </RawSelectInput>
-                    <RawSelectInput id="new-log-channel" label="The channel to associate this log to">
-                      {auditlogs.channel != 'false' &&
-                          <option value="false" selected>Default Channel</option>
-                      }
-                      {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                        <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                      {!auditlogs.logs?.messageupdate && (
+                        <option value="messageupdate">Message Edited</option>
                       )}
-                    </RawSelectInput>
-                    <Button color="primary">
+                    </>
+                  )}
+                  {!auditlogs.logs?.channel && (
+                    <>
+                      <option value="channel">All Channel-Related Logs</option>
+                      {!auditlogs.logs?.channelcreate && (
+                        <option value="channelcreate">Channel Created</option>
+                      )}
+                      {!auditlogs.logs?.channeldelete && (
+                        <option value="channeldelete">Channel Deleted</option>
+                      )}
+                      {!auditlogs.logs?.channelupdate && (
+                        <option value="channelupdate">Channel Updated</option>
+                      )}
+                    </>
+                  )}
+                  {!auditlogs.logs?.voice && (
+                    <>
+                      <option value="voice">All Voice-Related Logs</option>
+                      {!auditlogs.logs?.voicejoin && (
+                        <option value="voicejoin">Voice Channel</option>
+                      )}
+                      {!auditlogs.logs?.voiceleave && (
+                        <option value="voiceleave">Left Voice Channel</option>
+                      )}
+                      {!auditlogs.logs?.voicemove && (
+                        <option value="voicemove">Moved Voice Channels</option>
+                      )}
+                      {!auditlogs.logs?.voicedeafen && (
+                        <option value="voicedeafen">Voice Deafened</option>
+                      )}
+                      {!auditlogs.logs?.voicemute && (
+                        <option value="voicemute">Voice Muted</option>
+                      )}
+                    </>
+                  )}
+                </RawSelectInput>
+                <RawSelectInput id="new-log-channel" label="The channel to associate this log to">
+                  {auditlogs.channel != 'false' &&
+                    <option value="false" selected>Default Channel</option>
+                  }
+                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                    <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                  )}
+                </RawSelectInput>
+                <Button color="primary">
                       Add Audit Log
-                    </Button>
-                  </>
-                }
+                </Button>
               </div>
             </div>
           );
