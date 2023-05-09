@@ -36,7 +36,7 @@ export const MenuItem = component$(({ href }: any) => {
 
 export const MenuTitle = component$((props: any) => {
   return (
-    <h1 {...props} class="font-bold tracking-tight text-gray-200 text-4xl transition duration-300">
+    <h1 {...props} class="font-bold tracking-tight text-gray-200 text-4xl transition">
       <Slot />
     </h1>
   );

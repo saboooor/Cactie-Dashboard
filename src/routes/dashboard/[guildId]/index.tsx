@@ -10,6 +10,7 @@ import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
+import { Close } from 'qwik-ionicons';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
@@ -202,12 +203,12 @@ export default component$(() => {
         </div>
         <MenuTitle>Audit Logs</MenuTitle>
         {(() => {
-          const auditlogs = JSON.parse(srvconfig?.auditlogs ?? '{ channel: "false", logs: [] }');
-          return (
-            <div class="flex flex-col sm:flex-row gap-6 py-10">
+          const auditlogs = JSON.parse(srvconfig?.auditlogs ?? '{ channel: "false", logs: {} }');
+          return <div class="py-10 flex flex-col gap-6">
+            <div class="flex flex-col sm:flex-row gap-6">
               <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
                 <h1 class="font-bold text-white text-2xl mb-2">Default Channel</h1>
-                <SelectInput id="auditlogs-channel" name="auditlogs.channel">
+                <SelectInput id="auditlogs-channel" name="auditlogs.channel" label="This is where logs will be sent if there is no specific channel set on them">
                   <option value="false" selected={auditlogs.channel == 'false'}>No channel specified.</option>
                   {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                     <option value={c.id} key={c.id} selected={auditlogs.channel == c.id}>{`# ${c.name}`}</option>,
@@ -290,7 +291,29 @@ export default component$(() => {
                 </Button>
               </div>
             </div>
-          );
+            <div class="flex flex-wrap justify-center gap-6">
+              {
+                Object.keys(auditlogs.logs).map((log, i) => {
+                  return (
+                    <div key={i} class="flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-6 gap-4">
+                      <div class="flex items-start flex-1">
+                        <h1 class="flex-1 justify-start font-bold tracking-tight text-white text-2xl">
+                          {log}
+                        </h1>
+                        <Close width="36" class="fill-red-400" />
+                      </div>
+                      <RawSelectInput id={`auditlogs-logs-${log}.channel`} name={`auditlogs.logs.${log}.channel`}>
+                        <option value="false" selected={auditlogs.logs[log].channel == 'false'}>Default Channel</option>
+                        {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                          <option value={c.id} key={c.id} selected={auditlogs.logs[log].channel == c.id}>{`# ${c.name}`}</option>,
+                        )}
+                      </RawSelectInput>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          </div>;
         })()}
       </div>
     </section>

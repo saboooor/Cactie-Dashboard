@@ -3,11 +3,11 @@ import { Link, useLocation } from '@builder.io/qwik-city';
 
 import { LogoDiscord, LogoGithub, Menu, SettingsOutline, ReaderOutline, HappyOutline, PersonCircleOutline } from 'qwik-ionicons';
 // @ts-ignore
-import iconAVIF from '~/components/images/Cactie.png?avif&width=40&height=40';
+import iconAVIF from '~/components/images/Cactie.png?avif&width=96&height=96';
 // @ts-ignore
-import iconWEBP from '~/components/images/Cactie.png?webp&width=40&height=40';
+import iconWEBP from '~/components/images/Cactie.png?webp&width=96&height=96';
 // @ts-ignore
-import { src as icon } from '~/components/images/Cactie.png?metadata&width=40&height=40';
+import { src as icon } from '~/components/images/Cactie.png?metadata&width=96&height=96';
 
 import Luminescent from '~/components/icons/Luminescent';
 

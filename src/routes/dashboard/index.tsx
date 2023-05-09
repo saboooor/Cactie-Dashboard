@@ -67,13 +67,13 @@ export default component$(() => {
         {
           GuildList.value.filter(guild => guild.mutual).map(guild => {
             return (
-              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-300 w-14 sm:w-48">
+              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all w-14 sm:w-48">
                 <div class="m-auto sm:p-8">
                   <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="rounded-full m-auto"/>
                   <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
-                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm duration-300">
-                  <Link href={`/dashboard/${guild.id}`} class="flex flex-col justify-center transition duration-200 hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
+                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm">
+                  <Link href={`/dashboard/${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
                     <SettingsOutline width="24" class="fill-current" />
                     Settings
                   </Link>
@@ -95,13 +95,13 @@ export default component$(() => {
         {
           GuildList.value.filter(guild => !guild.mutual).map(guild => {
             return (
-              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-300 w-14 sm:w-48">
+              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all w-14 sm:w-48">
                 <div class="m-auto sm:p-8">
                   <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="rounded-full m-auto w-32 grayscale group-hover:grayscale-0 group-hover:saturate-150 transition duration-500"/>
                   <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
-                <div class="sm:grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm duration-300">
-                  <a href={`/invite?guild=${guild.id}`} class="flex flex-col justify-center transition duration-200 hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
+                <div class="sm:grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm">
+                  <a href={`/invite?guild=${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
                     <HappyOutline width="24" class="fill-current" />
                     Invite
                   </a>
