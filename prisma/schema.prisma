@@ -66,8 +66,8 @@ model memberdata {
 }
 
 model userdata {
-  userId    String   @id
-  lastvoted DateTime
+  userId    String    @id
+  lastvoted DateTime?
 }
 
 model sessions {
