@@ -478,10 +478,10 @@ export default component$(() => {
                               const role = roles.find(r => r.id == rr.roleId);
 
                               return <div key={rr.roleId} class="flex-1 min-w-max flex bg-gray-800 rounded-xl p-4 gap-4" onContextMenu$={(event) => openContextMenu(event, rr)} preventdefault:contextmenu>
-                                <div>
+                                <div class="p-1">
                                   {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>
-                                <div class="ml-4">
+                                <div>
                                   <h1 class="font-bold text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
                                   <p class="hidden sm:flex">
                                     {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />

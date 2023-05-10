@@ -12,36 +12,35 @@ datasource db {
 
 model ticketdata {
   guildId     String
-  channelId   String
+  channelId   String @id
   opener      String
-  resolved    String
+  resolved    String @default("false")
   users       String
-  voiceticket String
+  voiceticket String @default("false")
 
-  @@unique([guildId, channelId])
+  @@unique([opener, guildId])
 }
 
 model settings {
   guildId         String @id
   prefix          String
-  reactions       String
-  leavemessage    String
-  joinmessage     String
-  maxppsize       Int
-  tickets         String
-  disabledcmds    String
-  auditlogs       String
-  suggestionchannel String
-  suggestthreads  String
-  pollchannel     String
-  logchannel      String
-  ticketlogchannel String
-  ticketcategory  String
-  supportrole     String
-  ticketmention   String
-  mutecmd         String
-  msgshortener    Int
-  djrole          String
+  reactions       String @default("false")
+  leavemessage    String @default("{\"message\":\"\",\"channel\":\"false\"}")
+  joinmessage     String @default("{\"message\":\"\",\"channel\":\"false\"}")
+  maxppsize       Int @default(35)
+  tickets         String @default("buttons")
+  disabledcmds    String @default("false")
+  auditlogs       String @default("false")
+  suggestionchannel String @default("false")
+  suggestthreads  String @default("true")
+  pollchannel     String @default("false")
+  logchannel      String @default("false")
+  ticketlogchannel String @default("false")
+  ticketcategory  String @default("false")
+  supportrole     String @default("false")
+  ticketmention   String @default("here")
+  mutecmd         String @default("timeout")
+  msgshortener    Int @default(30)
 }
 
 model reactionroles {
@@ -50,10 +49,10 @@ model reactionroles {
   messageId String
   emojiId   String
   roleId    String
-  type      String
-  silent    String
+  type      String @default("toggle")
+  silent    String @default("false")
 
-  @@unique([guildId, channelId, messageId, emojiId, roleId])
+  @@unique([messageId, emojiId])
 }
 
 model memberdata {
@@ -73,10 +72,10 @@ model lastvoted {
 
 model sessions {
   sessionId    String @id
-  accessToken String?
+  accessToken  String?
   refreshToken String?
-  expiresAt DateTime?
-  scope String?
-  pfp String?
-  accent String?
+  expiresAt    DateTime?
+  scope        String?
+  pfp          String?
+  accent       String?
 }
