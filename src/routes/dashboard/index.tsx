@@ -1,10 +1,11 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
-import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
-import { routeLoader$, Link } from '@builder.io/qwik-city';
+import type { DocumentHead, RequestEventLoader, RequestHandler } from '@builder.io/qwik-city';
+import { routeLoader$, server$, Link } from '@builder.io/qwik-city';
 import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
 import getAuth from '~/components/functions/auth';
+import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
@@ -20,8 +21,9 @@ export const onGet: RequestHandler = async ({ url, cookie, redirect, env }) => {
   }
 };
 
-export const useGuilds = routeLoader$(async ({ url, cookie, redirect, env }) => {
-  const auth = await getAuth(cookie, env);
+const getGuildsFn = server$(async function(props?: RequestEventLoader | typeof this, redirect?): Promise<Guild[]> {
+  props = props ?? this;
+  const auth = await getAuth(props.cookie, props.env);
   const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bearer ${auth?.accessToken}`,
@@ -29,20 +31,20 @@ export const useGuilds = routeLoader$(async ({ url, cookie, redirect, env }) => 
   });
   const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
-      authorization: `Bot ${env.get(`BOT_TOKEN${cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   let GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
   const BotGuildList: RESTError | RESTRateLimit | Guild[] = await botres.json();
   if ('retry_after' in GuildList) {
-    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after}ms`);
-    await sleep(GuildList.retry_after);
-    throw redirect(302, url.href);
+    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after * 1000}ms`);
+    await sleep(GuildList.retry_after * 1000);
+    return getGuildsFn(props, redirect);
   }
   if ('retry_after' in BotGuildList) {
-    console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after}ms`);
-    await sleep(BotGuildList.retry_after);
-    throw redirect(302, url.href);
+    console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after * 1000}ms`);
+    await sleep(Math.ceil(BotGuildList.retry_after * 1000));
+    return getGuildsFn(props, redirect);
   }
   if ('code' in GuildList) throw redirect(302, `/dashboard?error=${GuildList.code}`);
   if ('code' in BotGuildList) throw redirect(302, `/dashboard?error=${BotGuildList.code}`);
@@ -51,14 +53,19 @@ export const useGuilds = routeLoader$(async ({ url, cookie, redirect, env }) => 
   return GuildList;
 });
 
-export default component$(() => {
-  const GuildList = useGuilds();
+export const useGetGuildsRouteLoader = routeLoader$((props) => getGuildsFn(props, props.redirect));
 
+export default component$(() => {
+  const GuildList = useGetGuildsRouteLoader();
   const store = useStore({
     dev: undefined as boolean | undefined,
+    cooldown: true,
+    GuildList: GuildList.value,
   });
+
   useVisibleTask$(() => {
     store.dev = document.cookie.includes('branch=dev');
+    setTimeout(() => { store.cooldown = false; }, 1000);
   });
 
   return (
@@ -70,27 +77,28 @@ export default component$(() => {
         <p class="my-5 text-xl sm:text-2xl md:text-3xl text-gray-500">
           to open the dashboard for
         </p>
-        {store.dev !== undefined &&
-          <button onClick$={() => {
-            store.dev = !store.dev;
-            document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
-            location.reload();
-          }} class={'group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg p-2 items-center'}>
-            <span class="text-white font-bold pr-2">
+        <button onClick$={async () => {
+          store.cooldown = true;
+          store.dev = !store.dev;
+          document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
+          store.GuildList = await getGuildsFn();
+          setTimeout(() => { store.cooldown = false; }, 1000);
+        }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg p-2 ${store.cooldown ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
+          <span class="text-white font-bold pr-2">
               Bot:
-            </span>
-            <span class={'bg-green-300 rounded-lg transition-all px-3 py-1'}>
+          </span>
+          <span class={'bg-green-300 rounded-lg transition-all px-3 py-1'}>
               Cactie
-            </span>
-            <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
+          </span>
+          <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
               Dev
-            </span>
-          </button>
-        }
+          </span>
+          <LoadingIcon extraClass={`${store.cooldown ? '' : '-ml-5 opacity-0'} transition-all`} />
+        </button>
       </div>
       <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
         {
-          GuildList.value.filter(guild => guild.mutual).map(guild => {
+          store.GuildList.filter(guild => guild.mutual).map(guild => {
             return (
               <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48">
                 <div class="m-auto sm:p-8">
@@ -118,7 +126,7 @@ export default component$(() => {
       </div>
       <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
         {
-          GuildList.value.filter(guild => !guild.mutual).map(guild => {
+          store.GuildList.filter(guild => !guild.mutual).map(guild => {
             return (
               <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48">
                 <div class="m-auto sm:p-8">
