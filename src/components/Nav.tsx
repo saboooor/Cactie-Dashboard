@@ -104,7 +104,7 @@ export const Nav = component$(() => {
 export const Brand = component$(() => {
   const location = useLocation();
   return (
-    <div class="flex flex-1 items-center justify-start">
+    <div class="flex items-center justify-start">
       <Link href="/" class="transition ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white drop-shadow-2xl pl-3 pr-3 md:pr-4 py-3 rounded-lg text-lg flex gap-3 items-center whitespace-nowrap">
         <picture>
           <source srcSet={iconAVIF} type="image/avif" />

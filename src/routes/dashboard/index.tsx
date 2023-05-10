@@ -1,4 +1,4 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import { routeLoader$, Link } from '@builder.io/qwik-city';
 import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
@@ -29,7 +29,7 @@ export const useGuilds = routeLoader$(async ({ url, cookie, redirect, env }) => 
   });
   const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
-      authorization: `Bot ${env.get('BOT_TOKEN')}`,
+      authorization: `Bot ${env.get(`BOT_TOKEN${cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   let GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
@@ -53,15 +53,40 @@ export const useGuilds = routeLoader$(async ({ url, cookie, redirect, env }) => 
 
 export default component$(() => {
   const GuildList = useGuilds();
+
+  const store = useStore({
+    dev: undefined as boolean | undefined,
+  });
+  useVisibleTask$(() => {
+    store.dev = document.cookie.includes('branch=dev');
+  });
+
   return (
     <section class="mx-auto max-w-screen-2xl px-6 pt-12 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div class="text-center">
         <h1 class="font-bold text-white text-4xl sm:text-5xl md:text-6xl">
           Select a <span class="text-luminescent-900" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Server</span>.
         </h1>
-        <p class="mt-5 text-xl sm:text-2xl md:text-3xl text-gray-500">
+        <p class="my-5 text-xl sm:text-2xl md:text-3xl text-gray-500">
           to open the dashboard for
         </p>
+        {store.dev !== undefined &&
+          <button onClick$={() => {
+            store.dev = !store.dev;
+            document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
+            location.reload();
+          }} class={'group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg p-2 items-center'}>
+            <span class="text-white font-bold pr-2">
+              Bot:
+            </span>
+            <span class={'bg-green-300 rounded-lg transition-all px-3 py-1'}>
+              Cactie
+            </span>
+            <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
+              Dev
+            </span>
+          </button>
+        }
       </div>
       <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
         {
@@ -73,7 +98,7 @@ export default component$(() => {
                   <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
                 <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm transition duration-200">
-                  <Link href={`/dashboard/${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
+                  <Link href={`/dashboard/${store.dev ? 'dev' : 'master'}/${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
                     <SettingsOutline width="24" class="fill-current" />
                     Settings
                   </Link>
