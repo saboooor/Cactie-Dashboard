@@ -12,11 +12,11 @@ import icon from '~/components/images/Cactie.png?width=96&height=96';
 import Luminescent from './icons/Luminescent';
 import LoadingIcon from './icons/LoadingIcon';
 
-export default component$(({ user }: any) => {
+export default component$(({ auth }: any) => {
   return (
     <Nav>
       <MainNav>
-        <NavButton external={!user} href="/dashboard" extraClass="hidden sm:flex gap-3">
+        <NavButton external={!auth} href="/dashboard" extraClass="hidden sm:flex gap-3">
           <SettingsOutline width="24" class="fill-current" />
           Dashboard
         </NavButton>
@@ -41,12 +41,12 @@ export default component$(({ user }: any) => {
             </div>
           </div>
         </NavButton>
-        {user &&
-          <NavButton external icon href="/logout" title="Log out" style={{ backgroundColor: user.accent }}>
-            <img src={user.pfp} class="rounded-full h-6 w-6" />
+        {auth &&
+          <NavButton external icon href="/logout" title="Log out" style={{ backgroundColor: auth.accent }}>
+            <img src={auth.pfp ?? 'https://cdn.discordapp.com/embed/avatars/0.png'} class="rounded-full h-6 w-6" />
           </NavButton>
         }
-        {!user &&
+        {!auth &&
           <NavButton external icon href="/login" title="Login">
             <PersonCircleOutline width="24" class="fill-luminescent-700" />
           </NavButton>

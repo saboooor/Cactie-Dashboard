@@ -1,10 +1,9 @@
 import { component$, $, useStore } from '@builder.io/qwik';
-import { type DocumentHead, routeLoader$, type RequestHandler } from '@builder.io/qwik-city';
+import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
-import getAuth from '~/components/functions/auth';
+import * as prisma from '~/components/functions/prisma';
 import { MenuIndex, MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
-import { PrismaClient } from '@prisma/client/edge';
 import TextInput from '~/components/elements/TextInput';
 import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
@@ -18,18 +17,10 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const onGet: RequestHandler = async ({ url, cookie, redirect, env }) => {
-  const auth = await getAuth(cookie, env);
-  if (!auth) {
-    cookie.set('redirecturl', url.href, { path: '/' });
-    throw redirect(302, '/login');
-  }
-};
-
 export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
   const guildres = await fetch(`https://discord.com/api/v10/guilds/${params.guildId}/preview`, {
     headers: {
-      authorization: `Bot ${env.get('BOT_TOKEN')}`,
+      authorization: `Bot ${env.get(`BOT_TOKEN${params.branch == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   const guild: RESTError | RESTRateLimit | Guild = await guildres.json();
@@ -66,15 +57,14 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
   }
   if ('code' in roles) throw redirect(302, `/dashboard?error=${roles.code}&message=${roles.message}`);
 
-  const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } });
-  const srvconfig = await prisma.settings.findUnique({
+  const srvconfig = await prisma[params.branch as keyof typeof prisma].settings.findUnique({
     where: {
       guildId: params.guildId,
     },
   });
 
   const reactionroles = {
-    raw: await prisma.reactionroles.findMany({ where: { guildId: params.guildId } }),
+    raw: await prisma[params.branch as keyof typeof prisma].reactionroles.findMany({ where: { guildId: params.guildId } }),
     channels: [] as any[],
   };
 

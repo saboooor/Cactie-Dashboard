@@ -1,66 +1,16 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
-import type { DocumentHead, RequestEventLoader, RequestHandler } from '@builder.io/qwik-city';
-import { routeLoader$, server$, Link } from '@builder.io/qwik-city';
-import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
-import { PermissionFlagsBits } from 'discord-api-types/v10';
+import type { DocumentHead } from '@builder.io/qwik-city';
+import { Link } from '@builder.io/qwik-city';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
-import getAuth from '~/components/functions/auth';
 import LoadingIcon from '~/components/icons/LoadingIcon';
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-interface Guild extends APIGuild {
-  id: string;
-  mutual: boolean;
-}
-
-export const onGet: RequestHandler = async ({ url, cookie, redirect, env }) => {
-  const auth = await getAuth(cookie, env);
-  if (auth === null) {
-    cookie.set('redirecturl', url.href, { path: '/' });
-    throw redirect(302, '/login');
-  }
-};
-
-const getGuildsFn = server$(async function(props?: RequestEventLoader | typeof this, redirect?): Promise<Guild[]> {
-  props = props ?? this;
-  const auth = await getAuth(props.cookie, props.env);
-  const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
-    headers: {
-      authorization: `Bearer ${auth?.accessToken}`,
-    },
-  });
-  const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  });
-  let GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
-  const BotGuildList: RESTError | RESTRateLimit | Guild[] = await botres.json();
-  if ('retry_after' in GuildList) {
-    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after * 1000}ms`);
-    await sleep(GuildList.retry_after * 1000);
-    return getGuildsFn(props, redirect);
-  }
-  if ('retry_after' in BotGuildList) {
-    console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after * 1000}ms`);
-    await sleep(Math.ceil(BotGuildList.retry_after * 1000));
-    return getGuildsFn(props, redirect);
-  }
-  if ('code' in GuildList) throw redirect(302, `/dashboard?error=${GuildList.code}`);
-  if ('code' in BotGuildList) throw redirect(302, `/dashboard?error=${BotGuildList.code}`);
-  GuildList = GuildList.filter(guild => (BigInt(guild.permissions!) & PermissionFlagsBits.ManageGuild) === PermissionFlagsBits.ManageGuild);
-  GuildList.forEach(guild => guild.mutual = BotGuildList.some(botguild => botguild.id == guild.id));
-  return GuildList;
-});
-
-export const useGetGuildsRouteLoader = routeLoader$((props) => getGuildsFn(props, props.redirect));
+import { useGetAuth, getGuildsFn } from './layout';
 
 export default component$(() => {
-  const GuildList = useGetGuildsRouteLoader();
+  const { value: { auth, guilds } } = useGetAuth();
   const store = useStore({
     dev: undefined as boolean | undefined,
     loading: false,
-    GuildList: GuildList.value,
+    GuildList: guilds,
   });
 
   useVisibleTask$(() => {
@@ -80,7 +30,7 @@ export default component$(() => {
           store.loading = true;
           store.dev = !store.dev;
           document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
-          store.GuildList = await getGuildsFn();
+          store.GuildList = await getGuildsFn(auth.accessToken);
           store.loading = false;
         }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg px-3 py-2 ${store.loading ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
           <span class="text-white font-bold pr-2">
