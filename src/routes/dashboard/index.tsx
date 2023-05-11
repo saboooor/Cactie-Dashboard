@@ -59,13 +59,12 @@ export default component$(() => {
   const GuildList = useGetGuildsRouteLoader();
   const store = useStore({
     dev: undefined as boolean | undefined,
-    cooldown: true,
+    loading: false,
     GuildList: GuildList.value,
   });
 
   useVisibleTask$(() => {
     store.dev = document.cookie.includes('branch=dev');
-    setTimeout(() => { store.cooldown = false; }, 1000);
   });
 
   return (
@@ -78,12 +77,12 @@ export default component$(() => {
           to open the dashboard for
         </p>
         <button onClick$={async () => {
-          store.cooldown = true;
+          store.loading = true;
           store.dev = !store.dev;
           document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
           store.GuildList = await getGuildsFn();
-          setTimeout(() => { store.cooldown = false; }, 1000);
-        }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg px-3 py-2 ${store.cooldown ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
+          store.loading = false;
+        }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg px-3 py-2 ${store.loading ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
           <span class="text-white font-bold pr-2">
               Bot:
           </span>
@@ -93,7 +92,7 @@ export default component$(() => {
           <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
               Dev
           </span>
-          <div class={`${store.cooldown ? '' : '-ml-8 opacity-0'} transition-all`}>
+          <div class={`${store.loading ? '' : '-ml-8 opacity-0'} transition-all`}>
             <LoadingIcon />
           </div>
         </button>
