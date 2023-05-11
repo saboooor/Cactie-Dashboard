@@ -83,7 +83,7 @@ export default component$(() => {
           document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
           store.GuildList = await getGuildsFn();
           setTimeout(() => { store.cooldown = false; }, 1000);
-        }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg p-2 ${store.cooldown ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
+        }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg px-3 py-2 ${store.cooldown ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
           <span class="text-white font-bold pr-2">
               Bot:
           </span>
@@ -93,7 +93,7 @@ export default component$(() => {
           <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
               Dev
           </span>
-          <LoadingIcon extraClass={`${store.cooldown ? '' : '-ml-5 opacity-0'} transition-all`} />
+          <LoadingIcon extraClass={`${store.cooldown ? '' : '-ml-6 opacity-0'} transition-all`} />
         </button>
       </div>
       <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
