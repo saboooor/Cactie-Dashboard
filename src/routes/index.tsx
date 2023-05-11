@@ -2,11 +2,11 @@ import { component$ } from '@builder.io/qwik';
 import { type DocumentHead } from '@builder.io/qwik-city';
 
 // @ts-ignore
-import iconAVIF from '~/components/images/Cactie.png?avif?width=1024&height=1024';
+import iconAVIF from '~/components/images/Cactie.png?avif&width=552&height=552';
 // @ts-ignore
-import iconWEBP from '~/components/images/Cactie.png?webp?width=1024&height=1024';
+import iconWEBP from '~/components/images/Cactie.png?webp&width=552&height=552';
 // @ts-ignore
-import icon from '~/components/images/Cactie.png?width=1024&height=1024';
+import icon from '~/components/images/Cactie.png?width=552&height=552';
 
 import { HappyOutline, LogoDiscord, SettingsOutline } from 'qwik-ionicons';
 
