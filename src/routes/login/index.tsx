@@ -31,18 +31,25 @@ export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
       const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
       const userdata = await res.json();
       const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } });
-      await prisma.sessions.create({
-        data: {
-          sessionId: sid,
+      const session = await prisma.sessions.findUnique({
+        where: {
           accessToken: oauthData.access_token,
-          refreshToken: oauthData.refresh_token,
-          expiresAt: new Date(Date.now() + oauthData.expires_in),
-          scope: oauthData.scope,
-          pfp: userdata.id ? `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}` : undefined,
-          accent: userdata.banner_color,
         },
       });
-      cookie.set('sessionid', sid, { path: '/' });
+      if (!session) {
+        await prisma.sessions.create({
+          data: {
+            sessionId: sid,
+            accessToken: oauthData.access_token,
+            refreshToken: oauthData.refresh_token,
+            expiresAt: new Date(Date.now() + oauthData.expires_in),
+            scope: oauthData.scope,
+            pfp: userdata.id ? `https://cdn.discordapp.com/avatars/${userdata.id}/${userdata.avatar}` : undefined,
+            accent: userdata.banner_color,
+          },
+        });
+      }
+      cookie.set('sessionid', session ? session.sessionId : sid, { path: '/' });
     } catch (error) {
       // NOTE: An unauthorized token will not throw an error
       // tokenResponseData.statusCode will be 401

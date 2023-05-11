@@ -70,7 +70,7 @@ model userdata {
 
 model sessions {
   sessionId    String    @unique(map: "sessionId")
-  accessToken  String?   @db.Text
+  accessToken  String    @unique(map: "accessToken")
   refreshToken String?   @db.Text
   expiresAt    DateTime? @db.DateTime(0)
   scope        String?   @db.Text
