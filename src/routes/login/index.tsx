@@ -1,4 +1,4 @@
-import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import type { RequestHandler } from '@builder.io/qwik-city';
 import { v4 } from 'uuid';
 import { PrismaClient } from '@prisma/client/edge';
 
@@ -58,18 +58,4 @@ export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
     const href = cookie.get('redirecturl')?.value;
     throw redirect(302, href ?? '/');
   }
-};
-
-export const head: DocumentHead = {
-  title: 'Login',
-  meta: [
-    {
-      name: 'description',
-      content: 'Login to the dashboard using Discord',
-    },
-    {
-      property: 'og:description',
-      content: 'Login to the dashboard using Discord',
-    },
-  ],
 };
