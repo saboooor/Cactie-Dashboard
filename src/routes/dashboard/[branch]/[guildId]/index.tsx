@@ -33,7 +33,7 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
 
   const channelsres = await fetch(`https://discord.com/api/v10/guilds/${params.guildId}/channels`, {
     headers: {
-      authorization: `Bot ${env.get('BOT_TOKEN')}`,
+      authorization: `Bot ${env.get(`BOT_TOKEN${params.branch == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   const channels: RESTError | RESTRateLimit | APIChannel[] = await channelsres.json();
@@ -92,12 +92,13 @@ export default component$(() => {
   const { guild, channels, roles, srvconfig, reactionroles } = guildData.value;
 
   const store = useStore({
+    dev: undefined as boolean | undefined,
     modal: false,
   });
 
   return (
     <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6 sm:pt-12 min-h-[calc(100lvh-80px)]">
-      <MenuIndex guild={guild}>
+      <MenuIndex guild={guild} store={store} onSwitcherSwitch$={() => {}} >
         <MenuCategory name="GENERAL SETTINGS">
           <MenuItem href="#">
             Prefix

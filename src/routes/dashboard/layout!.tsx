@@ -58,7 +58,7 @@ export default component$(() => {
   return (
     <>
       <Nav auth={auth.value} />
-      <main class="pt-16">
+      <main class="mt-16">
         <Slot />
       </main>
     </>

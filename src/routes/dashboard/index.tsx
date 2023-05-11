@@ -2,14 +2,13 @@ import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import { Link } from '@builder.io/qwik-city';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
-import LoadingIcon from '~/components/icons/LoadingIcon';
-import { useGetAuth, getGuildsFn } from './layout';
+import { useGetAuth, getGuildsFn } from './layout!';
+import Switcher from '~/components/elements/Switcher';
 
 export default component$(() => {
   const { value: { auth, guilds } } = useGetAuth();
   const store = useStore({
     dev: undefined as boolean | undefined,
-    loading: false,
     GuildList: guilds,
   });
 
@@ -26,26 +25,9 @@ export default component$(() => {
         <p class="my-5 text-xl sm:text-2xl md:text-3xl text-gray-500">
           to open the dashboard for
         </p>
-        <button onClick$={async () => {
-          store.loading = true;
-          store.dev = !store.dev;
-          document.cookie = `branch=${store.dev ? 'dev' : 'master'};max-age=86400;path=/`;
+        <Switcher store={store} label='Bot:' centered onSwitch$={async () => {
           store.GuildList = await getGuildsFn(auth.accessToken);
-          store.loading = false;
-        }} class={`flex items-center m-auto group transition ease-in-out text-black/50 hover:bg-gray-800 rounded-lg px-3 py-2 ${store.loading ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''}`}>
-          <span class="text-white font-bold pr-2">
-              Bot:
-          </span>
-          <span class={'bg-green-300 rounded-lg transition-all px-3 py-1'}>
-              Cactie
-          </span>
-          <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
-              Dev
-          </span>
-          <div class={`${store.loading ? '' : '-ml-8 opacity-0'} transition-all`}>
-            <LoadingIcon />
-          </div>
-        </button>
+        }} />
       </div>
       <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
         {
