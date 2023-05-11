@@ -93,7 +93,9 @@ export default component$(() => {
           <span class={`${store.dev ? 'ml-1 bg-luminescent-800' : '-ml-12 text-transparent'} transition-all rounded-lg px-3 py-1`}>
               Dev
           </span>
-          <LoadingIcon extraClass={`${store.cooldown ? '' : '-ml-6 opacity-0'} transition-all`} />
+          <div class={`${store.cooldown ? '' : '-ml-8 opacity-0'} transition-all`}>
+            <LoadingIcon />
+          </div>
         </button>
       </div>
       <div class="flex flex-wrap justify-center sm:justify-evenly gap-5 my-12">
