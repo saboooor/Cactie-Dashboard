@@ -34,7 +34,7 @@ export const MenuCategory = component$(({ name }: any) => {
   return (
     <div class="space-y-4 mb-4">
       <span class="ml-2 font-bold">{name}</span>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-col gap-2">
         <Slot />
       </div>
       <hr class="border-gray-600" />
