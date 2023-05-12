@@ -98,7 +98,7 @@ export default component$(() => {
   });
 
   return (
-    <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6 sm:pt-12 min-h-[calc(100lvh-80px)]">
+    <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 min-h-[calc(100lvh-80px)]">
       <MenuIndex guild={guild} store={store} onSwitcherSwitch$={() => {}} >
         <MenuCategory name="GENERAL SETTINGS">
           <MenuItem href="#">
@@ -158,7 +158,7 @@ export default component$(() => {
             Reaction Roles
         </MenuItem>
       </MenuIndex>
-      <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4">
+      <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
         <MenuTitle>General Settings</MenuTitle>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
           <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
