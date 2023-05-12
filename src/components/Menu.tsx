@@ -6,7 +6,7 @@ export const MenuIndex = component$(({ guild, store, onSwitcherSwitch$ }: any) =
     <aside class="z-10 w-full sm:h-1 align-middle sm:sticky sm:top-28" aria-label="Sidebar">
       <div class="py-4 px-3 rounded-xl bg-gray-800 border-2 border-gray-700 text-base font-bold mb-6 text-white">
         <div class="flex items-center mb-4">
-          {guild.icon && <img class="w-10 h-10 rounded-full" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} />}
+          {guild.icon && <img class="w-10 h-10 rounded-full" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
           <p class="flex-1 ml-3 text-lg">{guild.name}</p>
         </div>
         <Switcher store={store} label='Bot:' lighter onSwitch$={onSwitcherSwitch$} />

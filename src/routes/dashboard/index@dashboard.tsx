@@ -1,11 +1,13 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
-import { Link } from '@builder.io/qwik-city';
+import { Link, useLocation } from '@builder.io/qwik-city';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
 import { useGetAuth, getGuildsFn } from '../layout-dashboard';
 import Switcher from '~/components/elements/Switcher';
 
 export default component$(() => {
+  const loc = useLocation();
+
   const { value: { auth, guilds } } = useGetAuth();
   const store = useStore({
     dev: undefined as boolean | undefined,
@@ -33,18 +35,19 @@ export default component$(() => {
         {
           store.GuildList.filter(guild => guild.mutual).map(guild => {
             return (
-              <div key={guild.id} class="relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48">
-                <div class="m-auto sm:p-8">
-                  <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="rounded-full m-auto"/>
-                  <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
-                </div>
+              <Link key={guild.id} href={`/dashboard/${store.dev ? 'dev' : 'master'}/${guild.id}`} class="flex flex-col items-center relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48 py-10 pic-link">
+                <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class={{
+                  'rounded-full pic': true,
+                  'pic-prev': !loc.isNavigating && loc.prevUrl?.pathname.includes(guild.id),
+                }}/>
+                <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm transition duration-200">
-                  <Link href={`/dashboard/${store.dev ? 'dev' : 'master'}/${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
+                  <div class={'flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4'}>
                     <SettingsOutline width="24" class="fill-current" />
                     Settings
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         }
