@@ -2,7 +2,7 @@ import { component$, $, useStore } from '@builder.io/qwik';
 import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
-import * as prisma from '~/components/functions/prisma';
+import { PrismaClient } from '@prisma/client';
 import { MenuIndex, MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
 import TextInput from '~/components/elements/TextInput';
 import Toggle from '~/components/elements/Toggle';
@@ -57,14 +57,15 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
   }
   if ('code' in roles) throw redirect(302, `/dashboard?error=${roles.code}&message=${roles.message}`);
 
-  const srvconfig = await prisma[params.branch as keyof typeof prisma].settings.findUnique({
+  const prisma = new PrismaClient({ datasources: { db: { url: env.get(`DATABASE_URL${params.branch == 'dev' ? '_DEV' : ''}`) } } });
+  const srvconfig = await prisma.settings.findUnique({
     where: {
       guildId: params.guildId,
     },
   });
 
   const reactionroles = {
-    raw: await prisma[params.branch as keyof typeof prisma].reactionroles.findMany({ where: { guildId: params.guildId } }),
+    raw: await prisma.reactionroles.findMany({ where: { guildId: params.guildId } }),
     channels: [] as any[],
   };
 
