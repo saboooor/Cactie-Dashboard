@@ -18,7 +18,7 @@ export const MenuIndex = component$(({ guild, store, onSwitcherSwitch$ }: any) =
           <div class="flex-1">
             <Switcher store={store} label='Bot:' lighter onSwitch$={onSwitcherSwitch$} />
           </div>
-          <Button onClick$={() => menuStore.menu = !menuStore.menu}>
+          <Button extraClass="sm:hidden" onClick$={() => menuStore.menu = !menuStore.menu}>
             <Menu width="24"/>
           </Button>
         </div>
