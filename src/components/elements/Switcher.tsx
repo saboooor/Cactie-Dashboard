@@ -13,7 +13,7 @@ export default component$(({ store, lighter, label, centered, onSwitch$ }: any) 
       await onSwitch$();
       loadingStore.loading = false;
     }} class={`flex items-center group transition ease-in-out text-black/50 border  ${lighter ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' : 'bg-gray-800 hover:bg-gray-700 border-gray-700'} rounded-lg px-3 py-2 ${loadingStore.loading ? `${store.dev === undefined ? 'opacity-0' : 'opacity-50'} pointer-events-none` : ''} ${centered ? 'm-auto' : ''}`}>
-      <span class="text-white font-bold pr-2">
+      <span class="text-gray-300 font-bold pr-2">
         {label}
       </span>
       <span class={'bg-green-300 rounded-lg transition-all px-3 py-1'}>

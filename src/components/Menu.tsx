@@ -4,7 +4,7 @@ import Switcher from './elements/Switcher';
 export const MenuIndex = component$(({ guild, store, onSwitcherSwitch$ }: any) => {
   return (
     <aside class="z-10 w-full sm:h-1 align-middle sm:sticky sm:top-28" aria-label="Sidebar">
-      <div class="py-4 px-3 rounded-xl bg-gray-800 border border-gray-700 text-base font-bold mb-4 text-white">
+      <div class="py-4 px-3 rounded-xl bg-gray-800 border border-gray-700 text-base font-bold mb-4 text-gray-200">
         <div class="flex items-center mb-4">
           {guild.icon && <img class="w-10 h-10 rounded-full" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
           <p class="flex-1 ml-3 text-lg">{guild.name}</p>
@@ -40,7 +40,7 @@ export const MenuItem = component$(({ href }: any) => {
 
 export const MenuTitle = component$((props: any) => {
   return (
-    <h1 {...props} class={`font-bold text-gray-200 text-4xl transition ${props.extraClass}`}>
+    <h1 {...props} class={`font-bold text-white text-4xl transition ${props.extraClass}`}>
       <Slot />
     </h1>
   );

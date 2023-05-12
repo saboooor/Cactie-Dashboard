@@ -42,7 +42,7 @@ export default component$(() => {
                 }}/>
                 <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm transition duration-200">
-                  <div class={'flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4'}>
+                  <div class={'flex flex-col justify-center transition hover:bg-luminescent-900/20 text-gray-200 rounded-xl font-bold items-center gap-4'}>
                     <SettingsOutline width="24" class="fill-current" />
                     Settings
                   </div>
@@ -70,7 +70,7 @@ export default component$(() => {
                   <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
                 </div>
                 <div class="sm:grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm transition duration-200">
-                  <a href={`/invite?guild=${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-white rounded-xl font-bold items-center gap-4">
+                  <a href={`/invite?guild=${guild.id}`} class="flex flex-col justify-center transition hover:bg-luminescent-900/20 text-gray-200 rounded-xl font-bold items-center gap-4">
                     <HappyOutline width="24" class="fill-current" />
                     Invite
                   </a>

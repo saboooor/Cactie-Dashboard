@@ -163,13 +163,13 @@ export default component$(() => {
         <MenuTitle>GENERAL SETTINGS</MenuTitle>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
           <Card>
-            <h1 class="font-bold text-white text-2xl">Prefix</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Prefix</h1>
             <TextInput name="prefix" value={srvconfig?.prefix} placeholder="The bot's prefix">
               Cactie's text command prefix
             </TextInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Suggestions</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Suggestions</h1>
             <SelectInput id="suggestionchannel" name="suggestionchannel" label="Channel to make suggestions in" extraClass="mb-4">
               <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -183,7 +183,7 @@ export default component$(() => {
             </Toggle>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Polls</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Polls</h1>
             <SelectInput id="pollchannel" name="pollchannel" label="Channel to make polls in">
               <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -195,7 +195,7 @@ export default component$(() => {
             const joinmessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
             return (
               <Card>
-                <h1 class="font-bold text-white text-2xl">Join Message</h1>
+                <h1 class="font-bold text-gray-100 text-2xl">Join Message</h1>
                 <TextInput big id="joinmessage-message" name="joinmessage.message" value={joinmessage.message} placeholder="The content of the message sent when someone joins">
                     The message when someone joins the server
                 </TextInput>
@@ -215,7 +215,7 @@ export default component$(() => {
             const leavemessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
             return (
               <Card>
-                <h1 class="font-bold text-white text-2xl">Leave Message</h1>
+                <h1 class="font-bold text-gray-100 text-2xl">Leave Message</h1>
                 <TextInput big id="leavemessage-message" name="leavemessage.message" value={leavemessage.message} placeholder="The content of the message sent when someone leaves">
                   The message when someone leaves the server
                 </TextInput>
@@ -231,9 +231,9 @@ export default component$(() => {
               </Card>
             );
           })()}
-          <div class="grid gap-6">
+          <div class="grid gap-4">
             <Card>
-              <h1 class="font-bold text-white text-2xl">Max PP Size</h1>
+              <h1 class="font-bold text-gray-100 text-2xl">Max PP Size</h1>
               <NumberInput input value={srvconfig?.maxppsize} name="maxppsize" id="maxppsize">
                 The maximum size for the boner command
               </NumberInput>
@@ -251,7 +251,7 @@ export default component$(() => {
         <MenuTitle>TICKET SYSTEM</MenuTitle>
         <div class="flex flex-wrap gap-4 py-10">
           <Card>
-            <h1 class="font-bold text-white text-2xl">Mode</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Mode</h1>
             <SelectInput id="tickets" name="tickets" label="This is how the bot will handle tickets">
               <option value="false" selected={srvconfig?.tickets == 'false'}>Disable Tickets</option>
               <option value="buttons" selected={srvconfig?.tickets == 'buttons'}>Use buttons</option>
@@ -259,7 +259,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Category</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Category</h1>
             <SelectInput id="ticketcategory" name="ticketcategory" label="The category where tickets will appear">
               <option value="false" selected={srvconfig?.ticketcategory == 'false'}>No Category</option>
               {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
@@ -268,7 +268,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Log Channel</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Log Channel</h1>
             <SelectInput id="ticketlogchannel" name="ticketlogchannel" label="The channel where transcripts will appear">
               <option value="false" selected={srvconfig?.ticketlogchannel == 'false'}>Don't send transcripts</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -277,7 +277,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Access Role</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Access Role</h1>
             <SelectInput id="supportrole" name="supportrole" label="The role that may access tickets">
               <option value="false" selected={srvconfig?.supportrole == 'false'}>Only Administrators</option>
               {roles.map(r =>
@@ -286,7 +286,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Mention</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Mention</h1>
             <SelectInput id="ticketmention" name="ticketmention" label="Pings the specified role when a ticket is created">
               <option value="false" selected={srvconfig?.ticketmention == 'false'}>No mention</option>
               <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'}>@ everyone</option>
@@ -300,13 +300,13 @@ export default component$(() => {
         <MenuTitle>MODERATION</MenuTitle>
         <div class="flex flex-wrap gap-4 py-10">
           <Card>
-            <h1 class="font-bold text-white text-2xl">Message Shortener</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Message Shortener</h1>
             <NumberInput input value={srvconfig?.msgshortener} name="msgshortener" id="msgshortener">
               The amount of lines in a message to shorten into a link. To disable, set to 0
             </NumberInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Mute Command</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Mute Command</h1>
             <SelectInput id="ticketcategory" name="ticketcategory" label="Select a role to give when muting or use Discord's timeout feature">
               <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'}>Use Discord's timeout feature</option>
               {roles.map(r =>
@@ -315,7 +315,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-white text-2xl">Disabled Commands</h1>
+            <h1 class="font-bold text-gray-100 text-2xl">Disabled Commands</h1>
             <TextInput name="disabledcmds" value={srvconfig?.disabledcmds == 'false' ? '' : srvconfig?.disabledcmds} placeholder="Specify commands to disable, no spaces">
               Disable certain commands from Cactie separated by commas
             </TextInput>
@@ -327,7 +327,7 @@ export default component$(() => {
           return <div class="py-10 flex flex-col gap-4">
             <div class="flex flex-col sm:flex-row gap-4">
               <Card>
-                <h1 class="font-bold text-white text-2xl">Default Channel</h1>
+                <h1 class="font-bold text-gray-100 text-2xl">Default Channel</h1>
                 <SelectInput id="auditlogs-channel" name="auditlogs.channel" label="This is where logs will be sent if there is no specific channel set on them">
                   <option value="false" selected={auditlogs.channel == 'false'}>No channel specified.</option>
                   {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -417,7 +417,7 @@ export default component$(() => {
                   return (
                     <Card key={i}>
                       <div class="flex items-start flex-1">
-                        <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+                        <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                           {log}
                         </h1>
                         <Close width="36" class="fill-red-400" />
@@ -446,7 +446,7 @@ export default component$(() => {
             reactionroles.channels.map(channel => (
               <Card key={channel.id}>
                 <div class="flex items-start flex-1">
-                  <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+                  <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                     # {channel?.name ?? 'Channel Not Found.'}
                   </h1>
                   <Button color="primary" small onClick$={() => store.modal = !store.modal}>
@@ -458,7 +458,7 @@ export default component$(() => {
                     channel.messages.map((messageId: string) => (
                       <Card darker key={messageId}>
                         <div class="flex items-start flex-1">
-                          <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+                          <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                             Message # {messageId}
                           </h1>
                           <Button color="primary" small onClick$={() => store.modal = !store.modal}>
@@ -475,7 +475,7 @@ export default component$(() => {
                                   {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>
                                 <div>
-                                  <h1 class="font-bold text-white text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
+                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
                                   <p class="hidden sm:flex">
                                     {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
                                     {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
@@ -518,7 +518,7 @@ export default component$(() => {
         <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
           <div class="flex min-h-full max-h-full items-start justify-center p-4 pt-24 text-center sm:items-center">
             <div class="rounded-lg bg-gray-900/50 backdrop-blur-lg text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
-              <h1 class="flex-1 justify-start font-bold text-white text-2xl">
+              <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                 Create Reaction Role
               </h1>
               <div class="flex flex-col my-4 gap-4">
