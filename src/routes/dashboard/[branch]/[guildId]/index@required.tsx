@@ -325,7 +325,7 @@ export default component$(() => {
         {(() => {
           const auditlogs = JSON.parse(srvconfig?.auditlogs ?? '{ channel: "false", logs: {} }');
           return <div class="py-10 flex flex-col gap-4">
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex flex-col md:flex-row gap-4">
               <Card>
                 <h1 class="font-bold text-gray-100 text-2xl">Default Channel</h1>
                 <SelectInput id="auditlogs-channel" name="auditlogs.channel" label="This is where logs will be sent if there is no specific channel set on them">
