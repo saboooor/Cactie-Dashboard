@@ -9,7 +9,8 @@ import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
-import { Close } from 'qwik-ionicons';
+import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SpeedometerOutline, Stop } from 'qwik-ionicons';
+import Card from '~/components/elements/Card';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
@@ -98,77 +99,77 @@ export default component$(() => {
   });
 
   return (
-    <section class="grid gap-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 min-h-[calc(100lvh-80px)]">
+    <section class="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 min-h-[calc(100lvh-80px)]">
       <MenuIndex guild={guild} store={store} onSwitcherSwitch$={() => {}} >
         <MenuCategory name="GENERAL SETTINGS">
           <MenuItem href="#">
-            Prefix
+            <Alert width="24" class="fill-current" /> Prefix
           </MenuItem>
           <MenuItem href="#">
-            Suggestions
+            <MailOpenOutline width="24" class="fill-current" /> Suggestions
           </MenuItem>
           <MenuItem href="#">
-            Polls
+            <CheckboxOutline width="24" class="fill-current" /> Polls
           </MenuItem>
           <MenuItem href="#">
-            Join Message
+            <Add width="24" class="fill-current" /> Join Message
           </MenuItem>
           <MenuItem href="#">
-            Leave Message
+            <Remove width="24" class="fill-current" /> Leave Message
           </MenuItem>
           <MenuItem href="#">
-            Max PP Size
+            <SpeedometerOutline width="24" class="fill-current" /> Max PP Size
           </MenuItem>
           <MenuItem href="#">
-            Reactions
+            <HappyOutline width="24" class="fill-current" /> Reactions
           </MenuItem>
         </MenuCategory>
         <MenuCategory name="TICKET SYSTEM">
           <MenuItem href="#">
-            Mode
+            <InvertModeOutline width="24" class="fill-current" /> Mode
           </MenuItem>
           <MenuItem href="#">
-            Category
+            <FolderOutline width="24" class="fill-current" /> Category
           </MenuItem>
           <MenuItem href="#">
-            Log Channel
+            <FileTrayFullOutline width="24" class="fill-current" /> Log Channel
           </MenuItem>
           <MenuItem href="#">
-            Access Role
+            <At width="24" class="fill-current" /> Access Role
           </MenuItem>
           <MenuItem href="#">
-            Mention
+            <At width="24" class="fill-current" /> Mention
           </MenuItem>
         </MenuCategory>
         <MenuCategory name="MODERATION">
           <MenuItem href="#">
-            Message Shortener
+            <CreateOutline width="24" class="fill-current" /> Message Shortener
           </MenuItem>
           <MenuItem href="#">
-            Mute Command
+            <NotificationsOffOutline width="24" class="fill-current" /> Mute Command
           </MenuItem>
           <MenuItem href="#">
-            Disabled Commands
+            <Stop width="24" class="fill-current" /> Disabled Commands
           </MenuItem>
         </MenuCategory>
         <MenuItem href="#audit">
-            Audit Logs
+          <NewspaperOutline width="24" class="fill-current" /> Audit Logs
         </MenuItem>
         <MenuItem href="#reactionroles">
-            Reaction Roles
+          <HappyOutline width="24" class="fill-current" /> Reaction Roles
         </MenuItem>
       </MenuIndex>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
-        <MenuTitle>General Settings</MenuTitle>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Prefix</h1>
+        <MenuTitle>GENERAL SETTINGS</MenuTitle>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Prefix</h1>
             <TextInput name="prefix" value={srvconfig?.prefix} placeholder="The bot's prefix">
               Cactie's text command prefix
             </TextInput>
-          </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Suggestions</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Suggestions</h1>
             <SelectInput id="suggestionchannel" name="suggestionchannel" label="Channel to make suggestions in" extraClass="mb-4">
               <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -180,21 +181,21 @@ export default component$(() => {
                 Create threads associated to suggestions for discussion
               </span>
             </Toggle>
-          </div>
-          <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Polls</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Polls</h1>
             <SelectInput id="pollchannel" name="pollchannel" label="Channel to make polls in">
               <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.pollchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
-          </div>
+          </Card>
           {(() => {
             const joinmessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
             return (
-              <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-                <h1 class="font-bold text-white text-2xl mb-2">Join Message</h1>
+              <Card>
+                <h1 class="font-bold text-white text-2xl">Join Message</h1>
                 <TextInput big id="joinmessage-message" name="joinmessage.message" value={joinmessage.message} placeholder="The content of the message sent when someone joins">
                     The message when someone joins the server
                 </TextInput>
@@ -207,14 +208,14 @@ export default component$(() => {
                     <option value={c.id} key={c.id} selected={joinmessage.channel == c.id}>{`# ${c.name}`}</option>,
                   )}
                 </SelectInput>
-              </div>
+              </Card>
             );
           })()}
           {(() => {
             const leavemessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
             return (
-              <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-                <h1 class="font-bold text-white text-2xl mb-2">Leave Message</h1>
+              <Card>
+                <h1 class="font-bold text-white text-2xl">Leave Message</h1>
                 <TextInput big id="leavemessage-message" name="leavemessage.message" value={leavemessage.message} placeholder="The content of the message sent when someone leaves">
                   The message when someone leaves the server
                 </TextInput>
@@ -227,65 +228,65 @@ export default component$(() => {
                     <option value={c.id} key={c.id} selected={leavemessage.channel == c.id}>{`# ${c.name}`}</option>,
                   )}
                 </SelectInput>
-              </div>
+              </Card>
             );
           })()}
           <div class="grid gap-6">
-            <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-              <h1 class="font-bold text-white text-2xl mb-2">Max PP Size</h1>
+            <Card>
+              <h1 class="font-bold text-white text-2xl">Max PP Size</h1>
               <NumberInput input value={srvconfig?.maxppsize} name="maxppsize" id="maxppsize">
                 The maximum size for the boner command
               </NumberInput>
-            </div>
-            <div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+            </Card>
+            <Card>
               <Toggle id="reactions" name="reactions" checked={srvconfig?.reactions == 'true'}>
                 <span class="text-2xl font-bold">
                   Reactions
                 </span>
               </Toggle>
               <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
-            </div>
+            </Card>
           </div>
         </div>
-        <MenuTitle>Ticket System</MenuTitle>
-        <div class="flex flex-wrap gap-6 py-10">
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Mode</h1>
+        <MenuTitle>TICKET SYSTEM</MenuTitle>
+        <div class="flex flex-wrap gap-4 py-10">
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Mode</h1>
             <SelectInput id="tickets" name="tickets" label="This is how the bot will handle tickets">
               <option value="false" selected={srvconfig?.tickets == 'false'}>Disable Tickets</option>
               <option value="buttons" selected={srvconfig?.tickets == 'buttons'}>Use buttons</option>
               <option value="reactions" selected={srvconfig?.tickets == 'reactions'}>Use reactions</option>
             </SelectInput>
-          </div>
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Category</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Category</h1>
             <SelectInput id="ticketcategory" name="ticketcategory" label="The category where tickets will appear">
               <option value="false" selected={srvconfig?.ticketcategory == 'false'}>No Category</option>
               {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.ticketcategory == c.id}>{`> ${c.name}`}</option>,
               )}
             </SelectInput>
-          </div>
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Log Channel</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Log Channel</h1>
             <SelectInput id="ticketlogchannel" name="ticketlogchannel" label="The channel where transcripts will appear">
               <option value="false" selected={srvconfig?.ticketlogchannel == 'false'}>Don't send transcripts</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.ticketlogchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
-          </div>
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Access Role</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Access Role</h1>
             <SelectInput id="supportrole" name="supportrole" label="The role that may access tickets">
               <option value="false" selected={srvconfig?.supportrole == 'false'}>Only Administrators</option>
               {roles.map(r =>
                 <option value={r.id} key={r.id} selected={srvconfig?.supportrole == r.id}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
-          </div>
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Mention</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Mention</h1>
             <SelectInput id="ticketmention" name="ticketmention" label="Pings the specified role when a ticket is created">
               <option value="false" selected={srvconfig?.ticketmention == 'false'}>No mention</option>
               <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'}>@ everyone</option>
@@ -294,47 +295,47 @@ export default component$(() => {
                 <option value={r.id} key={r.id} selected={srvconfig?.ticketmention == r.id}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
-          </div>
+          </Card>
         </div>
-        <MenuTitle>Moderation</MenuTitle>
-        <div class="flex flex-wrap gap-6 py-10">
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Message Shortener</h1>
+        <MenuTitle>MODERATION</MenuTitle>
+        <div class="flex flex-wrap gap-4 py-10">
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Message Shortener</h1>
             <NumberInput input value={srvconfig?.msgshortener} name="msgshortener" id="msgshortener">
               The amount of lines in a message to shorten into a link. To disable, set to 0
             </NumberInput>
-          </div>
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Mute Command</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Mute Command</h1>
             <SelectInput id="ticketcategory" name="ticketcategory" label="Select a role to give when muting or use Discord's timeout feature">
               <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'}>Use Discord's timeout feature</option>
               {roles.map(r =>
                 <option value={r.id} key={r.id} selected={srvconfig?.mutecmd == r.id}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
-          </div>
-          <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-            <h1 class="font-bold text-white text-2xl mb-2">Disabled Commands</h1>
+          </Card>
+          <Card>
+            <h1 class="font-bold text-white text-2xl">Disabled Commands</h1>
             <TextInput name="disabledcmds" value={srvconfig?.disabledcmds == 'false' ? '' : srvconfig?.disabledcmds} placeholder="Specify commands to disable, no spaces">
               Disable certain commands from Cactie separated by commas
             </TextInput>
-          </div>
+          </Card>
         </div>
-        <MenuTitle>Audit Logs</MenuTitle>
+        <MenuTitle>AUDIT LOGS</MenuTitle>
         {(() => {
           const auditlogs = JSON.parse(srvconfig?.auditlogs ?? '{ channel: "false", logs: {} }');
-          return <div class="py-10 flex flex-col gap-6">
-            <div class="flex flex-col sm:flex-row gap-6">
-              <div class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
-                <h1 class="font-bold text-white text-2xl mb-2">Default Channel</h1>
+          return <div class="py-10 flex flex-col gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
+              <Card>
+                <h1 class="font-bold text-white text-2xl">Default Channel</h1>
                 <SelectInput id="auditlogs-channel" name="auditlogs.channel" label="This is where logs will be sent if there is no specific channel set on them">
                   <option value="false" selected={auditlogs.channel == 'false'}>No channel specified.</option>
                   {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                     <option value={c.id} key={c.id} selected={auditlogs.channel == c.id}>{`# ${c.name}`}</option>,
                   )}
                 </SelectInput>
-              </div>
-              <div class="flex flex-col gap-2 bg-gray-800 border-2 border-gray-700 rounded-xl p-6">
+              </Card>
+              <Card squish>
                 <RawSelectInput id="new-log">
                   <option value="all">All Logs</option>
                   {!auditlogs.logs?.member && (
@@ -408,13 +409,13 @@ export default component$(() => {
                 <Button color="primary">
                   Add Audit Log
                 </Button>
-              </div>
+              </Card>
             </div>
-            <div class="flex flex-wrap justify-center gap-6">
+            <div class="flex flex-wrap justify-center gap-4">
               {
                 Object.keys(auditlogs.logs).map((log, i) => {
                   return (
-                    <div key={i} class="flex-1 flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-6 gap-4">
+                    <Card key={i}>
                       <div class="flex items-start flex-1">
                         <h1 class="flex-1 justify-start font-bold text-white text-2xl">
                           {log}
@@ -427,7 +428,7 @@ export default component$(() => {
                           <option value={c.id} key={c.id} selected={auditlogs.logs[log].channel == c.id}>{`# ${c.name}`}</option>,
                         )}
                       </RawSelectInput>
-                    </div>
+                    </Card>
                   );
                 })
               }
@@ -435,15 +436,15 @@ export default component$(() => {
           </div>;
         })()}
         <div class="flex">
-          <MenuTitle extraClass="flex-1">Reaction Roles</MenuTitle>
+          <MenuTitle extraClass="flex-1">REACTION ROLES</MenuTitle>
           <Button color="primary" onClick$={() => store.modal = !store.modal}>
             Create Reaction Role
           </Button>
         </div>
-        <div class="flex flex-col gap-6 py-10">
+        <div class="flex flex-col gap-4 py-10">
           {
             reactionroles.channels.map(channel => (
-              <div key={channel.id} class="flex-1 flex flex-col bg-gray-800 border-2 border-gray-700 rounded-xl p-4 gap-4">
+              <Card key={channel.id}>
                 <div class="flex items-start flex-1">
                   <h1 class="flex-1 justify-start font-bold text-white text-2xl">
                     # {channel?.name ?? 'Channel Not Found.'}
@@ -455,7 +456,7 @@ export default component$(() => {
                 <div class='flex flex-col gap-4'>
                   {
                     channel.messages.map((messageId: string) => (
-                      <div key={messageId} class="flex-1 flex flex-col bg-gray-900/50 border-2 border-gray-700 rounded-xl p-4 gap-4">
+                      <Card darker key={messageId}>
                         <div class="flex items-start flex-1">
                           <h1 class="flex-1 justify-start font-bold text-white text-2xl">
                             Message # {messageId}
@@ -469,7 +470,7 @@ export default component$(() => {
                             reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
                               const role = roles.find(r => r.id == rr.roleId);
 
-                              return <div key={rr.roleId} class="flex-1 min-w-max flex bg-gray-800 rounded-xl p-4 gap-4" onContextMenu$={(event) => openContextMenu(event, rr)} preventdefault:contextmenu>
+                              return <Card key={rr.roleId} row contextMenu={{ func: openContextMenu, args: [rr] }}>
                                 <div class="p-1">
                                   {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>
@@ -480,20 +481,20 @@ export default component$(() => {
                                     {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
                                   </p>
                                 </div>
-                              </div>;
+                              </Card>;
                             })
                           }
                         </div>
-                      </div>
+                      </Card>
                     ))
                   }
                 </div>
-              </div>
+              </Card>
             ))
           }
         </div>
       </div>
-      <div class="hidden flex-col gap-2 py-3 px-2 rounded-xl bg-gray-900/50 backdrop-blur-lg border-2 border-gray-800 drop-shadow-lg absolute top-0" id="contextmenu" preventdefault:contextmenu>
+      <div class="hidden flex-col gap-2 py-3 px-2 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-gray-800 drop-shadow-lg absolute top-0" id="contextmenu" preventdefault:contextmenu>
         <RawSelectInput id="rrrole" name="rrrole" extraClass="text-sm bg-transparent hover:bg-gray-800">
           {roles.map(r =>
             <option value={r.id} key={r.id}>{`@ ${r.name}`}</option>,

@@ -57,7 +57,7 @@ export default component$(() => {
   const auth = useGetAuth();
   return (
     <>
-      <Nav auth={auth.value} />
+      <Nav auth={auth.value.auth} />
       <main class="mt-16">
         <Slot />
       </main>

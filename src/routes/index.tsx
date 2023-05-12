@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import { type DocumentHead } from '@builder.io/qwik-city';
+import { Link, type DocumentHead } from '@builder.io/qwik-city';
 
 // @ts-ignore
 import iconAVIF from '~/components/images/Cactie.png?avif&width=552&height=552';
@@ -8,9 +8,11 @@ import iconWEBP from '~/components/images/Cactie.png?webp&width=552&height=552';
 // @ts-ignore
 import icon from '~/components/images/Cactie.png?width=552&height=552';
 
-import { HappyOutline, LogoDiscord, SettingsOutline } from 'qwik-ionicons';
+import { HappyOutline, LogoDiscord, PersonOutline, SettingsOutline } from 'qwik-ionicons';
+import { useGetAuth } from './layout';
 
 export default component$(() => {
+  const auth = useGetAuth();
   return (
     <section class="flex mx-auto max-w-6xl px-6 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div>
@@ -42,7 +44,7 @@ export default component$(() => {
         </p>
         <div class="flex flex-col sm:flex-row justify-start" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
           <div class="rounded-md shadow" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
-            <a href="/invite" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-luminescent-900/80 hover:bg-luminescent-900 border-2 border-luminescent-900 px-6 py-3 font-bold text-purple-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+            <a href="/invite" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-luminescent-900/80 hover:bg-luminescent-900 border border-luminescent-900 px-6 py-3 font-bold text-purple-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
               <HappyOutline width="24" class="fill-current" />
               Invite me to your server!
             </a>
@@ -50,16 +52,24 @@ export default component$(() => {
         </div>
         <div class="mt-3 flex flex-col sm:flex-row gap-2">
           <div class="rounded-md shadow">
-            <a href="/discord" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border-2 border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+            <a href="/discord" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
               <LogoDiscord width="24" class="fill-current" />
               Join the Discord!
             </a>
           </div>
           <div class="rounded-md shadow">
-            <a href="/dashboard" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border-2 border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
-              <SettingsOutline width="24" class="fill-current" />
-              Dashboard
-            </a>
+            {!auth.value &&
+              <a href="/login" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+                <PersonOutline width="24" class="fill-current" />
+                Login
+              </a>
+            }
+            {auth.value &&
+              <Link href="/dashboard" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+                <SettingsOutline width="24" class="fill-current" />
+                Dashboard
+              </Link>
+            }
           </div>
         </div>
       </div>
