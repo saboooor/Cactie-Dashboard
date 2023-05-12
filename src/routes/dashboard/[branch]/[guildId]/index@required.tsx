@@ -2,7 +2,7 @@ import { component$, $, useStore } from '@builder.io/qwik';
 import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/edge';
 import { MenuIndex, MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
 import TextInput from '~/components/elements/TextInput';
 import Toggle from '~/components/elements/Toggle';

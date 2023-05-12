@@ -1,5 +1,5 @@
 import type { Cookie } from '@builder.io/qwik-city';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/edge';
 
 export default async function getAuth(cookie: Cookie, env: any) {
   const sid = cookie.get('sessionid')?.value;
