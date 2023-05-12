@@ -2,7 +2,7 @@ import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import { Link } from '@builder.io/qwik-city';
 import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
-import { useGetAuth, getGuildsFn } from './layout!';
+import { useGetAuth, getGuildsFn } from '../layout-dashboard';
 import Switcher from '~/components/elements/Switcher';
 
 export default component$(() => {
