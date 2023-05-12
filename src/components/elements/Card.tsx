@@ -9,6 +9,7 @@ export default component$(({ row, squish, darker, contextMenu }: any) => {
       'bg-gray-800': !darker,
       'flex-col': !row,
       'flex-1': !squish,
+      'sm:flex-1': squish == 'sm'
     }} onContextMenu$={(event) => contextMenu ? contextMenu.func(event, ...contextMenu.args) : ''} preventdefault:contextmenu={contextMenu}>
       <Slot />
     </div>
