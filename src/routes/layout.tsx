@@ -3,7 +3,7 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import getAuth from '~/components/functions/auth';
 import Nav from '~/components/Nav';
 
-export const useGetAuth = routeLoader$(async ({ cookie }) => await getAuth(cookie));
+export const useGetAuth = routeLoader$(async ({ cookie, env }) => await getAuth(cookie, env));
 
 export default component$(() => {
   const auth = useGetAuth();

@@ -44,7 +44,7 @@ export const getGuildsFn = server$(async function(accessToken, props?: RequestEv
 });
 
 export const useGetAuth = routeLoader$(async (props) => {
-  const auth = await getAuth(props.cookie);
+  const auth = await getAuth(props.cookie, props.env);
   if (!auth) {
     props.cookie.set('redirecturl', props.url.href, { path: '/' });
     throw props.redirect(302, '/login');
