@@ -3,7 +3,7 @@ import Switcher from './elements/Switcher';
 import { Menu } from 'qwik-ionicons';
 import { Button } from './elements/Button';
 
-export const MenuIndex = component$(({ guild, store, onSwitcherSwitch$ }: any) => {
+export default component$(({ guild, store, onSwitcherSwitch$ }: any) => {
   const menuStore = useStore({
     menu: false,
   });

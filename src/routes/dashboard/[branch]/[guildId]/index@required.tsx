@@ -1,16 +1,18 @@
-import { component$, $, useStore } from '@builder.io/qwik';
-import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
+import { component$, $, useStore, useVisibleTask$ } from '@builder.io/qwik';
+import type { RequestEventLoader, DocumentHead } from '@builder.io/qwik-city';
+import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
+import type { reactionroles, settings } from '@prisma/client/edge';
 import { PrismaClient } from '@prisma/client/edge';
-import { MenuIndex, MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
+import Menu, { MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
 import TextInput from '~/components/elements/TextInput';
 import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
-import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SpeedometerOutline, Stop } from 'qwik-ionicons';
-import Card from '~/components/elements/Card';
+import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Stop } from 'qwik-ionicons';
+import Card, { CardHeader } from '~/components/elements/Card';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
@@ -18,55 +20,65 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
-  const guildres = await fetch(`https://discord.com/api/v10/guilds/${params.guildId}/preview`, {
+export const getGuildDataFn = server$(async function(props?: RequestEventLoader | typeof this, redirect?): Promise<{
+  guild: Guild;
+  channels: APIChannel[];
+  roles: APIRole[];
+  srvconfig: settings | null;
+  reactionroles: {
+    raw: reactionroles[];
+    channels: any[];
+  };
+}> {
+  props = props ?? this;
+  const guildres = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/preview`, {
     headers: {
-      authorization: `Bot ${env.get(`BOT_TOKEN${params.branch == 'dev' ? '_DEV' : ''}`)}`,
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   const guild: RESTError | RESTRateLimit | Guild = await guildres.json();
   if ('retry_after' in guild) {
-    console.log(`${guild.message}, retrying after ${guild.retry_after}ms`);
+    console.log(`${guild.message}, retrying after ${guild.retry_after * 1000}ms`);
     await sleep(guild.retry_after);
-    throw redirect(302, url.href);
+    return await getGuildDataFn(props, redirect);
   }
   if ('code' in guild) throw redirect(302, `/dashboard?error=${guild.code}&message=${guild.message}`);
 
-  const channelsres = await fetch(`https://discord.com/api/v10/guilds/${params.guildId}/channels`, {
+  const channelsres = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/channels`, {
     headers: {
-      authorization: `Bot ${env.get(`BOT_TOKEN${params.branch == 'dev' ? '_DEV' : ''}`)}`,
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   const channels: RESTError | RESTRateLimit | APIChannel[] = await channelsres.json();
   if ('retry_after' in channels) {
-    console.log(`${channels.message}, retrying after ${channels.retry_after}ms`);
+    console.log(`${channels.message}, retrying after ${channels.retry_after * 1000}ms`);
     await sleep(channels.retry_after);
-    throw redirect(302, url.href);
+    return await getGuildDataFn(props, redirect);
   }
   if ('code' in channels) throw redirect(302, `/dashboard?error=${channels.code}&message=${channels.message}`);
 
-  const rolesres = await fetch(`https://discord.com/api/v10/guilds/${params.guildId}/roles`, {
+  const rolesres = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/roles`, {
     headers: {
-      authorization: `Bot ${env.get('BOT_TOKEN')}`,
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
   });
   const roles: RESTError | RESTRateLimit | APIRole[] = await rolesres.json();
   if ('retry_after' in roles) {
-    console.log(`${roles.message}, retrying after ${roles.retry_after}ms`);
+    console.log(`${roles.message}, retrying after ${roles.retry_after * 1000}ms`);
     await sleep(roles.retry_after);
-    throw redirect(302, url.href);
+    return await getGuildDataFn(props, redirect);
   }
   if ('code' in roles) throw redirect(302, `/dashboard?error=${roles.code}&message=${roles.message}`);
 
-  const prisma = new PrismaClient({ datasources: { db: { url: env.get(`DATABASE_URL${params.branch == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
   const srvconfig = await prisma.settings.findUnique({
     where: {
-      guildId: params.guildId,
+      guildId: props.params.guildId,
     },
   });
 
   const reactionroles = {
-    raw: await prisma.reactionroles.findMany({ where: { guildId: params.guildId } }),
+    raw: await prisma.reactionroles.findMany({ where: { guildId: props.params.guildId } }),
     channels: [] as any[],
   };
 
@@ -89,18 +101,26 @@ export const useData = routeLoader$(async ({ url, redirect, params, env }) => {
   return { guild, channels, roles, srvconfig, reactionroles };
 });
 
-export default component$(() => {
-  const guildData = useData();
-  const { guild, channels, roles, srvconfig, reactionroles } = guildData.value;
+export const useGetGuildData = routeLoader$(async (props) => await getGuildDataFn(props, props.redirect));
 
+export default component$(() => {
+  const guildData = useGetGuildData().value;
   const store = useStore({
     dev: undefined as boolean | undefined,
     modal: false,
+    guildData,
+  });
+  const { guild, channels, roles, srvconfig, reactionroles } = store.guildData;
+
+  useVisibleTask$(() => {
+    store.dev = document.cookie.includes('branch=dev');
   });
 
   return (
     <section class="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 min-h-[calc(100lvh-80px)]">
-      <MenuIndex guild={guild} store={store} onSwitcherSwitch$={() => {}} >
+      <Menu guild={guild} store={store} onSwitcherSwitch$={async () => {
+        store.guildData = await getGuildDataFn();
+      }}>
         <MenuCategory name="GENERAL SETTINGS">
           <MenuItem href="#">
             <Alert width="24" class="fill-current" /> Prefix
@@ -158,18 +178,22 @@ export default component$(() => {
         <MenuItem href="#reactionroles">
           <HappyOutline width="24" class="fill-current" /> Reaction Roles
         </MenuItem>
-      </MenuIndex>
+      </Menu>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
         <MenuTitle>GENERAL SETTINGS</MenuTitle>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
           <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Prefix</h1>
+            <CardHeader>
+              <Alert width="32" class="fill-current" /> Prefix
+            </CardHeader>
             <TextInput name="prefix" value={srvconfig?.prefix} placeholder="The bot's prefix">
               Cactie's text command prefix
             </TextInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Suggestions</h1>
+            <CardHeader>
+              <MailOpenOutline width="32" class="fill-current" /> Suggestions
+            </CardHeader>
             <SelectInput id="suggestionchannel" name="suggestionchannel" label="Channel to make suggestions in" extraClass="mb-4">
               <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -177,13 +201,13 @@ export default component$(() => {
               )}
             </SelectInput>
             <Toggle id="suggestthreads" name="suggestthreads" checked={srvconfig?.suggestthreads == 'true'}>
-              <span>
-                Create threads associated to suggestions for discussion
-              </span>
+              Create threads associated to suggestions for discussion
             </Toggle>
           </Card>
           <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Polls</h1>
+            <CardHeader>
+              <CheckboxOutline width="32" class="fill-current" /> Polls
+            </CardHeader>
             <SelectInput id="pollchannel" name="pollchannel" label="Channel to make polls in">
               <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -195,7 +219,9 @@ export default component$(() => {
             const joinmessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
             return (
               <Card>
-                <h1 class="font-bold text-gray-100 text-2xl">Join Message</h1>
+                <CardHeader>
+                  <Add width="32" class="fill-current" /> Join Message
+                </CardHeader>
                 <TextInput big id="joinmessage-message" name="joinmessage.message" value={joinmessage.message} placeholder="The content of the message sent when someone joins">
                     The message when someone joins the server
                 </TextInput>
@@ -215,7 +241,9 @@ export default component$(() => {
             const leavemessage = JSON.parse(srvconfig?.joinmessage ?? '{"message":"","channel":"false"}');
             return (
               <Card>
-                <h1 class="font-bold text-gray-100 text-2xl">Leave Message</h1>
+                <CardHeader>
+                  <Remove width="32" class="fill-current" /> Leave Message
+                </CardHeader>
                 <TextInput big id="leavemessage-message" name="leavemessage.message" value={leavemessage.message} placeholder="The content of the message sent when someone leaves">
                   The message when someone leaves the server
                 </TextInput>
@@ -233,33 +261,42 @@ export default component$(() => {
           })()}
           <div class="grid gap-4">
             <Card>
-              <h1 class="font-bold text-gray-100 text-2xl">Max PP Size</h1>
+              <CardHeader>
+                <SpeedometerOutline width="32" class="fill-current" /> Max PP Size
+              </CardHeader>
+
               <NumberInput input value={srvconfig?.maxppsize} name="maxppsize" id="maxppsize">
                 The maximum size for the boner command
               </NumberInput>
             </Card>
             <Card>
-              <Toggle id="reactions" name="reactions" checked={srvconfig?.reactions == 'true'}>
-                <span class="text-2xl font-bold">
-                  Reactions
-                </span>
-              </Toggle>
+              <CardHeader>
+                <Toggle id="reactions" name="reactions" checked={srvconfig?.reactions == 'true'}>
+                  <span class="flex items-center gap-3">
+                    <HappyOutline width="32" class="fill-current" /> Reactions
+                  </span>
+                </Toggle>
+              </CardHeader>
               <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
             </Card>
           </div>
         </div>
         <MenuTitle>TICKET SYSTEM</MenuTitle>
         <div class="flex flex-wrap gap-4 py-10">
-          <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Mode</h1>
+          <Card fit>
+            <CardHeader>
+              <InvertModeOutline width="32" class="fill-current" /> Mode
+            </CardHeader>
             <SelectInput id="tickets" name="tickets" label="This is how the bot will handle tickets">
               <option value="false" selected={srvconfig?.tickets == 'false'}>Disable Tickets</option>
               <option value="buttons" selected={srvconfig?.tickets == 'buttons'}>Use buttons</option>
               <option value="reactions" selected={srvconfig?.tickets == 'reactions'}>Use reactions</option>
             </SelectInput>
           </Card>
-          <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Category</h1>
+          <Card fit>
+            <CardHeader>
+              <FolderOutline width="32" class="fill-current" /> Category
+            </CardHeader>
             <SelectInput id="ticketcategory" name="ticketcategory" label="The category where tickets will appear">
               <option value="false" selected={srvconfig?.ticketcategory == 'false'}>No Category</option>
               {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
@@ -267,8 +304,10 @@ export default component$(() => {
               )}
             </SelectInput>
           </Card>
-          <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Log Channel</h1>
+          <Card fit>
+            <CardHeader>
+              <FileTrayFullOutline width="32" class="fill-current" /> Log Channel
+            </CardHeader>
             <SelectInput id="ticketlogchannel" name="ticketlogchannel" label="The channel where transcripts will appear">
               <option value="false" selected={srvconfig?.ticketlogchannel == 'false'}>Don't send transcripts</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -276,8 +315,10 @@ export default component$(() => {
               )}
             </SelectInput>
           </Card>
-          <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Access Role</h1>
+          <Card fit>
+            <CardHeader>
+              <At width="32" class="fill-current" /> Access Role
+            </CardHeader>
             <SelectInput id="supportrole" name="supportrole" label="The role that may access tickets">
               <option value="false" selected={srvconfig?.supportrole == 'false'}>Only Administrators</option>
               {roles.map(r =>
@@ -285,8 +326,10 @@ export default component$(() => {
               )}
             </SelectInput>
           </Card>
-          <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Mention</h1>
+          <Card fit>
+            <CardHeader>
+              <At width="32" class="fill-current" /> Mention
+            </CardHeader>
             <SelectInput id="ticketmention" name="ticketmention" label="Pings the specified role when a ticket is created">
               <option value="false" selected={srvconfig?.ticketmention == 'false'}>No mention</option>
               <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'}>@ everyone</option>
@@ -300,13 +343,17 @@ export default component$(() => {
         <MenuTitle>MODERATION</MenuTitle>
         <div class="flex flex-wrap gap-4 py-10">
           <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Message Shortener</h1>
+            <CardHeader>
+              <CreateOutline width="32" class="fill-current" /> Message Shortener
+            </CardHeader>
             <NumberInput input value={srvconfig?.msgshortener} name="msgshortener" id="msgshortener">
               The amount of lines in a message to shorten into a link. To disable, set to 0
             </NumberInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Mute Command</h1>
+            <CardHeader>
+              <NotificationsOffOutline width="32" class="fill-current" /> Mute Command
+            </CardHeader>
             <SelectInput id="ticketcategory" name="ticketcategory" label="Select a role to give when muting or use Discord's timeout feature">
               <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'}>Use Discord's timeout feature</option>
               {roles.map(r =>
@@ -315,7 +362,9 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card>
-            <h1 class="font-bold text-gray-100 text-2xl">Disabled Commands</h1>
+            <CardHeader>
+              <Stop width="32" class="fill-current" />Disabled Commands
+            </CardHeader>
             <TextInput name="disabledcmds" value={srvconfig?.disabledcmds == 'false' ? '' : srvconfig?.disabledcmds} placeholder="Specify commands to disable, no spaces">
               Disable certain commands from Cactie separated by commas
             </TextInput>
@@ -325,9 +374,11 @@ export default component$(() => {
         {(() => {
           const auditlogs = JSON.parse(srvconfig?.auditlogs ?? '{ channel: "false", logs: {} }');
           return <div class="py-10 flex flex-col gap-4">
-            <div class="flex flex-col sm:flex-row gap-4">
-              <Card squish="md">
-                <h1 class="font-bold text-gray-100 text-2xl">Default Channel</h1>
+            <div class="flex flex-col md:flex-row gap-4">
+              <Card>
+                <CardHeader>
+                  <SendOutline width="32" class="fill-current" /> Default Channel
+                </CardHeader>
                 <SelectInput id="auditlogs-channel" name="auditlogs.channel" label="This is where logs will be sent if there is no specific channel set on them">
                   <option value="false" selected={auditlogs.channel == 'false'}>No channel specified.</option>
                   {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -470,7 +521,7 @@ export default component$(() => {
                             reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
                               const role = roles.find(r => r.id == rr.roleId);
 
-                              return <Card key={rr.roleId} row contextMenu={{ func: openContextMenu, args: [rr] }}>
+                              return <Card key={rr.roleId} row fit contextMenu={{ func: openContextMenu, args: [rr] }}>
                                 <div class="p-1">
                                   {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>

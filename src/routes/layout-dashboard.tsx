@@ -29,12 +29,12 @@ export const getGuildsFn = server$(async function(accessToken, props?: RequestEv
   if ('retry_after' in GuildList) {
     console.log(`${GuildList.message}, retrying after ${GuildList.retry_after * 1000}ms`);
     await sleep(GuildList.retry_after * 1000);
-    return getGuildsFn(props, redirect);
+    return await getGuildsFn(props, redirect);
   }
   if ('retry_after' in BotGuildList) {
     console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after * 1000}ms`);
     await sleep(Math.ceil(BotGuildList.retry_after * 1000));
-    return getGuildsFn(props, redirect);
+    return await getGuildsFn(props, redirect);
   }
   if ('code' in GuildList) throw redirect(302, `/dashboard?error=${GuildList.code}`);
   if ('code' in BotGuildList) throw redirect(302, `/dashboard?error=${BotGuildList.code}`);
