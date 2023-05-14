@@ -1,21 +1,28 @@
-import { component$, Slot, useStore } from '@builder.io/qwik';
-import { useNavigate } from '@builder.io/qwik-city';
-
-import LoadingIcon from '~/components/icons/LoadingIcon';
+import { component$, Slot } from '@builder.io/qwik';
+import { Link } from '@builder.io/qwik-city';
 
 const classes = {
-  primary: 'bg-purple-700 hover:bg-purple-600 focus:bg-purple-600',
-  secondary: 'bg-gray-700 hover:bg-gray-600 focus:bg-gray-600',
-  danger: 'bg-red-700 hover:bg-red-600 focus:bg-red-600',
-  success: 'bg-green-700 hover:bg-green-600 focus:bg-green-600',
-  warning: 'bg-yellow-700 hover:bg-yellow-600 focus:bg-yellow-600',
-  info: 'bg-blue-700 hover:bg-blue-600 focus:bg-blue-600',
+  primary: 'bg-luminescent-600 border-luminescent-500 hover:bg-luminescent-500 focus:bg-luminescent-500',
+  secondary: 'bg-gray-700 border-gray-600 hover:bg-gray-600 focus:bg-gray-600',
+  danger: 'bg-red-700 border-red-600 hover:bg-red-600 focus:bg-red-600',
+  success: 'bg-green-700 border-green-600 hover:bg-green-600 focus:bg-green-600',
+  warning: 'bg-yellow-700 border-yellow-600 hover:bg-yellow-600 focus:bg-yellow-600',
+  info: 'bg-blue-700 border-blue-600 hover:bg-blue-600 focus:bg-blue-600',
 };
 
 export const Button = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
-    <button {...props} class={`transition ease-in-out ${color} text-gray-50 rounded-md ${props.small ? 'text-sm px-2 py-1' : props.big ? 'text-xl px-6 py-3' : 'text-lg px-4 py-2'} ${props.extraClass}`}>
+    <button {...props} class={{
+      'flex items-center gap-3 transition ease-in-out border text-gray-50 rounded-md': true,
+      [color]: true,
+      'text-sm px-2 py-1 rounded-md': props.small,
+      'text-base px-6 py-3 rounded-xl': props.big,
+      'text-base px-8 py-4 rounded-xl': props.massive,
+      'font-bold': props.bold,
+      'text-base px-4 py-2 rounded-lg': !props.small && !props.big && !props.massive,
+      [props.extraClass]: !!props.extraClass,
+    }}>
       <Slot />
     </button>
   );
@@ -23,25 +30,35 @@ export const Button = component$((props: any) => {
 
 export const SPAButton = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
-  const store = useStore({
-    loading: false,
-  });
-  const nav = useNavigate();
   return (
-    <div class="flex flex-cols">
-      <button {...props} onClick$={async () => { store.loading = true; await nav(props.href); store.loading = false; }} class={`transition ease-in-out ${color} text-gray-50 rounded-md ${props.small ? 'text-sm px-2 py-1' : props.big ? 'text-xl px-6 py-3' : 'text-lg px-4 py-2'} ${props.extraClass}`}>
-        <div class="flex items-center">
-          <Slot /> <LoadingIcon extraClass={`${!store.loading && 'hidden'}`}/>
-        </div>
-      </button>
-    </div>
+    <Link {...props} class={{
+      'flex items-center gap-3 transition ease-in-out border text-gray-50 rounded-md': true,
+      [color]: true,
+      'text-sm px-2 py-1 rounded-md': props.small,
+      'text-base px-6 py-3 rounded-xl': props.big,
+      'text-base px-8 py-4 rounded-xl': props.massive,
+      'font-bold': props.bold,
+      'text-base px-4 py-2 rounded-lg': !props.small && !props.big && !props.massive,
+      [props.extraClass]: !!props.extraClass,
+    }}>
+      <Slot />
+    </Link>
   );
 });
 
 export const ExternalButton = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
-    <a {...props} class={`transition ease-in-out ${color} text-gray-50 rounded-md ${props.small ? 'text-sm px-2 py-1' : props.big ? 'text-xl px-6 py-3' : 'text-lg px-4 py-2'} ${props.extraClass}`}>
+    <a {...props} class={{
+      'flex items-center gap-3 transition ease-in-out border text-gray-50': true,
+      [color]: true,
+      'text-sm px-2 py-1 rounded-md': props.small,
+      'text-base px-6 py-3 rounded-xl': props.big,
+      'text-base px-8 py-4 rounded-xl': props.massive,
+      'font-bold': props.bold,
+      'text-base px-4 py-2 rounded-lg': !props.small && !props.big && !props.massive,
+      [props.extraClass]: !!props.extraClass,
+    }}>
       <Slot />
     </a>
   );

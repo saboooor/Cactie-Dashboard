@@ -1,5 +1,5 @@
 import { component$, Slot } from '@builder.io/qwik';
-import type { RequestEventLoader } from '@builder.io/qwik-city';
+import type { RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import type { APIGuild, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
@@ -12,32 +12,47 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const getGuildsFn = server$(async function(accessToken, props?: RequestEventLoader | typeof this, redirect?): Promise<Guild[]> {
-  props = props ?? this;
+export const getUserGuildsFn = server$(async function(accessToken): Promise<Guild[] | Error> {
   const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bearer ${accessToken}`,
     },
-  });
+  }).catch(() => null);
+  if (!clientres) return new Error('User guilds fetch failed');
+  const GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
+  if ('retry_after' in GuildList) {
+    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after * 1000}ms`);
+    await sleep(GuildList.retry_after * 1000);
+    return await getUserGuildsFn(accessToken);
+  }
+  if ('code' in GuildList) return new Error(`User guild list error ${GuildList.code}`);
+  return GuildList;
+});
+
+export const getBotGuildsFn = server$(async function(props): Promise<Guild[] | Error> {
   const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
-  });
-  let GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
+  }).catch(() => null);
+  if (!botres) return new Error('Bot guilds fetch failed');
   const BotGuildList: RESTError | RESTRateLimit | Guild[] = await botres.json();
-  if ('retry_after' in GuildList) {
-    console.log(`${GuildList.message}, retrying after ${GuildList.retry_after * 1000}ms`);
-    await sleep(GuildList.retry_after * 1000);
-    return await getGuildsFn(props, redirect);
-  }
   if ('retry_after' in BotGuildList) {
     console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after * 1000}ms`);
     await sleep(Math.ceil(BotGuildList.retry_after * 1000));
-    return await getGuildsFn(props, redirect);
+    return await getBotGuildsFn(props);
   }
-  if ('code' in GuildList) throw redirect(302, `/dashboard?error=${GuildList.code}`);
-  if ('code' in BotGuildList) throw redirect(302, `/dashboard?error=${BotGuildList.code}`);
+  if ('code' in BotGuildList) return new Error(`Bot guild list error ${BotGuildList.code}`);
+  return BotGuildList;
+});
+
+export const getGuildsFn = server$(async function(accessToken, props?: RequestEventBase): Promise<Guild[] | Error> {
+  let GuildList = await getUserGuildsFn(accessToken);
+  if (GuildList instanceof Error) return GuildList;
+
+  const BotGuildList = await getBotGuildsFn(props ?? this);
+  if (BotGuildList instanceof Error) return BotGuildList;
+
   GuildList = GuildList.filter(guild => (BigInt(guild.permissions!) & PermissionFlagsBits.ManageGuild) === PermissionFlagsBits.ManageGuild);
   GuildList.forEach(guild => guild.mutual = BotGuildList.some(botguild => botguild.id == guild.id));
   return GuildList;
@@ -49,7 +64,7 @@ export const useGetAuth = routeLoader$(async (props) => {
     props.cookie.set('redirecturl', props.url.href, { path: '/' });
     throw props.redirect(302, '/login');
   }
-  const guilds = await getGuildsFn(auth.accessToken, props, props.redirect);
+  const guilds = await getGuildsFn(auth.accessToken, props);
   return { auth, guilds };
 });
 

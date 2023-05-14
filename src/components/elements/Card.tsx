@@ -23,7 +23,7 @@ export const CardHeader = component$(() => {
       <div class="flex items-center gap-3 flex-1">
         <Slot />
       </div>
-      <div class={'opacity-0 transition-all'}>
+      <div class="opacity-0 transition-all">
         <LoadingIcon />
       </div>
     </h1>

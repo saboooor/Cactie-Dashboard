@@ -3,11 +3,11 @@ import { Link, useLocation } from '@builder.io/qwik-city';
 
 import { LogoDiscord, LogoGithub, Menu, SettingsOutline, ReaderOutline, HappyOutline, PersonCircleOutline } from 'qwik-ionicons';
 // @ts-ignore
-import iconAVIF from '~/components/images/Cactie.png?avif&width=96&height=96';
+import iconAVIF from '~/components/images/Cactie.png?avif&w=96&h=96';
 // @ts-ignore
-import iconWEBP from '~/components/images/Cactie.png?webp&width=96&height=96';
+import iconWEBP from '~/components/images/Cactie.png?webp&w=96&h=96';
 // @ts-ignore
-import icon from '~/components/images/Cactie.png?width=96&height=96';
+import icon from '~/components/images/Cactie.png?w=96&h=96';
 
 import Luminescent from './icons/Luminescent';
 import LoadingIcon from './icons/LoadingIcon';
@@ -48,7 +48,7 @@ export default component$(({ auth }: any) => {
         }
         {!auth &&
           <NavButton external icon href="/login" title="Login">
-            <PersonCircleOutline width="24" class="fill-luminescent-700" />
+            <PersonCircleOutline width="24" class="fill-luminescent-300" />
           </NavButton>
         }
         <button id="mobile-menu-button" type="button" title="Menu" onClick$={() => {

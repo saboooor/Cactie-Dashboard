@@ -7,7 +7,7 @@ export default component$(() => {
       <br/><br/>
       <div>
         <h1 class="font-bold text-white text-4xl sm:text-5xl md:text-6xl">
-          <span class="text-green-400" style={{ filter: 'drop-shadow(0 0 2rem rgb(74 222 128));' }}>Privacy</span> Policy / <span class="text-luminescent-900" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Terms</span> of Use.
+          <span class="text-green-400" style={{ filter: 'drop-shadow(0 0 2rem rgb(74 222 128));' }}>Privacy</span> Policy / <span class="text-luminescent-400" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Terms</span> of Use.
         </h1>
         <p class="mt-5 text-2xl text-gray-500">
           As of May 14th, 2023.
@@ -51,7 +51,7 @@ export default component$(() => {
       <br/><br/>
       <div>
         <h1 class="font-bold text-white text-4xl sm:text-5xl md:text-6xl">
-          Licensing <span class="text-luminescent-900" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Information</span>
+          Licensing <span class="text-luminescent-400" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Information</span>
         </h1>
         <br/>
         <a class="mt-5 text-2xl underline text-indigo-500" style={{ filter: 'drop-shadow(0 0 2rem rgb(99 102 241));' }} href="https://github.com/saboooor/Cactie/blob/master/LICENSE">

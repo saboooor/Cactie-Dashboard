@@ -1,15 +1,16 @@
 import { component$ } from '@builder.io/qwik';
-import { Link, type DocumentHead } from '@builder.io/qwik-city';
+import type { DocumentHead } from '@builder.io/qwik-city';
 
 // @ts-ignore
-import iconAVIF from '~/components/images/Cactie.png?avif&width=552&height=552';
+import iconAVIF from '~/components/images/Cactie.png?avif&w=1024&h=1024';
 // @ts-ignore
-import iconWEBP from '~/components/images/Cactie.png?webp&width=552&height=552';
+import iconWEBP from '~/components/images/Cactie.png?webp&w=1024&h=1024';
 // @ts-ignore
-import icon from '~/components/images/Cactie.png?width=552&height=552';
+import icon from '~/components/images/Cactie.png?w=1024&h=1024';
 
-import { HappyOutline, LogoDiscord, PersonOutline, SettingsOutline } from 'qwik-ionicons';
+import { HappyOutline, LogoDiscord, PersonCircleOutline, SettingsOutline } from 'qwik-ionicons';
 import { useGetAuth } from './layout';
+import { ExternalButton, SPAButton } from '~/components/elements/Button';
 
 export default component$(() => {
   const auth = useGetAuth();
@@ -43,32 +44,30 @@ export default component$(() => {
           It's pronounced Cact-E, btw
         </p>
         <div class="flex flex-col sm:flex-row justify-start" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
-          <div class="rounded-md shadow" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
-            <a href="/invite" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-luminescent-900/80 hover:bg-luminescent-900 border border-luminescent-900 px-6 py-3 font-bold text-purple-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
-              <HappyOutline width="24" class="fill-current" />
-              Invite me to your server!
-            </a>
-          </div>
+          <ExternalButton massive bold color="primary" href="/invite" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
+            <HappyOutline width="24" class="fill-current" />
+            Invite me to your server!
+          </ExternalButton>
         </div>
         <div class="mt-3 flex flex-col sm:flex-row gap-2">
           <div class="rounded-md shadow">
-            <a href="/discord" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+            <ExternalButton massive bold href="/discord">
               <LogoDiscord width="24" class="fill-current" />
               Join the Discord!
-            </a>
+            </ExternalButton>
           </div>
           <div class="rounded-md shadow">
             {!auth.value &&
-              <a href="/login" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
-                <PersonOutline width="24" class="fill-current" />
+              <ExternalButton massive bold href="/login">
+                <PersonCircleOutline width="24" class="fill-current" />
                 Login
-              </a>
+              </ExternalButton>
             }
             {auth.value &&
-              <Link href="/dashboard" class="flex transition rounded-2xl shadow-lg backdrop-blur-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 px-6 py-3 font-bold text-gray-100 md:py-4 md:px-8 text-sm md:text-lg whitespace-nowrap gap-4 items-center">
+              <SPAButton massive bold href="/dashboard">
                 <SettingsOutline width="24" class="fill-current" />
                 Dashboard
-              </Link>
+              </SPAButton>
             }
           </div>
         </div>
