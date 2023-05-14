@@ -14,13 +14,13 @@ export const Button = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
     <button {...props} class={{
-      'flex items-center gap-3 transition ease-in-out border text-gray-50 rounded-md': true,
+      'flex items-center gap-3 transition ease-in-out border text-gray-50': true,
       [color]: true,
       'text-sm px-2 py-1 rounded-md': props.small,
-      'text-base px-6 py-3 rounded-xl': props.big,
+      'text-base px-6 py-3 rounded-lg': props.big,
       'text-base px-8 py-4 rounded-xl': props.massive,
       'font-bold': props.bold,
-      'text-base px-4 py-2 rounded-lg': !props.small && !props.big && !props.massive,
+      'text-base px-4 py-2 rounded-md': !props.small && !props.big && !props.massive,
       [props.extraClass]: !!props.extraClass,
     }}>
       <Slot />
@@ -32,13 +32,13 @@ export const SPAButton = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
     <Link {...props} class={{
-      'flex items-center gap-3 transition ease-in-out border text-gray-50 rounded-md': true,
+      'flex items-center gap-3 transition ease-in-out border text-gray-50': true,
       [color]: true,
       'text-sm px-2 py-1 rounded-md': props.small,
       'text-base px-6 py-3 rounded-xl': props.big,
       'text-base px-8 py-4 rounded-xl': props.massive,
       'font-bold': props.bold,
-      'text-base px-4 py-2 rounded-lg': !props.small && !props.big && !props.massive,
+      'text-base px-4 py-2 rounded-md': !props.small && !props.big && !props.massive,
       [props.extraClass]: !!props.extraClass,
     }}>
       <Slot />
@@ -56,7 +56,7 @@ export const ExternalButton = component$((props: any) => {
       'text-base px-6 py-3 rounded-xl': props.big,
       'text-base px-8 py-4 rounded-xl': props.massive,
       'font-bold': props.bold,
-      'text-base px-4 py-2 rounded-lg': !props.small && !props.big && !props.massive,
+      'text-base px-4 py-2 rounded-md': !props.small && !props.big && !props.massive,
       [props.extraClass]: !!props.extraClass,
     }}>
       <Slot />

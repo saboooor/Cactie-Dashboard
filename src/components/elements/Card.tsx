@@ -18,13 +18,18 @@ export default component$(({ extraClass, row, squish, fit, darker, contextMenu }
   );
 });
 
-export const CardHeader = component$(() => {
+export const CardHeader = component$(({ loading, id }: any) => {
   return (
     <h1 class="flex font-bold text-gray-100 text-2xl">
+      <span id={id} class="block h-32 -mt-32" />
       <div class="flex items-center gap-3 flex-1">
         <Slot />
       </div>
-      <div class="opacity-0 transition-all">
+      <div class={{
+        'transition-all': true,
+        'opacity-0': !loading,
+        'opacity-100': loading,
+      }}>
         <LoadingIcon />
       </div>
     </h1>

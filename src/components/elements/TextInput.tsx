@@ -17,7 +17,7 @@ export default component$((props: any) => {
 export const RawTextInput = component$((props: any) => {
   return (
     <input {...props} class={{
-      'transition ease-in-out text-lg bg-gray-700 text-gray-50 hover:bg-gray-600 focus:bg-gray-600 rounded-md px-3 py-2': true,
+      'transition ease-in-out text-lg border border-gray-600 bg-gray-700 text-gray-50 hover:bg-gray-600 focus:bg-gray-600 rounded-md px-3 py-2': true,
       [props.extraClass]: !!props.extraClass,
     }}/>
   );
@@ -26,7 +26,7 @@ export const RawTextInput = component$((props: any) => {
 export const RawTextAreaInput = component$((props: any) => {
   return (
     <textarea {...props} class={{
-      'transition ease-in-out text-lg bg-gray-700 text-gray-50 hover:bg-gray-600 focus:bg-gray-600 rounded-md px-3 py-2 resize-y w-full h-32': true,
+      'transition ease-in-out text-lg border border-gray-600 bg-gray-700 text-gray-50 hover:bg-gray-600 focus:bg-gray-600 rounded-md px-3 py-2 resize-y w-full h-32': true,
       [props.extraClass]: !!props.extraClass,
     }}/>
   );
