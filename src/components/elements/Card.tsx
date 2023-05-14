@@ -2,7 +2,7 @@
 import { Slot, component$ } from '@builder.io/qwik';
 import LoadingIcon from '../icons/LoadingIcon';
 
-export default component$(({ row, squish, fit, darker, contextMenu }: any) => {
+export default component$(({ extraClass, row, squish, fit, darker, contextMenu }: any) => {
   return (
     <div class={{
       'flex gap-3 border border-gray-700 rounded-xl p-6': true,
@@ -11,6 +11,7 @@ export default component$(({ row, squish, fit, darker, contextMenu }: any) => {
       'flex-col': !row,
       'flex-1': !squish,
       'min-w-fit': fit,
+      ...extraClass,
     }} onContextMenu$={(event) => contextMenu ? contextMenu.func(event, ...contextMenu.args) : ''} preventdefault:contextmenu={contextMenu}>
       <Slot />
     </div>

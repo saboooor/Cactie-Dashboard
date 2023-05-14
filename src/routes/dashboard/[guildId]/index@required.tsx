@@ -1,5 +1,5 @@
 import { component$, $, useStore, useVisibleTask$ } from '@builder.io/qwik';
-import type { RequestEventLoader, DocumentHead } from '@builder.io/qwik-city';
+import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import type { APIChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
@@ -20,7 +20,58 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const getGuildDataFn = server$(async function(props?: RequestEventLoader | typeof this, redirect?): Promise<{
+export const getGuildFn = server$(async function(props: RequestEventBase): Promise<Guild | Error> {
+  const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}`, {
+    headers: {
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+    },
+  }).catch(() => null);
+  if (!res) return new Error('Guild fetch failed');
+  const guild: RESTError | RESTRateLimit | Guild = await res.json();
+  if ('retry_after' in guild) {
+    console.log(`${guild.message}, retrying after ${guild.retry_after * 1000}ms`);
+    await sleep(guild.retry_after * 1000);
+    return await getGuildFn(props);
+  }
+  if ('code' in guild) return new Error(`Guild error ${guild.code}`);
+  return guild;
+});
+
+export const getGuildChannelsFn = server$(async function(props: RequestEventBase): Promise<APIChannel[] | Error> {
+  const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/channels`, {
+    headers: {
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+    },
+  }).catch(() => null);
+  if (!res) return new Error('Guild Channel fetch failed');
+  const channels: RESTError | RESTRateLimit | APIChannel[] = await res.json();
+  if ('retry_after' in channels) {
+    console.log(`${channels.message}, retrying after ${channels.retry_after * 1000}ms`);
+    await sleep(channels.retry_after * 1000);
+    return await getGuildChannelsFn(props);
+  }
+  if ('code' in channels) return new Error(`Guild Channels error ${channels.code}`);
+  return channels;
+});
+
+export const getGuildRolesFn = server$(async function(props: RequestEventBase): Promise<APIRole[] | Error> {
+  const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/roles`, {
+    headers: {
+      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+    },
+  }).catch(() => null);
+  if (!res) return new Error('Guild Channel fetch failed');
+  const channels: RESTError | RESTRateLimit | APIRole[] = await res.json();
+  if ('retry_after' in channels) {
+    console.log(`${channels.message}, retrying after ${channels.retry_after * 1000}ms`);
+    await sleep(channels.retry_after * 1000);
+    return await getGuildRolesFn(props);
+  }
+  if ('code' in channels) return new Error(`Guild Channels error ${channels.code}`);
+  return channels;
+});
+
+export const getGuildDataFn = server$(async function(props?: RequestEventBase): Promise<{
   guild: Guild;
   channels: APIChannel[];
   roles: APIRole[];
@@ -29,46 +80,17 @@ export const getGuildDataFn = server$(async function(props?: RequestEventLoader 
     raw: reactionroles[];
     channels: any[];
   };
-}> {
+} | Error> {
   props = props ?? this;
-  const guildres = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/preview`, {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  });
-  const guild: RESTError | RESTRateLimit | Guild = await guildres.json();
-  if ('retry_after' in guild) {
-    console.log(`${guild.message}, retrying after ${guild.retry_after * 1000}ms`);
-    await sleep(guild.retry_after);
-    return await getGuildDataFn(props, redirect);
-  }
-  if ('code' in guild) throw redirect(302, `/dashboard?error=${guild.code}&message=${guild.message}`);
 
-  const channelsres = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/channels`, {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  });
-  const channels: RESTError | RESTRateLimit | APIChannel[] = await channelsres.json();
-  if ('retry_after' in channels) {
-    console.log(`${channels.message}, retrying after ${channels.retry_after * 1000}ms`);
-    await sleep(channels.retry_after);
-    return await getGuildDataFn(props, redirect);
-  }
-  if ('code' in channels) throw redirect(302, `/dashboard?error=${channels.code}&message=${channels.message}`);
+  const guild = await getGuildFn(props);
+  if (guild instanceof Error) return guild;
 
-  const rolesres = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/roles`, {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  });
-  const roles: RESTError | RESTRateLimit | APIRole[] = await rolesres.json();
-  if ('retry_after' in roles) {
-    console.log(`${roles.message}, retrying after ${roles.retry_after * 1000}ms`);
-    await sleep(roles.retry_after);
-    return await getGuildDataFn(props, redirect);
-  }
-  if ('code' in roles) throw redirect(302, `/dashboard?error=${roles.code}&message=${roles.message}`);
+  const channels = await getGuildChannelsFn(props);
+  if (channels instanceof Error) return channels;
+
+  const roles = await getGuildRolesFn(props);
+  if (roles instanceof Error) return roles;
 
   const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
   const srvconfig = await prisma.settings.findUnique({
@@ -101,15 +123,26 @@ export const getGuildDataFn = server$(async function(props?: RequestEventLoader 
   return { guild, channels, roles, srvconfig, reactionroles };
 });
 
-export const useGetGuildData = routeLoader$(async (props) => await getGuildDataFn(props, props.redirect));
+export const useGetGuildData = routeLoader$(async (props) => await getGuildDataFn(props));
 
 export default component$(() => {
   const guildData = useGetGuildData().value;
+
   const store = useStore({
     dev: undefined as boolean | undefined,
     modal: false,
     guildData,
   });
+
+  if (store.guildData instanceof Error) {
+    return (
+      <div class="flex flex-col items-center justify-center h-full">
+        <h1 class="text-4xl font-bold">Error</h1>
+        <p class="text-xl">{(guildData as Error).message}</p>
+      </div>
+    );
+  }
+
   const { guild, channels, roles, srvconfig, reactionroles } = store.guildData;
 
   useVisibleTask$(() => {
