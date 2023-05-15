@@ -8,12 +8,10 @@ import iconWEBP from '~/components/images/Cactie.png?webp&w=1024&h=1024';
 // @ts-ignore
 import icon from '~/components/images/Cactie.png?w=1024&h=1024';
 
-import { HappyOutline, LogoDiscord, PersonCircleOutline, SettingsOutline } from 'qwik-ionicons';
-import { useGetAuth } from './layout';
-import { ExternalButton, SPAButton } from '~/components/elements/Button';
+import { HappyOutline, LogoDiscord, SettingsOutline } from 'qwik-ionicons';
+import { ExternalButton } from '~/components/elements/Button';
 
 export default component$(() => {
-  const auth = useGetAuth();
   return (
     <section class="flex mx-auto max-w-6xl px-6 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div>
@@ -30,7 +28,9 @@ export default component$(() => {
               alt="Cactie"
               loading="eager"
               decoding="async"
-              style={{ maxWidth: '40%' }}
+              style={{ maxWidth: '40vh' }}
+              width={480}
+              height={480}
             />
           </picture>
         </div>
@@ -57,18 +57,10 @@ export default component$(() => {
             </ExternalButton>
           </div>
           <div class="rounded-md shadow">
-            {!auth.value &&
-              <ExternalButton massive bold href="/login">
-                <PersonCircleOutline width="24" class="fill-current" />
-                Login
-              </ExternalButton>
-            }
-            {auth.value &&
-              <SPAButton massive bold href="/dashboard">
-                <SettingsOutline width="24" class="fill-current" />
-                Dashboard
-              </SPAButton>
-            }
+            <ExternalButton massive bold href="/dashboard">
+              <SettingsOutline width="24" class="fill-current" />
+              Dashboard
+            </ExternalButton>
           </div>
         </div>
       </div>
@@ -85,6 +77,8 @@ export default component$(() => {
             alt="Cactie"
             loading="eager"
             decoding="async"
+            width={700}
+            height={700}
           />
         </picture>
       </div>

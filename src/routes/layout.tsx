@@ -1,15 +1,14 @@
-import { component$, Slot } from '@builder.io/qwik';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import { component$, Slot, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import getAuth from '~/components/functions/auth';
 import Nav from '~/components/Nav';
 
-export const useGetAuth = routeLoader$(async ({ cookie, env }) => await getAuth(cookie, env));
-
 export default component$(() => {
-  const auth = useGetAuth();
+  const store = useStore({ auth: null as any });
+  useVisibleTask$(async () => { store.auth = await getAuth(); });
+
   return (
     <>
-      <Nav auth={auth.value} />
+      <Nav auth={store.auth} />
       <main class="mt-16">
         <Slot />
       </main>

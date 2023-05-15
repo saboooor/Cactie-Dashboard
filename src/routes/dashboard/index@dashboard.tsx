@@ -1,7 +1,7 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import { Link, useLocation } from '@builder.io/qwik-city';
-import { HappyOutline, SettingsOutline } from 'qwik-ionicons';
+import { HappyOutline } from 'qwik-ionicons';
 import { useGetAuth, getGuildsFn } from '../layout-dashboard';
 import Switcher from '~/components/elements/Switcher';
 
@@ -38,16 +38,13 @@ export default component$(() => {
             return (
               <Link key={guild.id} href={`/dashboard/${guild.id}`} class="flex flex-col items-center relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48 py-10 pic-link">
                 <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class={{
+                  'fixed -z-10 opacity-60 transition-all group-hover:opacity-100 rounded-full blur-3xl pt-10': true,
+                }} width={128} height={128}/>
+                <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class={{
                   'rounded-full pic': true,
                   'pic-prev': !loc.isNavigating && loc.prevUrl?.pathname.includes(guild.id),
-                }}/>
-                <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
-                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm transition duration-200">
-                  <div class={'flex flex-col justify-center transition hover:bg-luminescent-600/20 text-gray-100 rounded-xl font-bold items-center gap-4'}>
-                    <SettingsOutline width="24" class="fill-current" />
-                    Settings
-                  </div>
-                </div>
+                }} width={128} height={128}/>
+                <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all text-gray-50">{guild.name}</p>
               </Link>
             );
           })
@@ -67,14 +64,12 @@ export default component$(() => {
           store.GuildList.filter(guild => !guild.mutual).map(guild => {
             return (
               <a href={`/invite?guild=${guild.id}`} key={guild.id} class="z-10 flex flex-col items-center relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48 py-10">
-                <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="rounded-full grayscale group-hover:grayscale-0 group-hover:saturate-150 transition duration-500"/>
-                <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
-                <div class="grid absolute top-0 w-full h-full bg-gray-900/50 opacity-0 sm:group-hover:opacity-100 sm:group-hover:backdrop-blur-sm transition duration-200">
-                  <div class="flex flex-col justify-center transition hover:bg-luminescent-600/20 text-gray-100 rounded-xl font-bold items-center gap-4">
-                    <HappyOutline width="24" class="fill-current" />
-                    Invite
-                  </div>
+                <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class="grayscale rounded-full" width={128} height={128}/>
+                <div class="fixed w-32 h-32 flex flex-col justify-center transition opacity-0 group-hover:opacity-100 bg-gray-900/80 text-gray-100 rounded-full font-bold items-center gap-4">
+                  <HappyOutline width="24" class="fill-current" />
+                  Invite
                 </div>
+                <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all">{guild.name}</p>
               </a>
             );
           })
