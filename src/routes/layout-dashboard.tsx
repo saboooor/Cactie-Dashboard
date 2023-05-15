@@ -12,14 +12,14 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-export const getUserGuildsFn = server$(async function(accessToken: string): Promise<Guild[] | Error> {
-  const res = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+export const getUserGuildsFn = server$(async function(accessToken): Promise<Guild[] | Error> {
+  const clientres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bearer ${accessToken}`,
     },
-  }).catch(() => new Error('USer guilds fetch failed'));
-  if (res instanceof Error) return res;
-  const GuildList: RESTError | RESTRateLimit | Guild[] = await res.json();
+  }).catch(() => null);
+  if (!clientres) return new Error('User guilds fetch failed');
+  const GuildList: RESTError | RESTRateLimit | Guild[] = await clientres.json();
   if ('retry_after' in GuildList) {
     console.log(`${GuildList.message}, retrying after ${GuildList.retry_after * 1000}ms`);
     await sleep(GuildList.retry_after * 1000);
@@ -29,15 +29,14 @@ export const getUserGuildsFn = server$(async function(accessToken: string): Prom
   return GuildList;
 });
 
-export const getBotGuildsFn = server$(async function(props?: RequestEventBase): Promise<Guild[] | Error> {
-  props = props ?? this;
-  const res = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+export const getBotGuildsFn = server$(async function(props): Promise<Guild[] | Error> {
+  const botres = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers: {
       authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
     },
-  }).catch(() => new Error('Bot guilds fetch failed'));
-  if (res instanceof Error) return res;
-  const BotGuildList: RESTError | RESTRateLimit | Guild[] = await res.json();
+  }).catch(() => null);
+  if (!botres) return new Error('Bot guilds fetch failed');
+  const BotGuildList: RESTError | RESTRateLimit | Guild[] = await botres.json();
   if ('retry_after' in BotGuildList) {
     console.log(`${BotGuildList.message}, retrying after ${BotGuildList.retry_after * 1000}ms`);
     await sleep(Math.ceil(BotGuildList.retry_after * 1000));
@@ -60,7 +59,7 @@ export const getGuildsFn = server$(async function(accessToken, props?: RequestEv
 });
 
 export const useGetAuth = routeLoader$(async (props) => {
-  const auth = await getAuth(props);
+  const auth = await getAuth(props.cookie, props.env);
   if (!auth) {
     props.cookie.set('redirecturl', props.url.href, { path: '/' });
     throw props.redirect(302, '/login');

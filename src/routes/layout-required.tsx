@@ -3,11 +3,11 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import getAuth from '~/components/functions/auth';
 import Nav from '~/components/Nav';
 
-export const useGetAuth = routeLoader$(async (props) => {
-  const auth = await getAuth(props);
+export const useGetAuth = routeLoader$(async ({ cookie, env, redirect }) => {
+  const auth = await getAuth(cookie, env);
   if (!auth) {
-    props.cookie.set('redirecturl', '/', { path: '/' });
-    throw props.redirect(302, '/login');
+    cookie.set('redirecturl', '/', { path: '/' });
+    throw redirect(302, '/login');
   }
   return auth;
 });

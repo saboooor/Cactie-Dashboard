@@ -2,14 +2,14 @@ import type { RequestHandler } from '@builder.io/qwik-city';
 import { PrismaClient } from '@prisma/client/edge';
 import getAuth from '~/components/functions/auth';
 
-export const onGet: RequestHandler = async (props) => {
-  const auth = await getAuth(props);
+export const onGet: RequestHandler = async ({ redirect, cookie, env }) => {
+  const auth = await getAuth(cookie, env);
 
   if (auth) {
-    const prisma = new PrismaClient({ datasources: { db: { url: props.env.get('DATABASE_URL') } } });
+    const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } });
     await prisma.sessions.delete({ where: { sessionId: auth.sessionId } });
-    props.cookie.delete('sessionid', { path: '/' });
+    cookie.delete('sessionid', { path: '/' });
   }
 
-  throw props.redirect(302, '/');
+  throw redirect(302, '/');
 };
