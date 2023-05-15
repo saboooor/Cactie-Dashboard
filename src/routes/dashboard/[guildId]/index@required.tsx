@@ -438,11 +438,14 @@ export default component$(() => {
             <SelectInput id="supportrole-input" label="The role that may access tickets" onChange$={async (event: any) => {
               store.loading.push('supportrole');
               await updateSettingFn('supportrole', event.target.value);
+              event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'supportrole');
+            }} style={{
+              color: '#' + (roles.find(r => r.id == srvconfig?.supportrole)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
             }}>
-              <option value="false" selected={srvconfig?.supportrole == 'false'}>Only Administrators</option>
+              <option value="false" selected={srvconfig?.supportrole == 'false'} style={{ color: '#ffffff' }}>Only Administrators</option>
               {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.supportrole == r.id}>{`@ ${r.name}`}</option>,
+                <option value={r.id} key={r.id} selected={srvconfig?.supportrole == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
           </Card>
@@ -453,13 +456,16 @@ export default component$(() => {
             <SelectInput id="ticketmention-input" label="Pings the specified role when a ticket is created" onChange$={async (event: any) => {
               store.loading.push('ticketmention');
               await updateSettingFn('ticketmention', event.target.value);
+              event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'ticketmention');
+            }} style={{
+              color: '#' + (roles.find(r => r.id == srvconfig?.supportrole)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
             }}>
-              <option value="false" selected={srvconfig?.ticketmention == 'false'}>No mention</option>
-              <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'}>@ everyone</option>
-              <option value="here" selected={srvconfig?.ticketmention == 'here'}>@ here</option>
+              <option value="false" selected={srvconfig?.ticketmention == 'false'} style={{ color: '#ffffff' }}>No mention</option>
+              <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'} style={{ color: 'rgb(59 130 246)' }}>@ everyone</option>
+              <option value="here" selected={srvconfig?.ticketmention == 'here'} style={{ color: 'rgb(59 130 246)' }}>@ here</option>
               {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.ticketmention == r.id}>{`@ ${r.name}`}</option>,
+                <option value={r.id} key={r.id} selected={srvconfig?.ticketmention == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
           </Card>
@@ -497,11 +503,14 @@ export default component$(() => {
             <SelectInput id="ticketcategory-input" label="Select a role to give when muting or use Discord's timeout feature" onChange$={async (event: any) => {
               store.loading.push('ticketcategory');
               await updateSettingFn('ticketcategory', event.target.value);
+              event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'ticketcategory');
+            }} style={{
+              color: '#' + (roles.find(r => r.id == srvconfig?.supportrole)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
             }}>
-              <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'}>Use Discord's timeout feature</option>
+              <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'} style={{ color: '#ffffff' }}>Use Discord's timeout feature</option>
               {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.mutecmd == r.id}>{`@ ${r.name}`}</option>,
+                <option value={r.id} key={r.id} selected={srvconfig?.mutecmd == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
           </Card>
@@ -699,7 +708,7 @@ export default component$(() => {
       <div class="hidden flex-col gap-2 py-3 px-2 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-gray-800 drop-shadow-lg absolute top-0" id="contextmenu" preventdefault:contextmenu>
         <RawSelectInput id="rrrole" transparent extraClass="text-sm hover:bg-gray-800">
           {roles.map(r =>
-            <option value={r.id} key={r.id}>{`@ ${r.name}`}</option>,
+            <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
           )}
         </RawSelectInput>
         <RawSelectInput id="rrswitch" transparent extraClass="text-sm hover:bg-gray-800">
@@ -731,7 +740,7 @@ export default component$(() => {
                   <div class="flex-1">
                     <SelectInput id="rrcreaterole" label="The role to be given">
                       {roles.map(r =>
-                        <option value={r.id} key={r.id}>{`@ ${r.name}`}</option>,
+                        <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
                       )}
                     </SelectInput>
                   </div>
