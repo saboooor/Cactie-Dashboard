@@ -30,7 +30,9 @@ export default component$(() => {
               alt="Cactie"
               loading="eager"
               decoding="async"
-              style={{ maxWidth: '40%' }}
+              style={{ maxWidth: '40vh' }}
+              width={480}
+              height={480}
             />
           </picture>
         </div>
@@ -85,6 +87,8 @@ export default component$(() => {
             alt="Cactie"
             loading="eager"
             decoding="async"
+            width={700}
+            height={700}
           />
         </picture>
       </div>

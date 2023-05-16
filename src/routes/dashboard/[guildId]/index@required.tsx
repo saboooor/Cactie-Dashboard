@@ -11,7 +11,7 @@ import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
-import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Stop } from 'qwik-ionicons';
+import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -228,7 +228,7 @@ export default component$(() => {
             <NotificationsOffOutline width="24" class="fill-current" /> Mute Command
           </MenuItem>
           <MenuItem href="#disabledcmds">
-            <Stop width="24" class="fill-current" /> Disabled Commands
+            <Ban width="24" class="fill-current" /> Disabled Commands
           </MenuItem>
         </MenuCategory>
         <MenuItem href="#auditlogs">
@@ -516,7 +516,7 @@ export default component$(() => {
           </Card>
           <Card>
             <CardHeader id="disabledcmds" loading={store.loading.includes('disabledcmds')}>
-              <Stop width="32" class="fill-current" />Disabled Commands
+              <Ban width="32" class="fill-current" />Disabled Commands
             </CardHeader>
             <TextInput id="disabledcmds-input" value={srvconfig?.disabledcmds == 'false' ? '' : srvconfig?.disabledcmds} placeholder="Specify commands to disable, no spaces" onChange$={async (event: any) => {
               store.loading.push('disabledcmds');
@@ -644,7 +644,7 @@ export default component$(() => {
               })
             }
           </div>
-        </div>;
+        </div>
         <div class="flex">
           <span id="reactionroles" class="block h-32 -mt-32" />
           <MenuTitle extraClass="flex-1">REACTION ROLES</MenuTitle>
@@ -683,7 +683,7 @@ export default component$(() => {
 
                               return <Card key={rr.roleId} row fit contextMenu={{ func: openContextMenu, args: [rr] }}>
                                 <div class="p-1">
-                                  {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12"/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
+                                  {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12 h-auto" width={48} height={48}/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>
                                 <div>
                                   <h1 class="font-bold text-gray-100 text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
@@ -706,7 +706,7 @@ export default component$(() => {
         </div>
       </div>
       <div class="hidden flex-col gap-2 py-3 px-2 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-gray-800 drop-shadow-lg absolute top-0" id="contextmenu" preventdefault:contextmenu>
-        <RawSelectInput id="rrrole" extraClass="text-sm bg-transparent hover:bg-gray-800">
+        <RawSelectInput id="rrrole" transparent extraClass="text-sm hover:bg-gray-800">
           {roles.map(r =>
             <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
           )}
