@@ -459,7 +459,7 @@ export default component$(() => {
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'ticketmention');
             }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.supportrole)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
+              color: '#' + (roles.find(r => r.id == srvconfig?.ticketmention)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
             }}>
               <option value="false" selected={srvconfig?.ticketmention == 'false'} style={{ color: '#ffffff' }}>No mention</option>
               <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'} style={{ color: 'rgb(59 130 246)' }}>@ everyone</option>
@@ -506,7 +506,7 @@ export default component$(() => {
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'ticketcategory');
             }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.supportrole)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
+              color: '#' + (roles.find(r => r.id == srvconfig?.mutecmd)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
             }}>
               <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'} style={{ color: '#ffffff' }}>Use Discord's timeout feature</option>
               {roles.map(r =>
@@ -711,7 +711,7 @@ export default component$(() => {
             <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
           )}
         </RawSelectInput>
-        <RawSelectInput id="rrswitch" extraClass="text-sm bg-transparent hover:bg-gray-800">
+        <RawSelectInput id="rrswitch" transparent extraClass="text-sm hover:bg-gray-800">
           <option value="switch">Add by reacting / Remove by unreacting</option>
           <option value="toggle">Add / Remove by reacting</option>
         </RawSelectInput>
