@@ -1,4 +1,4 @@
-import { component$, $, useStore, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import type { APIGuildChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
@@ -12,7 +12,7 @@ import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
 import EmojiInput from '~/components/elements/EmojiInput';
-import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban } from 'qwik-ionicons';
+import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban, EllipsisVertical, TrashOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -21,6 +21,23 @@ interface Guild extends APIGuild {
   id: string;
   mutual: boolean;
 }
+
+interface guildData {
+  guild: Guild;
+  channels: AnyGuildChannel[];
+  roles: APIRole[];
+  srvconfig: settings & {
+    joinmessage: any,
+    leavemessage: any,
+    auditlogs: any,
+  } | null;
+  reactionroles: {
+    raw: reactionroles[];
+    channels: any[];
+  };
+}
+
+type AnyGuildChannel = APIGuildChannel<ChannelType>;
 
 export const getGuildFn = server$(async function(props: RequestEventBase): Promise<Guild | Error> {
   const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}`, {
@@ -39,7 +56,6 @@ export const getGuildFn = server$(async function(props: RequestEventBase): Promi
   return guild;
 });
 
-type AnyGuildChannel = APIGuildChannel<ChannelType>;
 export const getGuildChannelsFn = server$(async function(props: RequestEventBase): Promise<AnyGuildChannel[] | Error> {
   const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/channels`, {
     headers: {
@@ -77,34 +93,11 @@ export const getGuildRolesFn = server$(async function(props: RequestEventBase): 
   return roles;
 });
 
-declare interface guildData {
-  guild: Guild;
-  channels: AnyGuildChannel[];
-  roles: APIRole[];
-  srvconfig: settings & {
-    joinmessage: any,
-    leavemessage: any,
-    auditlogs: any,
-  } | null;
-  reactionroles: {
-    raw: reactionroles[];
-    channels: any[];
-  };
-}
-
-export const getGuildDataFn = server$(async function(props?: RequestEventBase): Promise<guildData | Error> {
+export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], props?: RequestEventBase) {
   props = props ?? this;
 
-  const guild = await getGuildFn(props);
-  if (guild instanceof Error) return guild;
-
-  const channels = await getGuildChannelsFn(props);
-  if (channels instanceof Error) return channels;
-
-  const roles = await getGuildRolesFn(props);
-  if (roles instanceof Error) return roles;
-
   const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
   const srvconfigUnparsed = await prisma.settings.findUnique({
     where: {
       guildId: props.params.guildId,
@@ -138,6 +131,26 @@ export const getGuildDataFn = server$(async function(props?: RequestEventBase): 
     }
     reactionroles.channels.push(channelInfo);
   }
+
+  return { srvconfig, reactionroles };
+});
+
+export const getGuildDataFn = server$(async function(props?: RequestEventBase): Promise<guildData | Error> {
+  props = props ?? this;
+
+  const guild = await getGuildFn(props);
+  if (guild instanceof Error) return guild;
+
+  const channels = await getGuildChannelsFn(props);
+  if (channels instanceof Error) return channels;
+
+  const roles = await getGuildRolesFn(props);
+  if (roles instanceof Error) return roles;
+
+  const { srvconfig, reactionroles } = await getSQLDataFn(channels, props);
+  if (srvconfig instanceof Error) return srvconfig;
+  if (reactionroles instanceof Error) return reactionroles;
+
   return { guild, channels, roles, srvconfig, reactionroles };
 });
 
@@ -145,8 +158,77 @@ export const useGetGuildData = routeLoader$(async (props) => await getGuildDataF
 
 export const updateSettingFn = server$(async function(name: string, value: string | number | boolean | null | undefined) {
   const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-  const res = await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
-  return res;
+  await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
+});
+
+export const updateReactionRoleFn = server$(async function(props: reactionroles) {
+  let emojiId = props.emojiId.match(/(\d*)/)![0];
+  if (emojiId != '') {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
+      headers: {
+        authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+      },
+    }).catch(() => null);
+    if (!res) return new Error('Fetching custom emoji failed');
+    const emoji = await res.json();
+    emojiId = `${emoji.name}:${emoji.id}`;
+  }
+  else {
+    emojiId = props.emojiId;
+  }
+
+  const res = await fetch(`https://discord.com/api/v10/channels/${props.channelId}/messages/${props.messageId}/reactions/${emojiId}/@me`, {
+    method: 'PUT',
+    headers: {
+      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+    },
+  }).catch(() => null);
+  if (!res) return new Error('reaction failed');
+
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  await prisma.reactionroles.upsert({
+    where: { messageId_emojiId: {
+      messageId: props.messageId,
+      emojiId: props.emojiId,
+    } },
+    update: props,
+    create: props,
+  });
+});
+
+export const deleteReactionRoleFn = server$(async function(props: any) {
+  let emojiId = props.emojiId.match(/(\d*)/)![0];
+  if (emojiId != '') {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
+      headers: {
+        authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+      },
+    }).catch(() => null);
+    if (!res) return new Error('Fetching custom emoji failed');
+    const emoji = await res.json();
+    emojiId = `${emoji.name}:${emoji.id}`;
+  }
+  else {
+    emojiId = props.emojiId;
+  }
+
+  const res = await fetch(`https://discord.com/api/v10/channels/${props.channelId}/messages/${props.messageId}/reactions/${emojiId}/@me`, {
+    method: 'DELETE',
+    headers: {
+      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+    },
+  }).catch(() => null);
+  if (!res) return new Error('delete reaction failed');
+
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  await prisma.reactionroles.delete({
+    where: { messageId_emojiId: {
+      messageId: props.messageId,
+      emojiId: props.emojiId,
+    } },
+  });
 });
 
 export default component$(() => {
@@ -154,7 +236,7 @@ export default component$(() => {
 
   const store = useStore({
     dev: undefined as boolean | undefined,
-    modal: false,
+    modal: undefined as 'create' | 'edit' | undefined,
     guildData,
     loading: [] as string[],
   });
@@ -712,7 +794,7 @@ export default component$(() => {
             }}>
               <LoadingIcon />
             </div>
-            <Button color="primary" onClick$={() => store.modal = !store.modal}>
+            <Button color="primary" onClick$={() => store.modal = 'create'}>
               Create Reaction Role
             </Button>
           </div>
@@ -725,7 +807,11 @@ export default component$(() => {
                   <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                     # {channel?.name ?? 'Channel Not Found.'}
                   </h1>
-                  <Button color="primary" small onClick$={() => store.modal = !store.modal}>
+                  <Button color="primary" small onClick$={() => {
+                    const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                    channelselect.value = channel.id;
+                    store.modal = 'create';
+                  }}>
                     Create Here
                   </Button>
                 </div>
@@ -737,7 +823,13 @@ export default component$(() => {
                           <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                             Message # {messageId}
                           </h1>
-                          <Button color="primary" small onClick$={() => store.modal = !store.modal}>
+                          <Button color="primary" small onClick$={() => {
+                            const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                            channelselect.value = channel.id;
+                            const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
+                            messageinput.value = messageId;
+                            store.modal = 'create';
+                          }}>
                             Create Here
                           </Button>
                         </div>
@@ -746,17 +838,45 @@ export default component$(() => {
                             reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
                               const role = roles.find(r => r.id == rr.roleId);
 
-                              return <Card key={rr.roleId} row fit contextMenu={{ func: openContextMenu, args: [rr] }}>
+                              return <Card key={rr.roleId} row fit>
                                 <div class="p-1">
                                   {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12 h-auto" width={48} height={48}/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>
-                                <div>
-                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'} <br class="hidden group-hover:inline-flex sm:group-hover:hidden"/><span class="font-normal hidden group-hover:inline-flex text-gray-400">Right click to edit</span></h1>
+                                <div class="flex-1">
+                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'}</h1>
                                   <p class="hidden sm:flex">
                                     {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
                                     {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
                                   </p>
                                 </div>
+                                <EllipsisVertical width="24" class="fill-gray-400 cursor-pointer hidden sm:flex" onClick$={() => {
+                                  const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                                  const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
+                                  const roleinput = document.getElementById('rrcreaterole') as HTMLSelectElement;
+                                  const emojiinput = document.getElementById('rrcreateemoji') as HTMLButtonElement;
+                                  const typeinput = document.getElementById('rrcreateswitch') as HTMLSelectElement;
+                                  const silentinput = document.getElementById('rrcreatesilent') as HTMLInputElement;
+                                  channelselect.value = channel.id;
+                                  messageinput.value = messageId;
+                                  roleinput.value = role!.id;
+                                  emojiinput.innerText = rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId;
+                                  typeinput.value = rr.type;
+                                  silentinput.checked = rr.silent == 'true';
+                                  store.modal = 'edit';
+                                }} />
+                                <TrashOutline width="24" class="fill-red-400 text-red-400 cursor-pointer hidden sm:flex" onClick$={async () => {
+                                  await deleteReactionRoleFn({
+                                    emojiId: rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId,
+                                    messageId,
+                                  });
+                                  store.guildData = {
+                                    ...store.guildData,
+                                    reactionroles: {
+                                      ...(store.guildData as guildData).reactionroles,
+                                      raw: (store.guildData as guildData).reactionroles.raw.filter(r => r.emojiId != rr.emojiId || r.messageId != messageId),
+                                    },
+                                  };
+                                }} />
                               </Card>;
                             })
                           }
@@ -770,61 +890,45 @@ export default component$(() => {
           }
         </div>
       </div>
-      <div class="hidden flex-col gap-2 py-3 px-2 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-gray-800 drop-shadow-lg absolute top-0" id="contextmenu" preventdefault:contextmenu>
-        <RawSelectInput id="rrrole" transparent extraClass="text-sm hover:bg-gray-800">
-          {roles.map(r =>
-            <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
-          )}
-        </RawSelectInput>
-        <RawSelectInput id="rrswitch" transparent extraClass="text-sm hover:bg-gray-800">
-          <option value="switch">Add by reacting / Remove by unreacting</option>
-          <option value="toggle">Add / Remove by reacting</option>
-        </RawSelectInput>
-        <a class="flex items-center py-2 px-3 pr-1">
-          <span class="flex-1">
-            Silent
-          </span>
-          <Toggle nolabel id="rrsilent" />
-        </a>
-        <a id="rrdelete" class="flex items-center py-2 px-3 rounded-md transition text-red-400 hover:bg-gray-800 cursor-pointer" onClick$={closeContextMenu}>
-          Delete
-        </a>
-      </div>
       <div class={`relative z-10 ${store.modal ? '' : 'pointer-events-none'}`}>
         <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
           <div class="flex min-h-full max-h-full items-start justify-center p-4 pt-24 text-center sm:items-center">
             <div class="rounded-lg bg-gray-900/50 backdrop-blur-lg text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
               <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
-                Create Reaction Role
+                {store.modal == 'edit' ? 'Edit' : 'Create'} Reaction Role
               </h1>
               <div class="flex flex-col my-4 gap-4">
-                <EmojiInput id="rrcreateemoji"
-                  onEmojiSelect$={(emoji: any) => {
-                    emoji = emoji.native ?? emoji.id;
-                    const button = document.getElementById('rrcreateemoji')!;
-                    button.innerText = emoji;
-                  }}
-                  emojiPickerProps={{
-                    custom: [
-                      {
-                        id: 'custom',
-                        name: guild.name,
-                        emojis: guild.emojis.map(e => ({
-                          id: e.id,
-                          name: e.name,
-                          skins: [{ src: `https://cdn.discordapp.com/emojis/${e.id}` }],
-                        })),
+                <div class={{
+                  'hidden': store.modal == 'edit',
+                }}>
+                  <EmojiInput id="rrcreateemoji"
+                    onEmojiSelect$={(emoji: any) => {
+                      emoji = emoji.native ?? emoji.id;
+                      const button = document.getElementById('rrcreateemoji')!;
+                      button.innerText = emoji;
+                    }}
+                    emojiPickerProps={{
+                      custom: [
+                        {
+                          id: 'custom',
+                          name: guild.name,
+                          emojis: guild.emojis.map(e => ({
+                            id: e.id,
+                            name: e.name,
+                            skins: [{ src: `https://cdn.discordapp.com/emojis/${e.id}` }],
+                          })),
+                        },
+                      ],
+                      categoryIcons: {
+                        custom: {
+                          src: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`,
+                        },
                       },
-                    ],
-                    categoryIcons: {
-                      custom: {
-                        src: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`,
-                      },
-                    },
-                  }}
-                >
-                  The emoji to react with
-                </EmojiInput>
+                    }}
+                  >
+                    The emoji to react with
+                  </EmojiInput>
+                </div>
                 <SelectInput id="rrcreaterole" label="The role to be given">
                   {roles.map(r =>
                     <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
@@ -835,9 +939,13 @@ export default component$(() => {
                     <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
                   )}
                 </SelectInput>
-                <TextInput id="rrcreatemessage" placeholder="1105427534889353317">
-                  The Id of the message you want to create the reaction role in
-                </TextInput>
+                <div class={{
+                  'hidden': store.modal == 'edit',
+                }}>
+                  <TextInput id="rrcreatemessage" placeholder="1105427534889353317">
+                    The Id of the message you want to create the reaction role in
+                  </TextInput>
+                </div>
                 <SelectInput id="rrcreateswitch" label="Reaction role behavior">
                   <option value="switch">Add by reacting / Remove by unreacting</option>
                   <option value="toggle">Add / Remove by reacting</option>
@@ -847,10 +955,42 @@ export default component$(() => {
                 </Toggle>
               </div>
               <div class="flex flex-row-reverse gap-3">
-                <Button color="primary" extraClass="flex-1 sm:flex-initial">
-                  Create
+                <Button color="primary" extraClass="flex-1 sm:flex-initial" onClick$={async () => {
+                  store.loading.push('rrcreate');
+                  const emojiId = document.getElementById('rrcreateemoji')!.innerText;
+                  const roleId = document.getElementById('rrcreaterole')!as HTMLSelectElement;
+                  const channelId = document.getElementById('rrcreatechannel')! as HTMLSelectElement;
+                  const messageId = document.getElementById('rrcreatemessage')! as HTMLInputElement;
+                  const type = document.getElementById('rrcreateswitch')! as HTMLSelectElement;
+                  const silent = document.getElementById('rrcreatesilent')! as HTMLInputElement;
+
+                  await updateReactionRoleFn({
+                    guildId: guild.id,
+                    emojiId,
+                    roleId: roleId.value,
+                    channelId: channelId.value,
+                    messageId: messageId.value,
+                    type: type.value,
+                    silent: silent.checked ? 'true' : 'false',
+                  });
+
+                  store.guildData = {
+                    ...store.guildData,
+                    ...(await getSQLDataFn(channels)),
+                  };
+                  store.loading = store.loading.filter(l => l != 'rrcreate');
+                  store.modal = undefined;
+                }}>
+                  {store.modal == 'edit' ? 'Edit' : 'Create'}
+                  <div class={{
+                    'transition-all': true,
+                    '-ml-10 opacity-0': !store.loading.includes('rrcreate'),
+                    '-ml-1 opacity-100': store.loading.includes('rrcreate'),
+                  }}>
+                    <LoadingIcon />
+                  </div>
                 </Button>
-                <Button extraClass="flex-1 sm:flex-initial" onClick$={() => store.modal = !store.modal}>
+                <Button extraClass="flex-1 sm:flex-initial" onClick$={() => store.modal = undefined}>
                   Cancel
                 </Button>
               </div>
@@ -861,28 +1001,6 @@ export default component$(() => {
 
     </section>
   );
-});
-
-export const openContextMenu = $((event: any, rr: any) => {
-  const contextmenu = document.getElementById('contextmenu')!;
-  const rrRole: any = document.getElementById('rrrole')!;
-  const rrSwitch: any = document.getElementById('rrswitch')!;
-  const rrSilent: any = document.getElementById('rrsilent')!;
-  rrRole.value = rr.roleId;
-  rrSwitch.value = rr.type;
-  rrSilent.checked = rr.silent == 'true';
-  contextmenu.style.display = 'flex';
-  const Yoffset = event.pageY + contextmenu.clientHeight > document.body.clientHeight ? contextmenu.clientHeight : 0;
-  contextmenu.style.top = `${event.pageY - Yoffset}px`;
-  const Xoffset = event.pageX + contextmenu.clientWidth > document.body.clientWidth ? contextmenu.clientWidth : 0;
-  contextmenu.style.left = `${event.pageX - Xoffset}px`;
-  document.addEventListener('click', closeContextMenu);
-});
-
-export const closeContextMenu = $((event: any) => {
-  const contextmenu = document.getElementById('contextmenu')!;
-  if (event.target.id != 'rrdelete' && (contextmenu.contains(event.target) || event.target.innerText == '•••' || contextmenu.style.display == 'none')) return;
-  contextmenu.style.display = 'none';
 });
 
 export const head: DocumentHead = {
