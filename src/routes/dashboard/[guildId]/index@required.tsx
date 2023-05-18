@@ -11,6 +11,7 @@ import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
+import EmojiInput from '~/components/elements/EmojiInput';
 import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
@@ -797,9 +798,33 @@ export default component$(() => {
                 Create Reaction Role
               </h1>
               <div class="flex flex-col my-4 gap-4">
-                <TextInput id="rrcreateemoji" value="😃">
-                    The emoji to react with
-                </TextInput>
+                <EmojiInput id="rrcreateemoji"
+                  onEmojiSelect$={(emoji: any) => {
+                    emoji = emoji.native ?? emoji.id;
+                    const button = document.getElementById('rrcreateemoji')!;
+                    button.innerText = emoji;
+                  }}
+                  emojiPickerProps={{
+                    custom: [
+                      {
+                        id: 'custom',
+                        name: guild.name,
+                        emojis: guild.emojis.map(e => ({
+                          id: e.id,
+                          name: e.name,
+                          skins: [{ src: `https://cdn.discordapp.com/emojis/${e.id}` }],
+                        })),
+                      },
+                    ],
+                    categoryIcons: {
+                      custom: {
+                        src: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`,
+                      },
+                    },
+                  }}
+                >
+                  The emoji to react with
+                </EmojiInput>
                 <SelectInput id="rrcreaterole" label="The role to be given">
                   {roles.map(r =>
                     <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
