@@ -3,9 +3,9 @@ import { Link, useLocation } from '@builder.io/qwik-city';
 
 import { LogoDiscord, LogoGithub, Menu, SettingsOutline, ReaderOutline, HappyOutline, PersonCircleOutline } from 'qwik-ionicons';
 // @ts-ignore
-import iconAVIF from '~/components/images/Cactie.png?avif&w=96&h=96';
+import iconAVIF from '~/components/images/Cactie.png?format=avif&w=96&h=96';
 // @ts-ignore
-import iconWEBP from '~/components/images/Cactie.png?webp&w=96&h=96';
+import iconWEBP from '~/components/images/Cactie.png?format=webp&w=96&h=96';
 // @ts-ignore
 import icon from '~/components/images/Cactie.png?w=96&h=96';
 

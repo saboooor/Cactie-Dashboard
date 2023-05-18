@@ -2,9 +2,9 @@ import { component$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 
 // @ts-ignore
-import iconAVIF from '~/components/images/Cactie.png?avif&w=1024&h=1024';
+import iconAVIF from '~/components/images/Cactie.png?format=avif&w=1024&h=1024';
 // @ts-ignore
-import iconWEBP from '~/components/images/Cactie.png?webp&w=1024&h=1024';
+import iconWEBP from '~/components/images/Cactie.png?format=webp&w=1024&h=1024';
 // @ts-ignore
 import icon from '~/components/images/Cactie.png?w=1024&h=1024';
 
@@ -45,8 +45,8 @@ export default component$(() => {
         <p class="my-5 text-xs text-gray-400">
           It's pronounced Cact-E, btw
         </p>
-        <div class="flex flex-col sm:flex-row justify-start" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
-          <ExternalButton massive bold color="primary" href="/invite" style={{ filter: 'drop-shadow(0 5rem 10rem #CB6CE6)' }}>
+        <div class="flex flex-col sm:flex-row justify-start">
+          <ExternalButton massive bold color="primary" href="/invite" style={{ filter: 'drop-shadow(0 3rem 6rem #CB6CE6)' }}>
             <HappyOutline width="24" class="fill-current" />
             Invite me to your server!
           </ExternalButton>

@@ -69,6 +69,7 @@ export default component$(() => {
                   <HappyOutline width="24" class="fill-current" />
                   Invite
                 </div>
+                <p class="hidden mt-10 text-2xl overflow-hidden text-ellipsis sm:line-clamp-1 text-center break-all text-gray-50">{guild.name}</p>
               </a>
             );
           })

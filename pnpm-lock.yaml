@@ -2,23 +2,23 @@ lockfileVersion: '6.0'
 
 devDependencies:
   '@builder.io/qwik':
-    specifier: 1.1.2
-    version: 1.1.2(undici@5.22.1)
+    specifier: 1.1.4
+    version: 1.1.4(undici@5.22.1)
   '@builder.io/qwik-city':
-    specifier: 1.1.2
-    version: 1.1.2
+    specifier: 1.1.4
+    version: 1.1.4
   '@emoji-mart/data':
     specifier: ^1.1.2
     version: 1.1.2
   '@prisma/client':
-    specifier: 4.15.0-dev.26
-    version: 4.15.0-dev.26(prisma@4.15.0-dev.26)
+    specifier: 4.15.0-dev.51
+    version: 4.15.0-dev.51(prisma@4.15.0-dev.51)
   '@types/eslint':
     specifier: 8.37.0
     version: 8.37.0
   '@types/node':
-    specifier: 20.1.4
-    version: 20.1.4
+    specifier: 20.2.0
+    version: 20.2.0
   '@types/uuid':
     specifier: 9.0.1
     version: 9.0.1
@@ -41,8 +41,8 @@ devDependencies:
     specifier: 8.40.0
     version: 8.40.0
   eslint-plugin-qwik:
-    specifier: 1.1.2
-    version: 1.1.2(eslint@8.40.0)
+    specifier: 1.1.4
+    version: 1.1.4(eslint@8.40.0)
   imagetools-core:
     specifier: 4.0.3
     version: 4.0.3
@@ -53,8 +53,8 @@ devDependencies:
     specifier: 2.8.8
     version: 2.8.8
   prisma:
-    specifier: 4.15.0-dev.26
-    version: 4.15.0-dev.26
+    specifier: 4.15.0-dev.51
+    version: 4.15.0-dev.51
   qwik-ionicons:
     specifier: 1.0.5
     version: 1.0.5
@@ -71,14 +71,14 @@ devDependencies:
     specifier: 9.0.0
     version: 9.0.0
   vite:
-    specifier: 4.3.6
-    version: 4.3.6(@types/node@20.1.4)
+    specifier: 4.3.7
+    version: 4.3.7(@types/node@20.2.0)
   vite-imagetools:
     specifier: 5.0.4
     version: 5.0.4
   vite-tsconfig-paths:
     specifier: 4.2.0
-    version: 4.2.0(typescript@5.0.4)(vite@4.3.6)
+    version: 4.2.0(typescript@5.0.4)(vite@4.3.7)
   wrangler:
     specifier: latest
     version: 3.0.0
@@ -90,8 +90,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /@builder.io/qwik-city@1.1.2:
-    resolution: {integrity: sha512-rA0Q9c/A6b3qpAI+opizRgwO0rLXvU+AdJomUtnHX4D/H8XZisbCLVLM8hrDmPckmADgNcHMJlxaawiGPgVqaA==}
+  /@builder.io/qwik-city@1.1.4:
+    resolution: {integrity: sha512-J6EAZN2vXaoou5PBC3GS6Z0RTC4jzXXNup+gLQou4yMVPnnI+i4g1bD1240Uo0VDhTLJQkBHxKWMWwRqgckISA==}
     engines: {node: '>=16.8.0 <18.0.0 || >=18.11'}
     dependencies:
       '@mdx-js/mdx': 2.3.0
@@ -103,8 +103,8 @@ packages:
       - supports-color
     dev: true
 
-  /@builder.io/qwik@1.1.2(undici@5.22.1):
-    resolution: {integrity: sha512-oOif/cXd0EYi+lFprWkGeRoI+9MiUKpdwTqjk19L8OYzTo8XQ+X2OhgBzOkCKjGF32eJdRWYWFXKZyHlhHlg/g==}
+  /@builder.io/qwik@1.1.4(undici@5.22.1):
+    resolution: {integrity: sha512-FSbe2GcUBptAXMAHfN+oGUpnb3nZXzup2EYlza61bAfgWSx9SryOwNULyROis3mu7Ywdua3w6VKvCWOFdovz2w==}
     engines: {node: '>=16.8.0 <18.0.0 || >=18.11'}
     hasBin: true
     peerDependencies:
@@ -718,8 +718,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@prisma/client@4.15.0-dev.26(prisma@4.15.0-dev.26):
-    resolution: {integrity: sha512-+H6qGZgMf3Uai5+uETsCgMD7F4UB354K36nfb8rBLQig+1muEnr4GoKNkdqR6D9BhxrcnzRG6sGBWB+wuAgwLQ==}
+  /@prisma/client@4.15.0-dev.51(prisma@4.15.0-dev.51):
+    resolution: {integrity: sha512-2FzCNJFMF0gMVhr/9MuFVMxoTNJ/ud5VpPFHmzjjZdBgYGztN97DGhgTt4HMwbsv1S9Tp5htHpuJxj9ihO3fjw==}
     engines: {node: '>=14.17'}
     requiresBuild: true
     peerDependencies:
@@ -728,16 +728,16 @@ packages:
       prisma:
         optional: true
     dependencies:
-      '@prisma/engines-version': 4.15.0-6.79f1601f219fa209dfa987d7d3a677ec060f2dd1
-      prisma: 4.15.0-dev.26
+      '@prisma/engines-version': 4.15.0-12.08464e12680725cf8375f2ab314206401f8581a3
+      prisma: 4.15.0-dev.51
     dev: true
 
-  /@prisma/engines-version@4.15.0-6.79f1601f219fa209dfa987d7d3a677ec060f2dd1:
-    resolution: {integrity: sha512-axtcuw54fKsNCaTZyZVRWtb3ffmD9FyGl1/havDVHh+gJiAenqC6yP/7BAdHNf+QotosSOWoTOOzqfkIWzJHhw==}
+  /@prisma/engines-version@4.15.0-12.08464e12680725cf8375f2ab314206401f8581a3:
+    resolution: {integrity: sha512-KSssHHeVNDODjOCU/NbnARIT/uZ+FrwvPI50YmKk93CzFnYRUZ9ncDHqSzyyG1w2aYGUdxcqqdtu/CV2NA1oaw==}
     dev: true
 
-  /@prisma/engines@4.15.0-dev.26:
-    resolution: {integrity: sha512-DRbQRy24i/vGh7aWK8xEnFsuu2Wa7S5rXnZY+oP62DYQ/ypmjiJOQcCNTN9q0g5Gg+O0WqeK3/IbId1uFKuP3Q==}
+  /@prisma/engines@4.15.0-dev.51:
+    resolution: {integrity: sha512-m+6ijT+Y1snX9CwaGbTxPQlepiYJgZYxw4qh2fMb+rtwD4/VVhDob76Wv35dm6wKDVwetBDQ+HcPzAGV/vvGvw==}
     requiresBuild: true
     dev: true
 
@@ -808,8 +808,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node@20.1.4:
-    resolution: {integrity: sha512-At4pvmIOki8yuwLtd7BNHl3CiWNbtclUbNtScGx4OHfBd4/oWoJC8KRCIxXwkdndzhxOsPXihrsOoydxBjlE9Q==}
+  /@types/node@20.2.0:
+    resolution: {integrity: sha512-3iD2jaCCziTx04uudpJKwe39QxXgSUnpxXSvRQjRvHPxFQfmfP4NXIm/NURVeNlTCc+ru4WqjYGTmpXrW9uMlw==}
     dev: true
 
   /@types/semver@7.3.13:
@@ -1520,8 +1520,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-plugin-qwik@1.1.2(eslint@8.40.0):
-    resolution: {integrity: sha512-zeMi7uVE50tnfmKUr/g7fznDKZohdHX45CApQP+Uu8tffTe7iHYJQJG0EBrbqF32dTQtrFV/f8KFsgoZV4P9lg==}
+  /eslint-plugin-qwik@1.1.4(eslint@8.40.0):
+    resolution: {integrity: sha512-RHeH/OwYu6iLxVxyuHshCRiIetmrsEo585yGC8ZRTuIa25zCUbD54w/KumXU6u4W5t00NxxrDwt3+ZH206hQEA==}
     engines: {node: '>=16'}
     peerDependencies:
       eslint: '>= 8'
@@ -3052,13 +3052,13 @@ packages:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
     dev: true
 
-  /prisma@4.15.0-dev.26:
-    resolution: {integrity: sha512-qC1MSIThyw5V2oF2KXDqrUym7v93b99pFzZwr9pmUQsPe8xSLb8meSuGhqN343xIXeF3n33B1dGI6WXTOzdPUQ==}
+  /prisma@4.15.0-dev.51:
+    resolution: {integrity: sha512-13htFcJbt0Ht/E2isrU9reQ6R6JtSTtzBLdInOysi7bx9IxYxLJlq7Wl2uCS6M0g1iEdxWnn6TugS6KAgdal0A==}
     engines: {node: '>=14.17'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@prisma/engines': 4.15.0-dev.26
+      '@prisma/engines': 4.15.0-dev.51
     dev: true
 
   /property-information@6.2.0:
@@ -3742,7 +3742,7 @@ packages:
       - rollup
     dev: true
 
-  /vite-tsconfig-paths@4.2.0(typescript@5.0.4)(vite@4.3.6):
+  /vite-tsconfig-paths@4.2.0(typescript@5.0.4)(vite@4.3.7):
     resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
     peerDependencies:
       vite: '*'
@@ -3753,14 +3753,14 @@ packages:
       debug: 4.3.4
       globrex: 0.1.2
       tsconfck: 2.1.1(typescript@5.0.4)
-      vite: 4.3.6(@types/node@20.1.4)
+      vite: 4.3.7(@types/node@20.2.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
     dev: true
 
-  /vite@4.3.6(@types/node@20.1.4):
-    resolution: {integrity: sha512-cqIyLSbA6gornMS659AXTVKF7cvSHMdKmJJwQ9DXq3lwsT1uZSdktuBRlpHQ8VnOWx0QHtjDwxPpGtyo9Fh/Qg==}
+  /vite@4.3.7(@types/node@20.2.0):
+    resolution: {integrity: sha512-MTIFpbIm9v7Hh5b0wSBgkcWzSBz7SAa6K/cBTwS4kUiQJfQLFlZZRJRQgqunCVzhTPCk674tW+0Qaqh3Q00dBg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -3784,7 +3784,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.1.4
+      '@types/node': 20.2.0
       esbuild: 0.17.18
       postcss: 8.4.23
       rollup: 3.21.4
