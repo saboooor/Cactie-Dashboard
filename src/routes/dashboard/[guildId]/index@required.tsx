@@ -13,6 +13,7 @@ import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
 import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
+import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Guild extends APIGuild {
@@ -459,7 +460,7 @@ export default component$(() => {
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'ticketmention');
             }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.ticketmention)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
+              color: '#' + (roles.find(r => r.id == srvconfig?.ticketmention)?.color ? roles.find(r => r.id == srvconfig?.ticketmention)?.color.toString(16) : 'ffffff'),
             }}>
               <option value="false" selected={srvconfig?.ticketmention == 'false'} style={{ color: '#ffffff' }}>No mention</option>
               <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'} style={{ color: 'rgb(59 130 246)' }}>@ everyone</option>
@@ -506,7 +507,7 @@ export default component$(() => {
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
               store.loading = store.loading.filter(l => l != 'ticketcategory');
             }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.mutecmd)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
+              color: '#' + (roles.find(r => r.id == srvconfig?.mutecmd)?.color ? roles.find(r => r.id == srvconfig?.mutecmd)?.color.toString(16) : 'ffffff'),
             }}>
               <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'} style={{ color: '#ffffff' }}>Use Discord's timeout feature</option>
               {roles.map(r =>
@@ -527,18 +528,28 @@ export default component$(() => {
             </TextInput>
           </Card>
         </div>
-        <MenuTitle>AUDIT LOGS</MenuTitle>
+        <div class="flex">
+          <span id="auditlogs" class="block h-32 -mt-32" />
+          <MenuTitle extraClass="flex-1">AUDIT LOGS</MenuTitle>
+          <div class={{
+            'transition-all': true,
+            'opacity-0': !store.loading.includes('auditlogs'),
+            'opacity-100': store.loading.includes('auditlogs'),
+          }}>
+            <LoadingIcon />
+          </div>
+        </div>
         <div class="py-10 flex flex-col gap-4">
           <div class="flex flex-col md:flex-row gap-4">
             <Card>
-              <CardHeader id="auditlogs" loading={store.loading.includes('auditlogs-channel')}>
+              <CardHeader>
                 <SendOutline width="32" class="fill-current" /> Default Channel
               </CardHeader>
               <SelectInput id="auditlogs-channel" label="This is where logs will be sent if there is no specific channel set on them" onChange$={async (event: any) => {
-                store.loading.push('auditlogs-channel');
-                srvconfig!.auditlogs.message = event.target.value;
+                store.loading.push('auditlogs');
+                srvconfig!.auditlogs.channel = event.target.value;
                 await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
-                store.loading = store.loading.filter(l => l != 'auditlogs-channel');
+                store.loading = store.loading.filter(l => l != 'auditlogs');
               }}>
                 <option value="false" selected={srvconfig?.auditlogs.channel == 'false'}>No channel specified.</option>
                 {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -546,81 +557,113 @@ export default component$(() => {
                 )}
               </SelectInput>
             </Card>
-            <Card squish>
-              <RawSelectInput id="new-log">
-                <option value="all">All Logs</option>
-                {!srvconfig?.auditlogs.logs?.member && (
-                  <>
-                    <option value="member">All Member-Related Logs</option>
-                    {!srvconfig?.auditlogs.logs?.memberjoin && (
-                      <option value="memberjoin">Member Joined</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.memberleave && (
-                      <option value="memberleave">Member Left</option>
-                    )}
-                  </>
-                )}
-                {!srvconfig?.auditlogs.logs?.message && (
-                  <>
-                    <option value="message">All Message-Related Logs</option>
-                    {!srvconfig?.auditlogs.logs?.messagedelete && (
-                      <option value="messagedelete">Message Deleted</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.messagedeletebulk && (
-                      <option value="messagedeletebulk">Messages Bulk-Deleted</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.messageupdate && (
-                      <option value="messageupdate">Message Edited</option>
-                    )}
-                  </>
-                )}
-                {!srvconfig?.auditlogs.logs?.channel && (
-                  <>
-                    <option value="channel">All Channel-Related Logs</option>
-                    {!srvconfig?.auditlogs.logs?.channelcreate && (
-                      <option value="channelcreate">Channel Created</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.channeldelete && (
-                      <option value="channeldelete">Channel Deleted</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.channelupdate && (
-                      <option value="channelupdate">Channel Updated</option>
-                    )}
-                  </>
-                )}
-                {!srvconfig?.auditlogs.logs?.voice && (
-                  <>
-                    <option value="voice">All Voice-Related Logs</option>
-                    {!srvconfig?.auditlogs.logs?.voicejoin && (
-                      <option value="voicejoin">Voice Channel</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.voiceleave && (
-                      <option value="voiceleave">Left Voice Channel</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.voicemove && (
-                      <option value="voicemove">Moved Voice Channels</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.voicedeafen && (
-                      <option value="voicedeafen">Voice Deafened</option>
-                    )}
-                    {!srvconfig?.auditlogs.logs?.voicemute && (
-                      <option value="voicemute">Voice Muted</option>
-                    )}
-                  </>
-                )}
-              </RawSelectInput>
-              <RawSelectInput id="new-log-channel" label="The channel to associate this log to">
-                {srvconfig?.auditlogs.channel != 'false' &&
+            {!(srvconfig?.auditlogs.logs?.all || (
+              (srvconfig?.auditlogs.logs?.member || (srvconfig?.auditlogs.logs?.memberjoin && srvconfig?.auditlogs.logs?.memberleave))
+              && (srvconfig?.auditlogs.logs?.message || (srvconfig?.auditlogs.logs?.messagedelete && srvconfig?.auditlogs.logs?.messagedeletebulk && srvconfig?.auditlogs.logs?.messageupdate))
+              && (srvconfig?.auditlogs.logs?.channel || (srvconfig?.auditlogs.logs?.channelcreate && srvconfig?.auditlogs.logs?.channeldelete && srvconfig?.auditlogs.logs?.channelupdate))
+              && (srvconfig?.auditlogs.logs?.voice || (srvconfig?.auditlogs.logs?.voicejoin && srvconfig?.auditlogs.logs?.voiceleave && srvconfig?.auditlogs.logs?.voicemove && srvconfig?.auditlogs.logs?.voicedeafen && srvconfig?.auditlogs.logs?.voicemute))
+            )) && (
+              <Card squish>
+                <RawSelectInput id="new-log">
+                  {!srvconfig?.auditlogs.logs?.all && (
+                    <>
+                      {(!srvconfig?.auditlogs.logs?.member && !srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave
+                    && !srvconfig?.auditlogs.logs?.message && !srvconfig?.auditlogs.logs?.messagedelete && !srvconfig?.auditlogs.logs?.messagedeletebulk && !srvconfig?.auditlogs.logs?.messageupdate
+                    && !srvconfig?.auditlogs.logs?.channel && !srvconfig?.auditlogs.logs?.channelcreate && !srvconfig?.auditlogs.logs?.channeldelete && !srvconfig?.auditlogs.logs?.channelupdate
+                    && !srvconfig?.auditlogs.logs?.voice && !srvconfig?.auditlogs.logs?.voicejoin && !srvconfig?.auditlogs.logs?.voiceleave && !srvconfig?.auditlogs.logs?.voicemove && !srvconfig?.auditlogs.logs?.voicedeafen && !srvconfig?.auditlogs.logs?.voicemute
+                      ) && (
+                        <option value="all">All Logs</option>
+                      )}
+                      {!srvconfig?.auditlogs.logs?.member && (
+                        <>
+                          {(!srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave) && (
+                            <option value="member">All Member-Related Logs</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.memberjoin && (
+                            <option value="memberjoin">Member Joined</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.memberleave && (
+                            <option value="memberleave">Member Left</option>
+                          )}
+                        </>
+                      )}
+                      {!srvconfig?.auditlogs.logs?.message && (
+                        <>
+                          {(!srvconfig?.auditlogs.logs?.messagedelete && !srvconfig?.auditlogs.logs?.messagedeletebulk && !srvconfig?.auditlogs.logs?.messageupdate) && (
+                            <option value="message">All Message-Related Logs</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.messagedelete && (
+                            <option value="messagedelete">Message Deleted</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.messagedeletebulk && (
+                            <option value="messagedeletebulk">Messages Bulk-Deleted</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.messageupdate && (
+                            <option value="messageupdate">Message Edited</option>
+                          )}
+                        </>
+                      )}
+                      {!srvconfig?.auditlogs.logs?.channel && (
+                        <>
+                          {(!srvconfig?.auditlogs.logs?.channelcreate && !srvconfig?.auditlogs.logs?.channeldelete && !srvconfig?.auditlogs.logs?.channelupdate) && (
+                            <option value="channel">All Channel-Related Logs</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.channelcreate && (
+                            <option value="channelcreate">Channel Created</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.channeldelete && (
+                            <option value="channeldelete">Channel Deleted</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.channelupdate && (
+                            <option value="channelupdate">Channel Updated</option>
+                          )}
+                        </>
+                      )}
+                      {!srvconfig?.auditlogs.logs?.voice && (
+                        <>
+                          {(!srvconfig?.auditlogs.logs?.voicejoin && !srvconfig?.auditlogs.logs?.voiceleave && !srvconfig?.auditlogs.logs?.voicemove && !srvconfig?.auditlogs.logs?.voicedeafen && !srvconfig?.auditlogs.logs?.voicemute) && (
+                            <option value="voice">All Voice-Related Logs</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.voicejoin && (
+                            <option value="voicejoin">Joined Voice Channel</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.voiceleave && (
+                            <option value="voiceleave">Left Voice Channel</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.voicemove && (
+                            <option value="voicemove">Moved Voice Channels</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.voicedeafen && (
+                            <option value="voicedeafen">Voice Deafened</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.voicemute && (
+                            <option value="voicemute">Voice Muted</option>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </RawSelectInput>
+                <RawSelectInput id="new-log-channel" label="The channel to associate this log to">
+                  {srvconfig?.auditlogs.channel != 'false' &&
                     <option value="false" selected>Default Channel</option>
-                }
-                {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                  <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                )}
-              </RawSelectInput>
-              <Button color="primary">
+                  }
+                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                    <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                  )}
+                </RawSelectInput>
+                <Button color="primary" onClick$={async () => {
+                  store.loading.push('auditlogs');
+                  const log = (document.getElementById('new-log') as HTMLSelectElement).value;
+                  const channel = (document.getElementById('new-log-channel') as HTMLSelectElement).value;
+                  (store.guildData as guildData).srvconfig!.auditlogs.logs[log] = { channel };
+                  await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
+                  store.loading = store.loading.filter(l => l != 'auditlogs');
+                }}>
                   Add Audit Log
-              </Button>
-            </Card>
+                </Button>
+              </Card>
+            )}
           </div>
           <div class="flex flex-wrap justify-center gap-4">
             {
@@ -631,10 +674,22 @@ export default component$(() => {
                       <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                         {log}
                       </h1>
-                      <Close width="36" class="fill-red-400" />
+                      <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                        store.loading.push('auditlogs');
+                        delete (store.guildData as guildData).srvconfig!.auditlogs.logs[log];
+                        await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
+                        store.loading = store.loading.filter(l => l != 'auditlogs');
+                      }} />
                     </div>
-                    <RawSelectInput id={`auditlogs-logs-${log}.channel`} name={`auditlogs.logs.${log}.channel`}>
-                      <option value="false" selected={srvconfig?.auditlogs.logs[log].channel == 'false'}>Default Channel</option>
+                    <RawSelectInput id={`auditlogs-logs-${log}.channel`} name={`auditlogs.logs.${log}.channel`} onChange$={async (event) => {
+                      store.loading.push('auditlogs');
+                      srvconfig!.auditlogs.logs[log].channel = event.target.value;
+                      await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
+                      store.loading = store.loading.filter(l => l != 'auditlogs');
+                    }}>
+                      {srvconfig?.auditlogs.channel != 'false' &&
+                        <option value="false" selected={srvconfig?.auditlogs.logs[log].channel == 'false'}>Default Channel</option>
+                      }
                       {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                         <option value={c.id} key={c.id} selected={srvconfig?.auditlogs.logs[log].channel == c.id}>{`# ${c.name}`}</option>,
                       )}
