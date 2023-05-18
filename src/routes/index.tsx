@@ -45,8 +45,8 @@ export default component$(() => {
         <p class="my-5 text-xs text-gray-400">
           It's pronounced Cact-E, btw
         </p>
-        <div class="flex flex-col sm:flex-row justify-start">
-          <ExternalButton massive bold color="primary" href="/invite" style={{ filter: 'drop-shadow(0 48px 96px #CB6CE6)' }}>
+        <div class="flex flex-col sm:flex-row justify-start" style={{ filter: 'drop-shadow(0 2rem 3rem #CB6CE699)' }}>
+          <ExternalButton massive bold color="primary" href="/invite">
             <HappyOutline width="24" class="fill-current" />
             Invite me to your server!
           </ExternalButton>
