@@ -30,7 +30,7 @@ export default component$(() => {
               alt="Cactie"
               loading="eager"
               decoding="async"
-              style={{ maxWidth: '40vh' }}
+              style={{ maxWidth: '70vw' }}
               width={480}
               height={480}
             />
@@ -46,7 +46,7 @@ export default component$(() => {
           It's pronounced Cact-E, btw
         </p>
         <div class="flex flex-col sm:flex-row justify-start">
-          <ExternalButton massive bold color="primary" href="/invite" style={{ filter: 'drop-shadow(0 3rem 6rem #CB6CE6)' }}>
+          <ExternalButton massive bold color="primary" href="/invite" style={{ filter: 'drop-shadow(0 48px 96px #CB6CE6)' }}>
             <HappyOutline width="24" class="fill-current" />
             Invite me to your server!
           </ExternalButton>
@@ -75,9 +75,9 @@ export default component$(() => {
         </div>
       </div>
       <div class="hidden sm:flex relative justify-end align-center sm:ml-auto" style={{ maxWidth: '50%' }}>
-        <div class="absolute top-10 left-10 w-72 h-72 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
-        <div class="absolute top-10 right-10 w-72 h-72 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
-        <div class="absolute bottom-5 left-32 w-72 h-72 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
+        <div class="absolute top-8 left-8 w-48 h-48 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
+        <div class="absolute top-10 right-8 w-48 h-48 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
+        <div class="absolute bottom-10 left-32 w-48 h-48 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
         <picture>
           <source srcSet={iconAVIF} type="image/avif" />
           <source srcSet={iconWEBP} type="image/webp" />
