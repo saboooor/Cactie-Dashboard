@@ -681,7 +681,7 @@ export default component$(() => {
                         store.loading = store.loading.filter(l => l != 'auditlogs');
                       }} />
                     </div>
-                    <RawSelectInput id={`auditlogs-logs-${log}.channel`} name={`auditlogs.logs.${log}.channel`} onChange$={async (event) => {
+                    <RawSelectInput id={`auditlogs-logs-${log}.channel`} name={`auditlogs.logs.${log}.channel`} onChange$={async (event: any) => {
                       store.loading.push('auditlogs');
                       srvconfig!.auditlogs.logs[log].channel = event.target.value;
                       await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
@@ -703,9 +703,18 @@ export default component$(() => {
         <div class="flex">
           <span id="reactionroles" class="block h-32 -mt-32" />
           <MenuTitle extraClass="flex-1">REACTION ROLES</MenuTitle>
-          <Button color="primary" onClick$={() => store.modal = !store.modal}>
-            Create Reaction Role
-          </Button>
+          <div class="flex items-center gap-3">
+            <div class={{
+              'transition-all': true,
+              'opacity-0': !store.loading.includes('reactionroles'),
+              'opacity-100': store.loading.includes('reactionroles'),
+            }}>
+              <LoadingIcon />
+            </div>
+            <Button color="primary" onClick$={() => store.modal = !store.modal}>
+              Create Reaction Role
+            </Button>
+          </div>
         </div>
         <div class="flex flex-col gap-4 py-10">
           {
@@ -788,18 +797,14 @@ export default component$(() => {
                 Create Reaction Role
               </h1>
               <div class="flex flex-col my-4 gap-4">
-                <div class="flex flex-col sm:flex-row gap-4">
-                  <TextInput id="rrcreateemoji" value="😃">
+                <TextInput id="rrcreateemoji" value="😃">
                     The emoji to react with
-                  </TextInput>
-                  <div class="flex-1">
-                    <SelectInput id="rrcreaterole" label="The role to be given">
-                      {roles.map(r =>
-                        <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
-                      )}
-                    </SelectInput>
-                  </div>
-                </div>
+                </TextInput>
+                <SelectInput id="rrcreaterole" label="The role to be given">
+                  {roles.map(r =>
+                    <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
+                  )}
+                </SelectInput>
                 <SelectInput id="rrcreatechannel" label="Select the channel the reaction role will be in">
                   {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                     <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,

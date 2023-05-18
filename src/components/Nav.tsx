@@ -43,7 +43,7 @@ export default component$(({ auth }: any) => {
         </NavButton>
         {auth &&
           <NavButton external icon href="/logout" title="Log out" style={{ backgroundColor: auth.accent }}>
-            <img src={auth.pfp ?? 'https://cdn.discordapp.com/embed/avatars/0.png'} class="rounded-full h-6 w-6" />
+            <img src={auth.pfp ?? 'https://cdn.discordapp.com/embed/avatars/0.png'} class="rounded-full h-6 w-6" width={24} height={24} />
           </NavButton>
         }
         {!auth &&
@@ -113,6 +113,8 @@ export const Brand = component$(() => {
           <img
             src={icon}
             class="h-8 w-8"
+            width={32}
+            height={32}
             alt="Cactie"
             loading="eager"
             decoding="async"
