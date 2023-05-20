@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-import colors from 'tailwindcss/colors'
 
 const gray = {
   50: "hsl(0deg, 0%, 95%)",
