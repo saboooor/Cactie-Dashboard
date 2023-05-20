@@ -314,6 +314,9 @@ export default component$(() => {
           <MenuItem href="#disabledcmds">
             <Ban width="24" class="fill-current" /> Disabled Commands
           </MenuItem>
+          <MenuItem href="#logchannel">
+            <FileTrayFullOutline width="24" class="fill-current" /> Log Channel
+          </MenuItem>
         </MenuCategory>
         <MenuItem href="#auditlogs">
           <NewspaperOutline width="24" class="fill-current" /> Audit Logs
@@ -516,7 +519,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
           <Card fit>
-            <CardHeader id="supportrole" loading={store.loading.includes('ticketlogchannel')}>
+            <CardHeader id="supportrole" loading={store.loading.includes('suppportrole')}>
               <At width="32" class="fill-current" /> Access Role
             </CardHeader>
             <SelectInput id="supportrole-input" label="The role that may access tickets" onChange$={async (event: any) => {
@@ -609,6 +612,21 @@ export default component$(() => {
             }}>
               Disable certain commands from Cactie separated by commas
             </TextInput>
+          </Card>
+          <Card>
+            <CardHeader id="logchannel" loading={store.loading.includes('logchannel')}>
+              <FileTrayFullOutline width="32" class="fill-current" /> Log Channel
+            </CardHeader>
+            <SelectInput id="logchannel-value" label="The channel where moderation logs will appear (this is separate from audit logs for now)" onChange$={async (event: any) => {
+              store.loading.push('logchannel');
+              await updateSettingFn('logchannel', event.target.value);
+              store.loading = store.loading.filter(l => l != 'logchannel');
+            }}>
+              <option value="false" selected={srvconfig?.logchannel == 'false'}>No logs</option>
+              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                <option value={c.id} key={c.id} selected={srvconfig?.logchannel == c.id}>{`# ${c.name}`}</option>,
+              )}
+            </SelectInput>
           </Card>
         </div>
         <div class="flex">
