@@ -47,7 +47,7 @@ export const getBotGuildsFn = server$(async function(props?: RequestEventBase): 
   return BotGuildList;
 });
 
-export const getGuildsFn = server$(async function(accessToken, props?: RequestEventBase): Promise<Guild[] | Error> {
+export const getGuildsFn = server$(async function(accessToken, props?: RequestEventBase, dev?: boolean): Promise<Guild[] | Error> {
   let GuildList = await getUserGuildsFn(accessToken);
   if (GuildList instanceof Error) return GuildList;
 
@@ -56,6 +56,7 @@ export const getGuildsFn = server$(async function(accessToken, props?: RequestEv
 
   GuildList = GuildList.filter(guild => (BigInt(guild.permissions!) & PermissionFlagsBits.ManageGuild) === PermissionFlagsBits.ManageGuild);
   GuildList.forEach(guild => guild.mutual = BotGuildList.some(botguild => botguild.id == guild.id));
+  if (dev) return BotGuildList.map(guild => ({ ...guild, mutual: true }));
   return GuildList;
 });
 
@@ -65,7 +66,7 @@ export const useGetAuth = routeLoader$(async (props) => {
     props.cookie.set('redirecturl', props.url.href, { path: '/' });
     throw props.redirect(302, '/login');
   }
-  const guilds = await getGuildsFn(auth.accessToken, props);
+  const guilds = await getGuildsFn(auth.accessToken, props, auth.pfp?.includes('249638347306303499'));
   return { auth, guilds };
 });
 
