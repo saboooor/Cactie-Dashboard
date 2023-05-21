@@ -12,7 +12,7 @@ import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
 import EmojiInput from '~/components/elements/EmojiInput';
-import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban, EllipsisVertical, TrashOutline } from 'qwik-ionicons';
+import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban, EllipsisVertical, TrashOutline, ChatboxOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -283,9 +283,6 @@ export default component$(() => {
           <MenuItem href="#maxppsize">
             <SpeedometerOutline width="24" class="fill-current" /> Max PP Size
           </MenuItem>
-          <MenuItem href="#reactions">
-            <HappyOutline width="24" class="fill-current" /> Reactions
-          </MenuItem>
         </MenuCategory>
         <MenuCategory name="TICKET SYSTEM">
           <MenuItem href="#tickets">
@@ -318,6 +315,9 @@ export default component$(() => {
             <FileTrayFullOutline width="24" class="fill-current" /> Log Channel
           </MenuItem>
         </MenuCategory>
+        <MenuItem href="#reactions">
+          <ChatboxOutline width="24" class="fill-current" /> Reactions
+        </MenuItem>
         <MenuItem href="#auditlogs">
           <NewspaperOutline width="24" class="fill-current" /> Audit Logs
         </MenuItem>
@@ -327,27 +327,53 @@ export default component$(() => {
       </Menu>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
         <MenuTitle>GENERAL SETTINGS</MenuTitle>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
-          <Card>
-            <CardHeader id="prefix" loading={store.loading.includes('prefix')}>
-              <Alert width="32" class="fill-current" /> Prefix
+        <div class="grid md:grid-cols-2 gap-4 py-10">
+          <div class="grid gap-4">
+            <Card fit>
+              <CardHeader id="prefix" loading={store.loading.includes('prefix')}>
+                <Alert width="32" class="fill-current" /> Prefix
+              </CardHeader>
+              <TextInput id="prefix-input" value={srvconfig?.prefix} placeholder="The bot's prefix" onChange$={async (event: any) => {
+                store.loading.push('prefix');
+                await updateSettingFn('prefix', event.target.value);
+                store.loading = store.loading.filter(l => l != 'prefix');
+              }}>
+                Cactie's text command prefix
+              </TextInput>
+            </Card>
+            <Card>
+              <CardHeader id="maxppsize" loading={store.loading.includes('maxppsize')}>
+                <SpeedometerOutline width="32" class="fill-current" /> Max PP Size
+              </CardHeader>
+              <NumberInput input value={(store.guildData as guildData).srvconfig?.maxppsize} id="maxppsize-input" onChange$={async (event: any) => {
+                store.loading.push('maxppsize');
+                await updateSettingFn('maxppsize', event.target.value);
+                store.loading = store.loading.filter(l => l != 'maxppsize');
+              }}
+              onIncrement$={async () => {
+                store.loading.push('maxppsize');
+                (store.guildData as guildData).srvconfig!.maxppsize++;
+                await updateSettingFn('maxppsize', (store.guildData as guildData).srvconfig!.maxppsize);
+                store.loading = store.loading.filter(l => l != 'maxppsize');
+              }}
+              onDecrement$={async () => {
+                store.loading.push('maxppsize');
+                (store.guildData as guildData).srvconfig!.maxppsize--;
+                await updateSettingFn('maxppsize', (store.guildData as guildData).srvconfig!.maxppsize);
+                store.loading = store.loading.filter(l => l != 'maxppsize');
+              }}>
+                The maximum size for the boner command
+              </NumberInput>
+            </Card>
+          </div>
+          <Card fit extraClass={{ 'gap-5': true }}>
+            <CardHeader id="suggestionpoll" loading={store.loading.includes('suggestionpoll')}>
+              <MailOpenOutline width="32" class="fill-current" /> Suggestions & Polls
             </CardHeader>
-            <TextInput id="prefix-input" value={srvconfig?.prefix} placeholder="The bot's prefix" onChange$={async (event: any) => {
-              store.loading.push('prefix');
-              await updateSettingFn('prefix', event.target.value);
-              store.loading = store.loading.filter(l => l != 'prefix');
-            }}>
-              Cactie's text command prefix
-            </TextInput>
-          </Card>
-          <Card>
-            <CardHeader id="suggestions" loading={store.loading.includes('suggestions')}>
-              <MailOpenOutline width="32" class="fill-current" /> Suggestions
-            </CardHeader>
-            <SelectInput id="suggestionchannel" label="Channel to make suggestions in" extraClass="mb-4" onChange$={async (event: any) => {
-              store.loading.push('suggestions');
+            <SelectInput id="suggestionchannel" label="Channel to make suggestions in" onChange$={async (event: any) => {
+              store.loading.push('suggestionpoll');
               await updateSettingFn('suggestionchannel', event.target.value);
-              store.loading = store.loading.filter(l => l != 'suggestions');
+              store.loading = store.loading.filter(l => l != 'suggestionpoll');
             }}>
               <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -355,21 +381,16 @@ export default component$(() => {
               )}
             </SelectInput>
             <Toggle id="suggestthreads" checked={srvconfig?.suggestthreads == 'true'} onChange$={async (event: any) => {
-              store.loading.push('suggestions');
+              store.loading.push('suggestionpoll');
               await updateSettingFn('suggestthreads', event.target.checked ? 'true' : 'false');
-              store.loading = store.loading.filter(l => l != 'suggestions');
+              store.loading = store.loading.filter(l => l != 'suggestionpoll');
             }}>
               Create threads associated to suggestions for discussion
             </Toggle>
-          </Card>
-          <Card>
-            <CardHeader id="polls" loading={store.loading.includes('polls')}>
-              <CheckboxOutline width="32" class="fill-current" /> Polls
-            </CardHeader>
             <SelectInput id="pollchannel" label="Channel to make polls in" onChange$={async (event: any) => {
-              store.loading.push('polls');
+              store.loading.push('suggestionpoll');
               await updateSettingFn('pollchannel', event.target.value);
-              store.loading = store.loading.filter(l => l != 'polls');
+              store.loading = store.loading.filter(l => l != 'suggestionpoll');
             }}>
               <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
@@ -431,46 +452,6 @@ export default component$(() => {
               )}
             </SelectInput>
           </Card>
-          <div class="grid gap-4">
-            <Card>
-              <CardHeader id="maxppsize" loading={store.loading.includes('maxppsize')}>
-                <SpeedometerOutline width="32" class="fill-current" /> Max PP Size
-              </CardHeader>
-              <NumberInput input value={(store.guildData as guildData).srvconfig?.maxppsize} id="maxppsize-input" onChange$={async (event: any) => {
-                store.loading.push('maxppsize');
-                await updateSettingFn('maxppsize', event.target.value);
-                store.loading = store.loading.filter(l => l != 'maxppsize');
-              }}
-              onIncrement$={async () => {
-                store.loading.push('maxppsize');
-                (store.guildData as guildData).srvconfig!.maxppsize++;
-                await updateSettingFn('maxppsize', (store.guildData as guildData).srvconfig!.maxppsize);
-                store.loading = store.loading.filter(l => l != 'maxppsize');
-              }}
-              onDecrement$={async () => {
-                store.loading.push('maxppsize');
-                (store.guildData as guildData).srvconfig!.maxppsize--;
-                await updateSettingFn('maxppsize', (store.guildData as guildData).srvconfig!.maxppsize);
-                store.loading = store.loading.filter(l => l != 'maxppsize');
-              }}>
-                The maximum size for the boner command
-              </NumberInput>
-            </Card>
-            <Card>
-              <CardHeader id="reactions" loading={store.loading.includes('reactions')}>
-                <Toggle id="reactions-input" checked={srvconfig?.reactions == 'true'} onChange$={async (event: any) => {
-                  store.loading.push('reactions');
-                  await updateSettingFn('reactions', event.target.checked ? 'true' : 'false');
-                  store.loading = store.loading.filter(l => l != 'reactions');
-                }}>
-                  <span class="flex items-center gap-3">
-                    <HappyOutline width="32" class="fill-current" /> Reactions
-                  </span>
-                </Toggle>
-              </CardHeader>
-              <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
-            </Card>
-          </div>
         </div>
         <MenuTitle>TICKET SYSTEM</MenuTitle>
         <div class="flex flex-wrap gap-4 py-10">
@@ -628,6 +609,35 @@ export default component$(() => {
               )}
             </SelectInput>
           </Card>
+        </div>
+        <div class="flex">
+          <span id="reactions" class="block h-32 -mt-32" />
+          <MenuTitle extraClass="flex-1">REACTIONS</MenuTitle>
+          <div class={{
+            'transition-all': true,
+            'opacity-0': !store.loading.includes('reactions'),
+            'opacity-100': store.loading.includes('reactions'),
+          }}>
+            <LoadingIcon />
+          </div>
+        </div>
+        <div class="py-10 flex flex-col gap-4">
+          <div class="flex flex-col md:flex-row gap-4">
+            <Card>
+              <CardHeader>
+                <Toggle id="reactions-input" checked={srvconfig?.reactions == 'true'} onChange$={async (event: any) => {
+                  store.loading.push('reactions');
+                  await updateSettingFn('reactions', event.target.checked ? 'true' : 'false');
+                  store.loading = store.loading.filter(l => l != 'reactions');
+                }}>
+                  <span class="flex items-center gap-3">
+                    <HappyOutline width="32" class="fill-current" /> Reactions
+                  </span>
+                </Toggle>
+              </CardHeader>
+              <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
+            </Card>
+          </div>
         </div>
         <div class="flex">
           <span id="auditlogs" class="block h-32 -mt-32" />
