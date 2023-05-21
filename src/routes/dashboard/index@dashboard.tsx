@@ -38,7 +38,7 @@ export default component$(() => {
             return (
               <Link key={guild.id} href={`/dashboard/${guild.id}`} class="flex flex-col items-center relative rounded-xl group sm:hover:-translate-y-4 hover:scale-105 transition-all duration-200 w-14 sm:w-48 py-10 pic-link">
                 <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class={{
-                  'fixed -z-10 opacity-60 transition-all group-hover:opacity-100 rounded-full blur-3xl pt-10': true,
+                  'absolute -z-10 opacity-60 transition-all group-hover:opacity-100 rounded-full blur-3xl pt-10': true,
                 }} width={128} height={128}/>
                 <img src={guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}` : 'https://cdn.discordapp.com/embed/avatars/0.png'} alt={guild.name} class={{
                   'rounded-full pic': true,

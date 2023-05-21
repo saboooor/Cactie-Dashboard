@@ -621,23 +621,109 @@ export default component$(() => {
             <LoadingIcon />
           </div>
         </div>
-        <div class="py-10 flex flex-col gap-4">
-          <div class="flex flex-col md:flex-row gap-4">
-            <Card>
-              <CardHeader>
-                <Toggle id="reactions-input" checked={srvconfig?.reactions == 'true'} onChange$={async (event: any) => {
-                  store.loading.push('reactions');
-                  await updateSettingFn('reactions', event.target.checked ? 'true' : 'false');
-                  store.loading = store.loading.filter(l => l != 'reactions');
-                }}>
-                  <span class="flex items-center gap-3">
-                    <HappyOutline width="32" class="fill-current" /> Reactions
-                  </span>
-                </Toggle>
-              </CardHeader>
-              <p class="text-gray-400 text-md mt-2.5">Reacts with various emojis on messages that have specific key-words</p>
-            </Card>
-          </div>
+        <div class="py-10 flex flex-wrap gap-4">
+          <Card>
+            <CardHeader>
+              <div class="flex flex-1 gap-2 text-base">
+                <div class="border border-gray-700 py-2 px-3 rounded-md">
+                  'bad', 'gross', 'shit', 'dum'
+                </div>
+                <div class="border border-gray-700 py-2 px-3 rounded-md">
+                  cactie
+                </div>
+              </div>
+              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                store.loading.push('reactions');
+                // put code here
+                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                store.loading = store.loading.filter(l => l != 'reactions');
+              }} />
+            </CardHeader>
+            <div class="flex gap-2">
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                🇳
+              </div>
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                🇴
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <CardHeader>
+              <div class="flex flex-1 gap-2 text-base">
+                <div class="border border-gray-700 py-2 px-3 rounded-md">
+                  'mad', 'angry', 'kill', 'punch', 'evil'
+                </div>
+              </div>
+              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                store.loading.push('reactions');
+                // put code here
+                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                store.loading = store.loading.filter(l => l != 'reactions');
+              }} />
+            </CardHeader>
+            <div class="flex gap-2">
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                <img src="https://cdn.discordapp.com/emojis/899340907432792105.gif" width={24} height={24} />
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <CardHeader>
+              <div class="flex flex-1 gap-2 text-base">
+                <div class="border border-gray-700 py-2 px-3 rounded-md">
+                  'shoto'
+                </div>
+              </div>
+              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                store.loading.push('reactions');
+                // put code here
+                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                store.loading = store.loading.filter(l => l != 'reactions');
+              }} />
+            </CardHeader>
+            <div class="flex gap-2">
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                <img src="https://cdn.discordapp.com/emojis/867259182642102303.webp" width={24} height={24} />
+              </div>
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                😩
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <CardHeader>
+              <div class="flex flex-1 gap-2 text-base">
+                <div class="border border-gray-700 py-2 px-3 rounded-md">
+                  'lov', 'simp', ' ily ', ' ily', 'kiss', 'cute'
+                </div>
+              </div>
+              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                store.loading.push('reactions');
+                // put code here
+                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                store.loading = store.loading.filter(l => l != 'reactions');
+              }} />
+            </CardHeader>
+            <div class="flex gap-2">
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                <img src="https://cdn.discordapp.com/emojis/834126271088558160.webp" width={24} height={24} />
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <CardHeader>
+              <div class="flex flex-1 gap-2 text-base">
+                <TextInput placeholder="Add reaction" />
+                <TextInput placeholder="Add reaction" />
+              </div>
+            </CardHeader>
+            <div class="flex gap-2">
+              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
+                <TextInput placeholder="Add reaction" />
+              </div>
+            </div>
+          </Card>
         </div>
         <div class="flex">
           <span id="auditlogs" class="block h-32 -mt-32" />
