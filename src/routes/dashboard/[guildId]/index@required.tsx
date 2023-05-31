@@ -265,9 +265,6 @@ export default component$(() => {
         store.guildData = await getGuildDataFn();
       }}>
         <MenuCategory name="GENERAL SETTINGS">
-          <MenuItem href="#prefix">
-            <Alert width="24" class="fill-current" /> Prefix
-          </MenuItem>
           <MenuItem href="#suggestions">
             <MailOpenOutline width="24" class="fill-current" /> Suggestions
           </MenuItem>
@@ -279,9 +276,6 @@ export default component$(() => {
           </MenuItem>
           <MenuItem href="#leavemessage">
             <Remove width="24" class="fill-current" /> Leave Message
-          </MenuItem>
-          <MenuItem href="#maxppsize">
-            <SpeedometerOutline width="24" class="fill-current" /> Max PP Size
           </MenuItem>
         </MenuCategory>
         <MenuCategory name="TICKET SYSTEM">
@@ -327,45 +321,61 @@ export default component$(() => {
       </Menu>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
         <MenuTitle>GENERAL SETTINGS</MenuTitle>
-        <div class="grid md:grid-cols-2 gap-4 py-10">
-          <div class="grid gap-4">
-            <Card fit>
-              <CardHeader id="prefix" loading={store.loading.includes('prefix')}>
-                <Alert width="32" class="fill-current" /> Prefix
-              </CardHeader>
-              <TextInput id="prefix-input" value={srvconfig?.prefix} placeholder="The bot's prefix" onChange$={async (event: any) => {
-                store.loading.push('prefix');
-                await updateSettingFn('prefix', event.target.value);
-                store.loading = store.loading.filter(l => l != 'prefix');
-              }}>
-                Cactie's text command prefix
-              </TextInput>
-            </Card>
-            <Card>
-              <CardHeader id="maxppsize" loading={store.loading.includes('maxppsize')}>
-                <SpeedometerOutline width="32" class="fill-current" /> Max PP Size
-              </CardHeader>
-              <NumberInput input value={(store.guildData as guildData).srvconfig?.maxppsize} id="maxppsize-input" onChange$={async (event: any) => {
-                store.loading.push('maxppsize');
-                await updateSettingFn('maxppsize', event.target.value);
-                store.loading = store.loading.filter(l => l != 'maxppsize');
-              }}
-              onIncrement$={async () => {
-                store.loading.push('maxppsize');
-                (store.guildData as guildData).srvconfig!.maxppsize++;
-                await updateSettingFn('maxppsize', (store.guildData as guildData).srvconfig!.maxppsize);
-                store.loading = store.loading.filter(l => l != 'maxppsize');
-              }}
-              onDecrement$={async () => {
-                store.loading.push('maxppsize');
-                (store.guildData as guildData).srvconfig!.maxppsize--;
-                await updateSettingFn('maxppsize', (store.guildData as guildData).srvconfig!.maxppsize);
-                store.loading = store.loading.filter(l => l != 'maxppsize');
-              }}>
-                The maximum size for the boner command
-              </NumberInput>
-            </Card>
-          </div>
+        <div class="flex flex-wrap gap-4 py-10">
+          <Card fit>
+            <CardHeader id="joinmessage" loading={store.loading.includes('joinmessage')}>
+              <Add width="32" class="fill-current" /> Join Message
+            </CardHeader>
+            <TextInput big id="joinmessage-message" value={srvconfig?.joinmessage.message} placeholder="The content of the message sent when someone joins" onChange$={async (event: any) => {
+              store.loading.push('joinmessage');
+              srvconfig!.joinmessage.message = event.target.value;
+              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
+              store.loading = store.loading.filter(l => l != 'joinmessage');
+            }}>
+              The message when someone joins the server
+            </TextInput>
+            <p class="mt-2 mb-4">
+              Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
+            </p>
+            <SelectInput id="joinmessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
+              store.loading.push('joinmessage');
+              srvconfig!.joinmessage.channel = event.target.value;
+              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
+              store.loading = store.loading.filter(l => l != 'joinmessage');
+            }}>
+              <option value="false" selected={srvconfig?.joinmessage.channel == 'false'}>System Channel</option>
+              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                <option value={c.id} key={c.id} selected={srvconfig?.joinmessage.channel == c.id}>{`# ${c.name}`}</option>,
+              )}
+            </SelectInput>
+          </Card>
+          <Card fit>
+            <CardHeader id="leavemessage" loading={store.loading.includes('leavemessage')}>
+              <Remove width="32" class="fill-current" /> Leave Message
+            </CardHeader>
+            <TextInput big id="leavemessage-message" value={srvconfig?.leavemessage.message} placeholder="The content of the message sent when someone leaves" onChange$={async (event: any) => {
+              store.loading.push('leavemessage');
+              srvconfig!.leavemessage.message = event.target.value;
+              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
+              store.loading = store.loading.filter(l => l != 'leavemessage');
+            }}>
+              The message when someone leaves the server
+            </TextInput>
+            <p class="mt-2 mb-4">
+              Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
+            </p>
+            <SelectInput id="leavemessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
+              store.loading.push('leavemessage');
+              srvconfig!.leavemessage.channel = event.target.value;
+              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
+              store.loading = store.loading.filter(l => l != 'leavemessage');
+            }}>
+              <option value="false" selected={srvconfig?.leavemessage.channel == 'false'}>System Channel</option>
+              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
+                <option value={c.id} key={c.id} selected={srvconfig?.leavemessage.channel == c.id}>{`# ${c.name}`}</option>,
+              )}
+            </SelectInput>
+          </Card>
           <Card fit extraClass={{ 'gap-5': true }}>
             <CardHeader id="suggestionpoll" loading={store.loading.includes('suggestionpoll')}>
               <MailOpenOutline width="32" class="fill-current" /> Suggestions & Polls
@@ -395,60 +405,6 @@ export default component$(() => {
               <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
                 <option value={c.id} key={c.id} selected={srvconfig?.pollchannel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card>
-            <CardHeader id="joinmessage" loading={store.loading.includes('joinmessage')}>
-              <Add width="32" class="fill-current" /> Join Message
-            </CardHeader>
-            <TextInput big id="joinmessage-message" value={srvconfig?.joinmessage.message} placeholder="The content of the message sent when someone joins" onChange$={async (event: any) => {
-              store.loading.push('joinmessage');
-              srvconfig!.joinmessage.message = event.target.value;
-              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
-              store.loading = store.loading.filter(l => l != 'joinmessage');
-            }}>
-              The message when someone joins the server
-            </TextInput>
-            <p class="mt-2 mb-4">
-              Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
-            </p>
-            <SelectInput id="joinmessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
-              store.loading.push('joinmessage');
-              srvconfig!.joinmessage.channel = event.target.value;
-              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
-              store.loading = store.loading.filter(l => l != 'joinmessage');
-            }}>
-              <option value="false" selected={srvconfig?.joinmessage.channel == 'false'}>System Channel</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.joinmessage.channel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card>
-            <CardHeader id="leavemessage" loading={store.loading.includes('leavemessage')}>
-              <Remove width="32" class="fill-current" /> Leave Message
-            </CardHeader>
-            <TextInput big id="leavemessage-message" value={srvconfig?.leavemessage.message} placeholder="The content of the message sent when someone leaves" onChange$={async (event: any) => {
-              store.loading.push('leavemessage');
-              srvconfig!.leavemessage.message = event.target.value;
-              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
-              store.loading = store.loading.filter(l => l != 'leavemessage');
-            }}>
-              The message when someone leaves the server
-            </TextInput>
-            <p class="mt-2 mb-4">
-              Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
-            </p>
-            <SelectInput id="leavemessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
-              store.loading.push('leavemessage');
-              srvconfig!.leavemessage.channel = event.target.value;
-              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
-              store.loading = store.loading.filter(l => l != 'leavemessage');
-            }}>
-              <option value="false" selected={srvconfig?.leavemessage.channel == 'false'}>System Channel</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.leavemessage.channel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
           </Card>
