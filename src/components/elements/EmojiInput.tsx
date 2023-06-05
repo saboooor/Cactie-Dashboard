@@ -9,9 +9,10 @@ export default component$(({ id, emoji, nolabel }: any) => {
       <Button id={id} onClick$={(event: any) => {
         const picker = document.getElementById('emoji-picker');
         if (picker) {
-          document.getElementById('emoji-picker')?.classList.toggle('hidden');
+          document.getElementById('emoji-picker')?.classList.remove('hidden');
           picker.style.left = `${event.clientX || 0}px`;
           picker.style.top = `${event.clientY || 0}px`;
+          event.target.classList.add('emoji-picker-active');
         }
         else {
           console.error('Emoji picker not found!!');
@@ -25,7 +26,9 @@ export const EmojiPicker = component$(({ props }: any) => {
   useVisibleTask$(() => {
     const picker = new Picker({
       onEmojiSelect: (emoji: any) => {
-        console.log(emoji);
+        emoji = emoji.native ?? emoji.id;
+        const button = document.querySelector('.emoji-picker-active') as HTMLButtonElement;
+        if (button) button.innerText = emoji;
       },
       navPosition: 'bottom',
       noCountryFlags: false,
@@ -53,6 +56,8 @@ export const EmojiPicker = component$(({ props }: any) => {
       const picker = document.getElementById('emoji-picker');
       if (picker && !picker.contains(event.target as any)) {
         picker.classList.add('hidden');
+        const active = document.querySelectorAll('.emoji-picker-active');
+        active.forEach((element) => element.classList.remove('emoji-picker-active'));
       }
     });
   });

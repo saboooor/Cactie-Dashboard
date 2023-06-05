@@ -926,13 +926,7 @@ export default component$(() => {
                 <div class={{
                   'hidden': store.modal == 'edit',
                 }}>
-                  <EmojiInput id="rrcreateemoji"
-                    onEmojiSelect$={(emoji: any) => {
-                      emoji = emoji.native ?? emoji.id;
-                      const button = document.getElementById('rrcreateemoji')!;
-                      button.innerText = emoji;
-                    }}
-                  >
+                  <EmojiInput id="rrcreateemoji">
                     The emoji to react with
                   </EmojiInput>
                 </div>
