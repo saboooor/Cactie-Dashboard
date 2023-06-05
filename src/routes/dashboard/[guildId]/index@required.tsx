@@ -11,8 +11,8 @@ import Toggle from '~/components/elements/Toggle';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
-import EmojiInput from '~/components/elements/EmojiInput';
-import { Add, Alert, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, SpeedometerOutline, Ban, EllipsisVertical, TrashOutline, ChatboxOutline } from 'qwik-ionicons';
+import EmojiInput, { EmojiPicker } from '~/components/elements/EmojiInput';
+import { Add, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, Ban, EllipsisVertical, TrashOutline, ChatboxOutline, Checkmark } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -29,6 +29,7 @@ interface guildData {
   srvconfig: settings & {
     joinmessage: any,
     leavemessage: any,
+    reactions: any[],
     auditlogs: any,
   } | null;
   reactionroles: {
@@ -103,10 +104,12 @@ export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], 
       guildId: props.params.guildId,
     },
   });
+
   const srvconfig = srvconfigUnparsed ? {
     ...srvconfigUnparsed,
     joinmessage: JSON.parse(srvconfigUnparsed.joinmessage),
     leavemessage: JSON.parse(srvconfigUnparsed.leavemessage),
+    reactions: JSON.parse(srvconfigUnparsed.reactions),
     auditlogs: JSON.parse(srvconfigUnparsed.auditlogs),
   } : null;
 
@@ -577,107 +580,59 @@ export default component$(() => {
             <LoadingIcon />
           </div>
         </div>
-        <div class="py-10 flex flex-wrap gap-4">
+        <div class="py-10 grid gap-4">
+          {
+            srvconfig?.reactions.map((reaction, i) =>
+              <Card key={i}>
+                <div class="flex gap-2">
+                  <div class="flex-1">
+                    <TextInput placeholder="Triggers, separated by commas, no spaces" value={reaction.triggers.join(',')} />
+                  </div>
+                  <div class="flex-1">
+                    <TextInput placeholder="Additional triggers, separated by commas, no spaces" value={reaction.additionaltriggers?.join(',')} />
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="flex gap-2 flex-1">
+                    {(reaction.emojis as any[]).map((emoji, i) =>
+                      <EmojiInput nolabel emoji={emoji} key={i} id={`reaction-emoji-${i}`} />,
+                    )}
+                    <Button small>
+                      <Add width="24" class="fill-current" />
+                    </Button>
+                  </div>
+                  <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                    store.loading.push('reactions');
+                    // put code here
+                    await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                    store.loading = store.loading.filter(l => l != 'reactions');
+                  }} />
+                </div>
+              </Card>,
+            )
+          }
           <Card>
-            <CardHeader>
-              <div class="flex flex-1 gap-2 text-base">
-                <div class="border border-gray-700 py-2 px-3 rounded-md">
-                  'bad', 'gross', 'shit', 'dum'
-                </div>
-                <div class="border border-gray-700 py-2 px-3 rounded-md">
-                  cactie
-                </div>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <TextInput placeholder="Triggers, separated by commas, no spaces" />
               </div>
-              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+              <div class="flex-1">
+                <TextInput placeholder="Additional triggers, separated by commas, no spaces" />
+              </div>
+            </div>
+            <div class="flex">
+              <div class="flex gap-2 flex-1">
+                <EmojiInput nolabel id="reaction-emoji-create" />
+                <Button small>
+                  <Add width="24" class="fill-current" />
+                </Button>
+              </div>
+              <Checkmark width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
                 store.loading.push('reactions');
                 // put code here
                 await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
                 store.loading = store.loading.filter(l => l != 'reactions');
               }} />
-            </CardHeader>
-            <div class="flex gap-2">
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                🇳
-              </div>
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                🇴
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <CardHeader>
-              <div class="flex flex-1 gap-2 text-base">
-                <div class="border border-gray-700 py-2 px-3 rounded-md">
-                  'mad', 'angry', 'kill', 'punch', 'evil'
-                </div>
-              </div>
-              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                store.loading.push('reactions');
-                // put code here
-                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                store.loading = store.loading.filter(l => l != 'reactions');
-              }} />
-            </CardHeader>
-            <div class="flex gap-2">
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                <img src="https://cdn.discordapp.com/emojis/899340907432792105.gif" width={24} height={24} />
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <CardHeader>
-              <div class="flex flex-1 gap-2 text-base">
-                <div class="border border-gray-700 py-2 px-3 rounded-md">
-                  'shoto'
-                </div>
-              </div>
-              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                store.loading.push('reactions');
-                // put code here
-                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                store.loading = store.loading.filter(l => l != 'reactions');
-              }} />
-            </CardHeader>
-            <div class="flex gap-2">
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                <img src="https://cdn.discordapp.com/emojis/867259182642102303.webp" width={24} height={24} />
-              </div>
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                😩
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <CardHeader>
-              <div class="flex flex-1 gap-2 text-base">
-                <div class="border border-gray-700 py-2 px-3 rounded-md">
-                  'lov', 'simp', ' ily ', ' ily', 'kiss', 'cute'
-                </div>
-              </div>
-              <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                store.loading.push('reactions');
-                // put code here
-                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                store.loading = store.loading.filter(l => l != 'reactions');
-              }} />
-            </CardHeader>
-            <div class="flex gap-2">
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                <img src="https://cdn.discordapp.com/emojis/834126271088558160.webp" width={24} height={24} />
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <CardHeader>
-              <div class="flex flex-1 gap-2 text-base">
-                <TextInput placeholder="Add reaction" />
-                <TextInput placeholder="Add reaction" />
-              </div>
-            </CardHeader>
-            <div class="flex gap-2">
-              <div class="border border-gray-700 bg-gray-900/30 py-1 px-3 rounded-md">
-                <TextInput placeholder="Add reaction" />
-              </div>
             </div>
           </Card>
         </div>
@@ -977,24 +932,6 @@ export default component$(() => {
                       const button = document.getElementById('rrcreateemoji')!;
                       button.innerText = emoji;
                     }}
-                    emojiPickerProps={{
-                      custom: [
-                        {
-                          id: 'custom',
-                          name: guild.name,
-                          emojis: guild.emojis.map(e => ({
-                            id: e.id,
-                            name: e.name,
-                            skins: [{ src: `https://cdn.discordapp.com/emojis/${e.id}` }],
-                          })),
-                        },
-                      ],
-                      categoryIcons: {
-                        custom: {
-                          src: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`,
-                        },
-                      },
-                    }}
                   >
                     The emoji to react with
                   </EmojiInput>
@@ -1069,6 +1006,24 @@ export default component$(() => {
         </div>
       </div>
 
+      <EmojiPicker props={{
+        custom: [
+          {
+            id: 'custom',
+            name: guild.name,
+            emojis: guild.emojis.map(e => ({
+              id: e.id,
+              name: e.name,
+              skins: [{ src: `https://cdn.discordapp.com/emojis/${e.id}` }],
+            })),
+          },
+        ],
+        categoryIcons: {
+          custom: {
+            src: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`,
+          },
+        },
+      }}/>
     </section>
   );
 });

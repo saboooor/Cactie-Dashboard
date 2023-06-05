@@ -1,11 +1,32 @@
 import { Picker } from 'emoji-mart';
-import { Slot, component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
+import { Slot, component$, useVisibleTask$ } from '@builder.io/qwik';
 import { Button } from './Button';
 
-export default component$(({ id, emojiPickerProps, onEmojiSelect$ }: any) => {
+export default component$(({ id, emoji, nolabel }: any) => {
+  return <>
+    <div class="flex items-center">
+      {!nolabel && <label for={id} class="mr-2 text-xl"><Slot /></label>}
+      <Button id={id} onClick$={(event: any) => {
+        const picker = document.getElementById('emoji-picker');
+        if (picker) {
+          document.getElementById('emoji-picker')?.classList.toggle('hidden');
+          picker.style.left = `${event.clientX || 0}px`;
+          picker.style.top = `${event.clientY || 0}px`;
+        }
+        else {
+          console.error('Emoji picker not found!!');
+        }
+      }}>{emoji ?? '😃'}</Button>
+    </div>
+  </>;
+});
+
+export const EmojiPicker = component$(({ props }: any) => {
   useVisibleTask$(() => {
     const picker = new Picker({
-      onEmojiSelect: onEmojiSelect$,
+      onEmojiSelect: (emoji: any) => {
+        console.log(emoji);
+      },
       navPosition: 'bottom',
       noCountryFlags: false,
       previewPosition: 'none',
@@ -24,26 +45,16 @@ export default component$(({ id, emojiPickerProps, onEmojiSelect$ }: any) => {
         'symbols',
         'flags',
       ],
-      ...emojiPickerProps,
+      ...props,
     });
     const div = document.getElementById('emoji-picker');
     div?.append(picker as any);
+    document.addEventListener('click', (event) => {
+      const picker = document.getElementById('emoji-picker');
+      if (picker && !picker.contains(event.target as any)) {
+        picker.classList.add('hidden');
+      }
+    });
   });
-
-  const store = useStore({
-    hidden: true,
-  });
-
-  return <>
-    <div class="flex items-center pb-3">
-      <label for={id} class="mr-2 text-xl">
-        <Slot />
-      </label>
-      <Button id={id} onClick$={() => store.hidden = !store.hidden}>😃</Button>
-    </div>
-    <div id="emoji-picker" class={{
-      'absolute top-32 right-0': true,
-      'hidden': store.hidden,
-    }} />
-  </>;
+  return <div id={'emoji-picker'} class="hidden fixed z-10" />;
 });
