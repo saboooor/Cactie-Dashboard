@@ -622,7 +622,7 @@ export default component$(() => {
                   </div>
                   <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
                     store.loading.push('reactions');
-                    // put code here
+                    (store.guildData as guildData).srvconfig!.reactions.splice(i, 1);
                     await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
                     store.loading = store.loading.filter(l => l != 'reactions');
                   }} />
@@ -631,20 +631,21 @@ export default component$(() => {
             )
           }
           <Card>
-            <TextInput placeholder="Regex Pattern" extraClass="font-mono" />
-            <div class="flex">
-              <div class="flex gap-2 flex-1">
-                <Button small disabled>
-                  <Remove width="24" class="fill-current" />
-                </Button>
-                <EmojiInput nolabel id="reaction-emoji-create" />
-                <Button small>
-                  <Add width="24" class="fill-current" />
-                </Button>
+            <CardHeader>
+              <Add width="32" class="fill-current" /> Create
+            </CardHeader>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <TextInput nolabel placeholder="Regex Pattern" extraClass="font-mono" id="reaction-create-regex" />
               </div>
+              <EmojiInput nolabel id="reaction-emoji-create" />
               <Checkmark width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
                 store.loading.push('reactions');
-                // put code here
+
+                srvconfig?.reactions.push({
+                  regex: (document.getElementById('reaction-create-regex') as HTMLInputElement).value,
+                  emojis: [(document.getElementById('reaction-emoji-create') as HTMLInputElement).innerText],
+                });
                 await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
                 store.loading = store.loading.filter(l => l != 'reactions');
               }} />

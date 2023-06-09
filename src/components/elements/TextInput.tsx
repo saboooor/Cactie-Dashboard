@@ -3,9 +3,11 @@ import { component$, Slot } from '@builder.io/qwik';
 export default component$((props: any) => {
   return (
     <div class="flex flex-col">
-      <label for={props.id} class="mb-2">
-        <Slot />
-      </label>
+      {!props.nolabel &&
+        <label for={props.id} class="mb-2">
+          <Slot />
+        </label>
+      }
       {props.big ?
         <RawTextAreaInput {...props} /> :
         <RawTextInput {...props} />
