@@ -592,7 +592,7 @@ export default component$(() => {
                   (store.guildData as guildData).srvconfig!.reactions[i].regex = event.target.value;
                   await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
                   store.loading = store.loading.filter(l => l != 'reactions');
-                }} />
+                }} extraClass="font-mono" />
                 <div class="flex">
                   <div class="flex flex-wrap gap-2 flex-1">
                     <Button small disabled={reaction.emojis.length < 2} onClick$={async () => {
@@ -631,7 +631,7 @@ export default component$(() => {
             )
           }
           <Card>
-            <TextInput placeholder="Regex Pattern" />
+            <TextInput placeholder="Regex Pattern" extraClass="font-mono" />
             <div class="flex">
               <div class="flex gap-2 flex-1">
                 <Button small disabled>
