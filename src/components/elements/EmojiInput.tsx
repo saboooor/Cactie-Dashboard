@@ -2,7 +2,7 @@ import { Picker } from 'emoji-mart';
 import { Slot, component$, useVisibleTask$ } from '@builder.io/qwik';
 import { Button } from './Button';
 
-export default component$(({ id, emoji, nolabel }: any) => {
+export default component$(({ id, emoji, nolabel, onChange$ }: any) => {
   return <>
     <div class="flex items-center">
       {!nolabel && <label for={id} class="mr-2 text-xl"><Slot /></label>}
@@ -17,7 +17,7 @@ export default component$(({ id, emoji, nolabel }: any) => {
         else {
           console.error('Emoji picker not found!!');
         }
-      }}>{emoji ?? '😃'}</Button>
+      }} onChange$={onChange$}>{emoji ?? '😃'}</Button>
     </div>
   </>;
 });
@@ -28,7 +28,9 @@ export const EmojiPicker = component$(({ props }: any) => {
       onEmojiSelect: (emoji: any) => {
         emoji = emoji.native ?? emoji.id;
         const button = document.querySelector('.emoji-picker-active') as HTMLButtonElement;
-        if (button) button.innerText = emoji;
+        if (!button) return;
+        button.innerText = emoji;
+        button.dispatchEvent(new Event('change'));
       },
       navPosition: 'bottom',
       noCountryFlags: false,

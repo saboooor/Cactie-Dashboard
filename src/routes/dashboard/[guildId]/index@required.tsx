@@ -595,7 +595,7 @@ export default component$(() => {
                 <div class="flex">
                   <div class="flex gap-2 flex-1">
                     {(reaction.emojis as any[]).map((emoji, i) =>
-                      <EmojiInput nolabel emoji={emoji} key={i} id={`reaction-emoji-${i}`} />,
+                      <EmojiInput nolabel emoji={emoji} key={i} id={`reaction-emoji-${i}`} onChange$={(event: any) => console.log(event.target.innerText)} />,
                     )}
                     <Button small>
                       <Add width="24" class="fill-current" />
