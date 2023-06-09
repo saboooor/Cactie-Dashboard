@@ -50,6 +50,7 @@ export const EmojiPicker = component$(({ props }: any) => {
         'symbols',
         'flags',
       ],
+      icons: 'outline',
       ...props,
     });
     const div = document.getElementById('emoji-picker');

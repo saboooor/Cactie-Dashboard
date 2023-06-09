@@ -569,7 +569,7 @@ export default component$(() => {
             </SelectInput>
           </Card>
         </div>
-        <div class="flex">
+        <div class="flex mb-2">
           <span id="reactions" class="block h-32 -mt-32" />
           <MenuTitle extraClass="flex-1">REACTIONS</MenuTitle>
           <div class={{
@@ -580,24 +580,43 @@ export default component$(() => {
             <LoadingIcon />
           </div>
         </div>
+        <p>
+          The Reactions feature uses regex to detect messages and react to them. You can use this to make your own custom reactions. In order to create a regex expression based on your needs, either ask AI to make one for you (for example: "Create a regex pattern that matches 'cactie' and 'stupid' in any order" will give you a regex pattern that matches "cactie is stupid" or "stupid cactie" etc.) or use a regex generator online (for example: https://regexr.com/)
+        </p>
         <div class="py-10 grid gap-4">
           {
             srvconfig?.reactions.map((reaction, i) =>
               <Card key={i}>
-                <div class="flex gap-2">
-                  <div class="flex-1">
-                    <TextInput placeholder="Triggers, separated by commas, no spaces" value={reaction.triggers.join(',')} />
-                  </div>
-                  <div class="flex-1">
-                    <TextInput placeholder="Additional triggers, separated by commas, no spaces" value={reaction.additionaltriggers?.join(',')} />
-                  </div>
-                </div>
+                <TextInput placeholder="Regex Pattern" value={reaction.regex} onChange$={async (event: any) => {
+                  store.loading.push('reactions');
+                  (store.guildData as guildData).srvconfig!.reactions[i].regex = event.target.value;
+                  await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                  store.loading = store.loading.filter(l => l != 'reactions');
+                }} />
                 <div class="flex">
-                  <div class="flex gap-2 flex-1">
-                    {(reaction.emojis as any[]).map((emoji, i) =>
-                      <EmojiInput nolabel emoji={emoji} key={i} id={`reaction-emoji-${i}`} onChange$={(event: any) => console.log(event.target.innerText)} />,
-                    )}
-                    <Button small>
+                  <div class="flex flex-wrap gap-2 flex-1">
+                    <Button small disabled={reaction.emojis.length < 2} onClick$={async () => {
+                      store.loading.push('reactions');
+                      (store.guildData as guildData).srvconfig!.reactions[i].emojis.pop();
+                      await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
+                      store.loading = store.loading.filter(l => l != 'reactions');
+                    }}>
+                      <Remove width="24" class="fill-current" />
+                    </Button>
+                    {(reaction.emojis as any[]).map((emoji, i2) => {
+                      return <EmojiInput nolabel emoji={emoji} key={i2} id={`reaction-emoji-${i2}`} onChange$={async (event: any) => {
+                        store.loading.push('reactions');
+                        const reactions = JSON.parse(JSON.stringify(srvconfig?.reactions));
+                        reactions[i].emojis[i2] = event.target.innerText;
+                        await updateSettingFn('reactions', JSON.stringify(reactions));
+                        store.loading = store.loading.filter(l => l != 'reactions');
+                      }} />;
+                    })}
+                    <Button small onClick$={() => {
+                      store.loading.push('reactions');
+                      (store.guildData as guildData).srvconfig!.reactions[i].emojis.push('Select an Emoji');
+                      store.loading = store.loading.filter(l => l != 'reactions');
+                    }} disabled={srvconfig?.reactions[i].emojis.includes('Select an Emoji')}>
                       <Add width="24" class="fill-current" />
                     </Button>
                   </div>
@@ -612,16 +631,12 @@ export default component$(() => {
             )
           }
           <Card>
-            <div class="flex gap-2">
-              <div class="flex-1">
-                <TextInput placeholder="Triggers, separated by commas, no spaces" />
-              </div>
-              <div class="flex-1">
-                <TextInput placeholder="Additional triggers, separated by commas, no spaces" />
-              </div>
-            </div>
+            <TextInput placeholder="Regex Pattern" />
             <div class="flex">
               <div class="flex gap-2 flex-1">
+                <Button small disabled>
+                  <Remove width="24" class="fill-current" />
+                </Button>
                 <EmojiInput nolabel id="reaction-emoji-create" />
                 <Button small>
                   <Add width="24" class="fill-current" />

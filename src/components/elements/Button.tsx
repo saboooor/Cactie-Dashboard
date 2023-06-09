@@ -14,7 +14,7 @@ export const Button = component$((props: any) => {
   const color = props.color ? classes[props.color as keyof typeof classes] : classes.secondary;
   return (
     <button {...props} class={{
-      'relative flex items-center gap-3 transition ease-in-out border text-gray-50': true,
+      'relative flex items-center gap-3 transition ease-in-out border text-gray-50 disabled:opacity-50 disabled:pointer-events-none': true,
       [color]: true,
       'text-sm px-2 py-1 rounded-md': props.small,
       'text-base px-6 py-3 rounded-lg': props.big,
