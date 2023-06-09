@@ -1,6 +1,6 @@
 {
   "name": "cactie-dashboard",
-  "version": "7.1.0",
+  "version": "7.2.0",
   "description": "Cactie dashboard go brr",
   "engines": {
     "node": ">=15.0.0"
@@ -32,20 +32,20 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@builder.io/qwik": "1.1.4",
-    "@builder.io/qwik-city": "1.1.4",
+    "@builder.io/qwik": "1.1.5",
+    "@builder.io/qwik-city": "1.1.5",
     "@emoji-mart/data": "^1.1.2",
     "@prisma/client": "4.15.0",
-    "@types/eslint": "8.40.0",
+    "@types/eslint": "8.40.1",
     "@types/node": "20.2.5",
-    "@types/uuid": "9.0.1",
-    "@typescript-eslint/eslint-plugin": "5.59.8",
-    "@typescript-eslint/parser": "5.59.8",
+    "@types/uuid": "9.0.2",
+    "@typescript-eslint/eslint-plugin": "5.59.9",
+    "@typescript-eslint/parser": "5.59.9",
     "autoprefixer": "10.4.14",
     "discord-api-types": "0.37.43",
     "emoji-mart": "^5.5.2",
     "eslint": "8.42.0",
-    "eslint-plugin-qwik": "1.1.4",
+    "eslint-plugin-qwik": "1.1.5",
     "imagetools-core": "4.0.3",
     "postcss": "8.4.24",
     "prettier": "2.8.8",
