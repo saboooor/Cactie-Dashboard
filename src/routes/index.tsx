@@ -40,7 +40,7 @@ export default component$(() => {
           The last <span class="text-blue-400">Discord</span> bot you need, <span class="text-green-200">Cactie</span>.
         </h1>
         <p class="mt-5 text-xl sm:text-2xl md:text-3xl text-gray-400">
-          Moderation, Fun, Music, Utilities, and More!
+          Moderation, Fun, QOL, Utilities, and More!
         </p>
         <p class="my-5 text-xs text-gray-400">
           It's pronounced Cact-E, btw
