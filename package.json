@@ -1,6 +1,6 @@
 {
   "name": "cactie-dashboard",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "description": "Cactie dashboard go brr",
   "engines": {
     "node": ">=15.0.0"

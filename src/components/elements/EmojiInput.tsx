@@ -10,8 +10,8 @@ export default component$(({ id, emoji, nolabel, onChange$ }: any) => {
         const picker = document.getElementById('emoji-picker');
         if (picker) {
           document.getElementById('emoji-picker')?.classList.remove('hidden');
-          picker.style.left = `${event.clientX || 0}px`;
-          picker.style.top = `${event.clientY || 0}px`;
+          picker.style.left = `${event.pageX || 0}px`;
+          picker.style.top = `${event.pageY || 0}px`;
           event.target.classList.add('emoji-picker-active');
         }
         else {
@@ -64,5 +64,5 @@ export const EmojiPicker = component$(({ props }: any) => {
       }
     });
   });
-  return <div id={'emoji-picker'} class="hidden fixed z-10" />;
+  return <div id={'emoji-picker'} class="hidden absolute z-10" />;
 });
