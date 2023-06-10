@@ -630,7 +630,7 @@ export default component$(() => {
                       return <EmojiInput nolabel emoji={emoji} key={i2} id={`reaction-emoji-${i2}`} onChange$={async (event: any) => {
                         store.loading.push('reactions');
                         const reactions = JSON.parse(JSON.stringify(srvconfig?.reactions));
-                        reactions[i].emojis[i2] = event.target.innerText;
+                        reactions[i].emojis[i2] = event.target.getAttribute('value');
                         await updateSettingFn('reactions', JSON.stringify(reactions));
                         store.loading = store.loading.filter(l => l != 'reactions');
                       }} />;
@@ -667,7 +667,7 @@ export default component$(() => {
 
                 srvconfig?.reactions.push({
                   regex: (document.getElementById('reaction-create-regex') as HTMLInputElement).value,
-                  emojis: [(document.getElementById('reaction-emoji-create') as HTMLInputElement).innerText],
+                  emojis: [(document.getElementById('reaction-emoji-create') as HTMLInputElement).getAttribute('value')],
                 });
                 await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
                 store.loading = store.loading.filter(l => l != 'reactions');
@@ -923,7 +923,7 @@ export default component$(() => {
                                   channelselect.value = channel.id;
                                   messageinput.value = messageId;
                                   roleinput.value = role!.id;
-                                  emojiinput.innerText = rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId;
+                                  emojiinput.setAttribute('value', rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId);
                                   typeinput.value = rr.type;
                                   silentinput.checked = rr.silent == 'true';
                                   store.modal = 'edit';
@@ -997,7 +997,7 @@ export default component$(() => {
               <div class="flex flex-row-reverse gap-3">
                 <Button color="primary" extraClass="flex-1 sm:flex-initial" onClick$={async () => {
                   store.loading.push('rrcreate');
-                  const emojiId = document.getElementById('rrcreateemoji')!.innerText;
+                  const emojiId = document.getElementById('rrcreateemoji')!.getAttribute('value')!;
                   const roleId = document.getElementById('rrcreaterole')!as HTMLSelectElement;
                   const channelId = document.getElementById('rrcreatechannel')! as HTMLSelectElement;
                   const messageId = document.getElementById('rrcreatemessage')! as HTMLInputElement;

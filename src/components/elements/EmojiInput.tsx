@@ -17,7 +17,7 @@ export default component$(({ id, emoji, nolabel, onChange$ }: any) => {
         else {
           console.error('Emoji picker not found!!');
         }
-      }} onChange$={onChange$}>{emoji ?? '😃'}</Button>
+      }} onChange$={onChange$} value={emoji}>{isNaN(emoji) ? emoji ?? '😃' : <img src={`https://cdn.discordapp.com/emojis/${emoji}`} width={24} height={24}/>}</Button>
     </div>
   </>;
 });
@@ -29,7 +29,8 @@ export const EmojiPicker = component$(({ props }: any) => {
         emoji = emoji.native ?? emoji.id;
         const button = document.querySelector('.emoji-picker-active') as HTMLButtonElement;
         if (!button) return;
-        button.innerText = emoji;
+        button.innerHTML = isNaN(emoji) ? emoji ?? '😃' : `<img src="https://cdn.discordapp.com/emojis/${emoji}" width="24" height="24"></img>`;
+        button.setAttribute('value', emoji);
         button.dispatchEvent(new Event('change'));
       },
       navPosition: 'bottom',
