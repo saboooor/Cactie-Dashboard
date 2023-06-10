@@ -32,10 +32,6 @@ model settings {
   suggestthreads    String @default("true") @db.Text
   pollchannel       String @default("false") @db.Text
   logchannel        String @default("false") @db.Text
-  ticketlogchannel  String @default("false") @db.Text
-  ticketcategory    String @default("false") @db.Text
-  supportrole       String @default("false") @db.Text
-  ticketmention     String @default("here") @db.Text
   mutecmd           String @default("timeout") @db.Text
   msgshortener      Int    @default(30)
 }
