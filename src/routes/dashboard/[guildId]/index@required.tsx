@@ -29,6 +29,7 @@ interface guildData {
   srvconfig: settings & {
     joinmessage: any,
     leavemessage: any,
+    tickets: any,
     reactions: any[],
     auditlogs: any,
   } | null;
@@ -109,6 +110,7 @@ export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], 
     ...srvconfigUnparsed,
     joinmessage: JSON.parse(srvconfigUnparsed.joinmessage),
     leavemessage: JSON.parse(srvconfigUnparsed.leavemessage),
+    tickets: JSON.parse(srvconfigUnparsed.tickets),
     reactions: JSON.parse(srvconfigUnparsed.reactions),
     auditlogs: JSON.parse(srvconfigUnparsed.auditlogs),
   } : null;
@@ -412,87 +414,108 @@ export default component$(() => {
             </SelectInput>
           </Card>
         </div>
-        <MenuTitle>TICKET SYSTEM</MenuTitle>
+        <div class="flex mb-2">
+          <span id="reactions" class="block h-32 -mt-32" />
+          <Toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
+            store.loading.push('tickets-enabled');
+            srvconfig!.tickets.enabled = event.target.checked;
+            await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
+            store.loading = store.loading.filter(l => l != 'tickets-enabled');
+          }}>
+            <MenuTitle extraClass="flex-1">TICKET SYSTEM</MenuTitle>
+          </Toggle>
+          <div class={{
+            'transition-all': true,
+            'opacity-0': !store.loading.includes('tickets-enabled'),
+            'opacity-100': store.loading.includes('tickets-enabled'),
+          }}>
+            <LoadingIcon />
+          </div>
+        </div>
         <div class="flex flex-wrap gap-4 py-10">
           <Card fit>
-            <CardHeader id="tickets" loading={store.loading.includes('tickets')}>
-              <InvertModeOutline width="32" class="fill-current" /> Mode
+            <CardHeader id="tickets-type" loading={store.loading.includes('tickets-type')}>
+              <InvertModeOutline width="32" class="fill-current" /> Type
             </CardHeader>
-            <SelectInput id="tickets-input" label="This is how the bot will handle tickets" onChange$={async (event: any) => {
-              store.loading.push('tickets');
-              await updateSettingFn('tickets', event.target.value);
-              store.loading = store.loading.filter(l => l != 'tickets');
+            <SelectInput id="tickets-type-input" label="Whether to use buttons or reactions for ticket interactions" onChange$={async (event: any) => {
+              store.loading.push('tickets-type');
+              srvconfig!.tickets.type = event.target.value;
+              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
+              store.loading = store.loading.filter(l => l != 'tickets-type');
             }}>
-              <option value="false" selected={srvconfig?.tickets == 'false'}>Disable Tickets</option>
-              <option value="buttons" selected={srvconfig?.tickets == 'buttons'}>Use buttons</option>
-              <option value="reactions" selected={srvconfig?.tickets == 'reactions'}>Use reactions</option>
+              <option value="buttons" selected={srvconfig?.tickets.type == 'buttons'}>Use buttons</option>
+              <option value="reactions" selected={srvconfig?.tickets.type == 'reactions'}>Use reactions</option>
             </SelectInput>
           </Card>
           <Card fit>
-            <CardHeader id="ticketcategory" loading={store.loading.includes('ticketcategory')}>
+            <CardHeader id="tickets-category" loading={store.loading.includes('tickets-category')}>
               <FolderOutline width="32" class="fill-current" /> Category
             </CardHeader>
-            <SelectInput id="ticketcategory-input" label="The category where tickets will appear" onChange$={async (event: any) => {
-              store.loading.push('ticketcategory');
-              await updateSettingFn('ticketcategory', event.target.value);
-              store.loading = store.loading.filter(l => l != 'ticketcategory');
+            <SelectInput id="tickets-category-input" label="The category where tickets will appear" onChange$={async (event: any) => {
+              store.loading.push('tickets-category');
+              srvconfig!.tickets.category = event.target.value;
+              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
+              store.loading = store.loading.filter(l => l != 'tickets-category');
             }}>
-              <option value="false" selected={srvconfig?.ticketcategory == 'false'}>No Category</option>
+              <option value="false" selected={srvconfig?.tickets.category == 'false'}>No Category</option>
               {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.ticketcategory == c.id}>{`> ${c.name}`}</option>,
+                <option value={c.id} key={c.id} selected={srvconfig?.tickets.category == c.id}>{`> ${c.name}`}</option>,
               )}
             </SelectInput>
           </Card>
           <Card fit>
-            <CardHeader id="ticketlogchannel" loading={store.loading.includes('ticketlogchannel')}>
+            <CardHeader id="tickets-logchannel" loading={store.loading.includes('tickets-logchannel')}>
               <FileTrayFullOutline width="32" class="fill-current" /> Log Channel
             </CardHeader>
-            <SelectInput id="ticketlogchannel-value" label="The channel where transcripts will appear" onChange$={async (event: any) => {
-              store.loading.push('ticketlogchannel');
-              await updateSettingFn('ticketlogchannel', event.target.value);
-              store.loading = store.loading.filter(l => l != 'ticketlogchannel');
+            <SelectInput id="tickets-logchannel-input" label="The channel where transcripts will appear" onChange$={async (event: any) => {
+              store.loading.push('tickets-logchannel');
+              srvconfig!.tickets.logchannel = event.target.value;
+              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
+              store.loading = store.loading.filter(l => l != 'tickets-logchannel');
             }}>
-              <option value="false" selected={srvconfig?.ticketlogchannel == 'false'}>Don't send transcripts</option>
+              <option value="false" selected={srvconfig?.tickets.logchannel == 'false'}>Don't send transcripts</option>
               {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.ticketlogchannel == c.id}>{`# ${c.name}`}</option>,
+                <option value={c.id} key={c.id} selected={srvconfig?.tickets.logchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
           </Card>
           <Card fit>
-            <CardHeader id="supportrole" loading={store.loading.includes('suppportrole')}>
+            <CardHeader id="tickets-role" loading={store.loading.includes('tickets-role')}>
               <At width="32" class="fill-current" /> Access Role
             </CardHeader>
-            <SelectInput id="supportrole-input" label="The role that may access tickets" onChange$={async (event: any) => {
-              store.loading.push('supportrole');
-              await updateSettingFn('supportrole', event.target.value);
+            <SelectInput id="tickets-role-input" label="The role that may access tickets" onChange$={async (event: any) => {
+              store.loading.push('tickets-role');
+              srvconfig!.tickets.role = event.target.value;
+              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
-              store.loading = store.loading.filter(l => l != 'supportrole');
+              store.loading = store.loading.filter(l => l != 'tickets-role');
             }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.supportrole)?.color ? roles.find(r => r.id == srvconfig?.supportrole)?.color.toString(16) : 'ffffff'),
+              color: '#' + (roles.find(r => r.id == srvconfig?.tickets.role)?.color ? roles.find(r => r.id == srvconfig?.tickets.role)?.color.toString(16) : 'ffffff'),
             }}>
-              <option value="false" selected={srvconfig?.supportrole == 'false'} style={{ color: '#ffffff' }}>Only Administrators</option>
+              <option value="false" selected={srvconfig?.tickets.role == 'false'} style={{ color: '#ffffff' }}>Only Administrators</option>
               {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.supportrole == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
+                <option value={r.id} key={r.id} selected={srvconfig?.tickets.role == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
           </Card>
           <Card fit>
-            <CardHeader id="ticketmention" loading={store.loading.includes('ticketmention')}>
+            <CardHeader id="tickets-mention" loading={store.loading.includes('tickets-mention')}>
               <At width="32" class="fill-current" /> Mention
             </CardHeader>
-            <SelectInput id="ticketmention-input" label="Pings the specified role when a ticket is created" onChange$={async (event: any) => {
-              store.loading.push('ticketmention');
-              await updateSettingFn('ticketmention', event.target.value);
+            <SelectInput id="tickets-mention-input" label="Pings the specified role when a ticket is created" onChange$={async (event: any) => {
+              store.loading.push('tickets-mention');
+              srvconfig!.tickets.mention = event.target.value;
+              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
-              store.loading = store.loading.filter(l => l != 'ticketmention');
+              store.loading = store.loading.filter(l => l != 'tickets-mention');
             }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.ticketmention)?.color ? roles.find(r => r.id == srvconfig?.ticketmention)?.color.toString(16) : 'ffffff'),
+              color: '#' + (roles.find(r => r.id == srvconfig?.tickets.mention)?.color ? roles.find(r => r.id == srvconfig?.tickets.mention)?.color.toString(16) : 'ffffff'),
             }}>
-              <option value="false" selected={srvconfig?.ticketmention == 'false'} style={{ color: '#ffffff' }}>No mention</option>
-              <option value="everyone" selected={srvconfig?.ticketmention == 'everyone'} style={{ color: 'rgb(59 130 246)' }}>@ everyone</option>
-              <option value="here" selected={srvconfig?.ticketmention == 'here'} style={{ color: 'rgb(59 130 246)' }}>@ here</option>
+              <option value="false" selected={srvconfig?.tickets.mention == 'false'} style={{ color: '#ffffff' }}>No mention</option>
+              <option value="everyone" selected={srvconfig?.tickets.mention == 'everyone'} style={{ color: 'rgb(59 130 246)' }}>@ everyone</option>
+              <option value="here" selected={srvconfig?.tickets.mention == 'here'} style={{ color: 'rgb(59 130 246)' }}>@ here</option>
               {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.ticketmention == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
+                <option value={r.id} key={r.id} selected={srvconfig?.tickets.mention == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
               )}
             </SelectInput>
           </Card>
