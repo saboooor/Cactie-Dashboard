@@ -62,60 +62,6 @@ async function fetchData(url: string, props: RequestEventBase, user?: boolean, a
   return data;
 }
 
-export const getGuildFn = server$(async function(props: RequestEventBase): Promise<Guild | Error> {
-  const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}`, {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  }).catch(() => null);
-  if (!res) return new Error('Guild fetch failed');
-  const guild: RESTError | RESTRateLimit | Guild = await res.json();
-  if ('retry_after' in guild) {
-    console.log(`${guild.message}, retrying after ${guild.retry_after * 1000}ms`);
-    await sleep(guild.retry_after * 1000);
-    return await getGuildFn(props);
-  }
-  if ('code' in guild) return new Error(`Guild error ${guild.code}`);
-  return guild;
-});
-
-export const getGuildChannelsFn = server$(async function(props: RequestEventBase): Promise<AnyGuildChannel[] | Error> {
-  const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/channels`, {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  }).catch(() => null);
-  if (!res) return new Error('Guild Channel fetch failed');
-  const channels: RESTError | RESTRateLimit | AnyGuildChannel[] = await res.json();
-  if ('retry_after' in channels) {
-    console.log(`${channels.message}, retrying after ${channels.retry_after * 1000}ms`);
-    await sleep(channels.retry_after * 1000);
-    return await getGuildChannelsFn(props);
-  }
-  if ('code' in channels) return new Error(`Guild Channels error ${channels.code}`);
-  channels.sort((a, b) => a.position - b.position);
-  return channels;
-});
-
-export const getGuildRolesFn = server$(async function(props: RequestEventBase): Promise<APIRole[] | Error> {
-  const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}/roles`, {
-    headers: {
-      authorization: `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  }).catch(() => null);
-  if (!res) return new Error('Guild roles fetch failed');
-  const roles: RESTError | RESTRateLimit | APIRole[] = await res.json();
-  if ('retry_after' in roles) {
-    console.log(`${roles.message}, retrying after ${roles.retry_after * 1000}ms`);
-    await sleep(roles.retry_after * 1000);
-    return await getGuildRolesFn(props);
-  }
-  if ('code' in roles) return new Error(`Guild Roles error ${roles.code}`);
-  roles.sort((a, b) => a.position - b.position);
-  roles.reverse();
-  return roles;
-});
-
 export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], props?: RequestEventBase) {
   props = props ?? this;
 
