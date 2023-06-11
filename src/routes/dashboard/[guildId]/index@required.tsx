@@ -432,7 +432,7 @@ export default component$(() => {
             <LoadingIcon />
           </div>
         </div>
-        <div class="flex flex-wrap gap-4 py-10">
+        <div class="grid grid-cols-3 gap-4 py-10">
           <Card fit>
             <CardHeader id="tickets-type" loading={store.loading.includes('tickets-type')}>
               <InvertModeOutline width="32" class="fill-current" /> Type
@@ -446,6 +446,22 @@ export default component$(() => {
               <option value="buttons" selected={srvconfig?.tickets.type == 'buttons'}>Use buttons</option>
               <option value="reactions" selected={srvconfig?.tickets.type == 'reactions'}>Use reactions</option>
             </SelectInput>
+          </Card>
+          <Card fit>
+            <CardHeader id="tickets-name" loading={store.loading.includes('tickets-name')}>
+              <InvertModeOutline width="32" class="fill-current" /> Name
+            </CardHeader>
+            <Toggle id="tickets-name-input" checked={srvconfig?.tickets.id == 'false'} onChange$={async () => {
+              store.loading.push('tickets-name');
+              srvconfig!.tickets.id = srvconfig?.tickets.id == 'false' ? '1' : 'false';
+              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
+              store.loading = store.loading.filter(l => l != 'tickets-name');
+            }}>
+              Use usernames in ticket names
+            </Toggle>
+            <p>
+              Enabling and disabling this setting will reset the ticket counter to 1.
+            </p>
           </Card>
           <Card fit>
             <CardHeader id="tickets-category" loading={store.loading.includes('tickets-category')}>
