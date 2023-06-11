@@ -451,9 +451,9 @@ export default component$(() => {
             <CardHeader id="tickets-name" loading={store.loading.includes('tickets-name')}>
               <InvertModeOutline width="32" class="fill-current" /> Name
             </CardHeader>
-            <Toggle id="tickets-name-input" checked={srvconfig?.tickets.id == 'false'} onChange$={async () => {
+            <Toggle id="tickets-name-input" checked={srvconfig?.tickets.count == 'false'} onChange$={async () => {
               store.loading.push('tickets-name');
-              srvconfig!.tickets.id = srvconfig?.tickets.id == 'false' ? '1' : 'false';
+              srvconfig!.tickets.count = srvconfig?.tickets.count == 'false' ? 1 : 'false';
               await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
               store.loading = store.loading.filter(l => l != 'tickets-name');
             }}>
