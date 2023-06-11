@@ -41,6 +41,27 @@ interface guildData {
 
 type AnyGuildChannel = APIGuildChannel<ChannelType>;
 
+async function fetchData(url: string, props: RequestEventBase, user?: boolean, accessToken?: string): Promise<any> {
+  const res = await fetch(url, {
+    headers: {
+      authorization: `${user ? `Bearer ${accessToken}` : `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`}`,
+    },
+  }).catch((err: any) => {
+    console.log(err);
+  });
+  if (!res) throw new Error(`Fetch failed for ${url}`);
+
+  const data: RESTError | RESTRateLimit | any = await res.json();
+  if ('retry_after' in data) {
+    console.log(`${data.message}, retrying after ${data.retry_after * 1000}ms`);
+    await sleep(data.retry_after * 1000);
+    return await fetchData(url, props);
+  }
+  if ('code' in data) throw new Error(`${url} error ${data.code}`);
+
+  return data;
+}
+
 export const getGuildFn = server$(async function(props: RequestEventBase): Promise<Guild | Error> {
   const res = await fetch(`https://discord.com/api/v10/guilds/${props.params.guildId}`, {
     headers: {
@@ -142,15 +163,12 @@ export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], 
 
 export const getGuildDataFn = server$(async function(props?: RequestEventBase): Promise<guildData | Error> {
   props = props ?? this;
-
-  const guild = await getGuildFn(props);
-  if (guild instanceof Error) return guild;
-
-  const channels = await getGuildChannelsFn(props);
-  if (channels instanceof Error) return channels;
-
-  const roles = await getGuildRolesFn(props);
-  if (roles instanceof Error) return roles;
+  const guildId = props.params.guildId;
+  const [guild, channels, roles] = await Promise.all([
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}`, props),
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props),
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props),
+  ]);
 
   const { srvconfig, reactionroles } = await getSQLDataFn(channels, props);
   if (srvconfig instanceof Error) return srvconfig;
