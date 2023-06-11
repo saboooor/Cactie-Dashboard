@@ -12,7 +12,7 @@ interface Guild extends APIGuild {
   mutual: boolean;
 }
 
-async function fetchGuilds(headers: Record<string, string>): Promise<Guild[] | Error> {
+export async function fetchGuilds(headers: Record<string, string>): Promise<Guild[] | Error> {
   const res = await fetch('https://discord.com/api/v10/users/@me/guilds', {
     headers,
   }).catch(() => new Error('Guilds fetch failed'));
