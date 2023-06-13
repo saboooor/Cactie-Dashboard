@@ -7,12 +7,12 @@ import type { reactionroles, settings } from '@prisma/client/edge';
 import { PrismaClient } from '@prisma/client/edge';
 import Menu, { MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
 import TextInput from '~/components/elements/TextInput';
-import Toggle from '~/components/elements/Toggle';
+import Checkbox from '~/components/elements/Checkbox';
 import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
 import EmojiInput, { EmojiPicker } from '~/components/elements/EmojiInput';
-import { Add, At, CheckboxOutline, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, SendOutline, Ban, EllipsisVertical, TrashOutline, ChatboxOutline, Checkmark } from 'qwik-ionicons';
+import { Add, At, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, Ban, EllipsisVertical, ChatboxOutline, Checkmark, ToggleOutline, IdCardOutline, Link, ExitOutline, EnterOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -166,7 +166,7 @@ export const updateReactionRoleFn = server$(async function(props: reactionroles)
   });
 });
 
-export const deleteReactionRoleFn = server$(async function(props: any) {
+export const deleteReactionRoleFn = server$(async function(props: any, store: any) {
   let emojiId = props.emojiId.match(/(\d*)/)![0];
   if (emojiId != '') {
     const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
@@ -198,6 +198,8 @@ export const deleteReactionRoleFn = server$(async function(props: any) {
       emojiId: props.emojiId,
     } },
   });
+
+  (store.guildData as guildData).reactionroles.raw = (store.guildData as guildData).reactionroles.raw.filter((rr) => rr.messageId != props.messageId || rr.emojiId != props.emojiId);
 });
 
 export default component$(() => {
@@ -208,6 +210,7 @@ export default component$(() => {
     modal: undefined as 'create' | 'edit' | undefined,
     guildData,
     loading: [] as string[],
+    rrselected: [] as string[],
   });
 
   if (store.guildData instanceof Error) {
@@ -234,33 +237,36 @@ export default component$(() => {
         store.guildData = await getGuildDataFn();
       }}>
         <MenuCategory name="GENERAL SETTINGS">
-          <MenuItem href="#suggestions">
-            <MailOpenOutline width="24" class="fill-current" /> Suggestions
-          </MenuItem>
-          <MenuItem href="#polls">
-            <CheckboxOutline width="24" class="fill-current" /> Polls
-          </MenuItem>
           <MenuItem href="#joinmessage">
-            <Add width="24" class="fill-current" /> Join Message
+            <EnterOutline width="24" class="fill-current" /> Join Message
           </MenuItem>
           <MenuItem href="#leavemessage">
-            <Remove width="24" class="fill-current" /> Leave Message
+            <ExitOutline width="24" class="fill-current" /> Leave Message
+          </MenuItem>
+          <MenuItem href="#suggestionpoll">
+            <MailOpenOutline width="24" class="fill-current" /> Suggestions & Polls
           </MenuItem>
         </MenuCategory>
         <MenuCategory name="TICKET SYSTEM">
           <MenuItem href="#tickets">
-            <InvertModeOutline width="24" class="fill-current" /> Mode
+            <ToggleOutline width="24" class="fill-current" /> Enabled
           </MenuItem>
-          <MenuItem href="#ticketcategory">
+          <MenuItem href="#tickets-type">
+            <InvertModeOutline width="24" class="fill-current" /> Type
+          </MenuItem>
+          <MenuItem href="#tickets-name">
+            <IdCardOutline width="24" class="fill-current" /> Name
+          </MenuItem>
+          <MenuItem href="#tickets-category">
             <FolderOutline width="24" class="fill-current" /> Category
           </MenuItem>
-          <MenuItem href="#ticketlogchannel">
+          <MenuItem href="#tickets-logchannel">
             <FileTrayFullOutline width="24" class="fill-current" /> Log Channel
           </MenuItem>
-          <MenuItem href="#supportrole">
+          <MenuItem href="#tickets-role">
             <At width="24" class="fill-current" /> Access Role
           </MenuItem>
-          <MenuItem href="#ticketmention">
+          <MenuItem href="#tickets-mention">
             <At width="24" class="fill-current" /> Mention
           </MenuItem>
         </MenuCategory>
@@ -293,7 +299,7 @@ export default component$(() => {
         <div class="flex flex-wrap gap-4 py-10">
           <Card fit>
             <CardHeader id="joinmessage" loading={store.loading.includes('joinmessage')}>
-              <Add width="32" class="fill-current" /> Join Message
+              <EnterOutline width="32" class="fill-current" /> Join Message
             </CardHeader>
             <TextInput big id="joinmessage-message" value={srvconfig?.joinmessage.message} placeholder="The content of the message sent when someone joins" onChange$={async (event: any) => {
               store.loading.push('joinmessage');
@@ -320,7 +326,7 @@ export default component$(() => {
           </Card>
           <Card fit>
             <CardHeader id="leavemessage" loading={store.loading.includes('leavemessage')}>
-              <Remove width="32" class="fill-current" /> Leave Message
+              <ExitOutline width="32" class="fill-current" /> Leave Message
             </CardHeader>
             <TextInput big id="leavemessage-message" value={srvconfig?.leavemessage.message} placeholder="The content of the message sent when someone leaves" onChange$={async (event: any) => {
               store.loading.push('leavemessage');
@@ -359,13 +365,13 @@ export default component$(() => {
                 <option value={c.id} key={c.id} selected={srvconfig?.suggestionchannel == c.id}>{`# ${c.name}`}</option>,
               )}
             </SelectInput>
-            <Toggle id="suggestthreads" checked={srvconfig?.suggestthreads == 'true'} onChange$={async (event: any) => {
+            <Checkbox toggle id="suggestthreads" checked={srvconfig?.suggestthreads == 'true'} onChange$={async (event: any) => {
               store.loading.push('suggestionpoll');
               await updateSettingFn('suggestthreads', event.target.checked ? 'true' : 'false');
               store.loading = store.loading.filter(l => l != 'suggestionpoll');
             }}>
               Create threads associated to suggestions for discussion
-            </Toggle>
+            </Checkbox>
             <SelectInput id="pollchannel" label="Channel to make polls in" onChange$={async (event: any) => {
               store.loading.push('suggestionpoll');
               await updateSettingFn('pollchannel', event.target.value);
@@ -379,15 +385,15 @@ export default component$(() => {
           </Card>
         </div>
         <div class="flex mb-2">
-          <span id="reactions" class="block h-32 -mt-32" />
-          <Toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
+          <span id="tickets" class="block h-32 -mt-32" />
+          <Checkbox toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
             store.loading.push('tickets-enabled');
             srvconfig!.tickets.enabled = event.target.checked;
             await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
             store.loading = store.loading.filter(l => l != 'tickets-enabled');
           }}>
             <MenuTitle extraClass="flex-1">TICKET SYSTEM</MenuTitle>
-          </Toggle>
+          </Checkbox>
           <div class={{
             'transition-all': true,
             'opacity-0': !store.loading.includes('tickets-enabled'),
@@ -396,7 +402,7 @@ export default component$(() => {
             <LoadingIcon />
           </div>
         </div>
-        <div class="grid grid-cols-3 gap-4 py-10">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
           <Card fit>
             <CardHeader id="tickets-type" loading={store.loading.includes('tickets-type')}>
               <InvertModeOutline width="32" class="fill-current" /> Type
@@ -413,16 +419,16 @@ export default component$(() => {
           </Card>
           <Card fit>
             <CardHeader id="tickets-name" loading={store.loading.includes('tickets-name')}>
-              <InvertModeOutline width="32" class="fill-current" /> Name
+              <IdCardOutline width="32" class="fill-current" /> Name
             </CardHeader>
-            <Toggle id="tickets-name-input" checked={srvconfig?.tickets.count == 'false'} onChange$={async () => {
+            <Checkbox toggle id="tickets-name-input" checked={srvconfig?.tickets.count == 'false'} onChange$={async () => {
               store.loading.push('tickets-name');
               srvconfig!.tickets.count = srvconfig?.tickets.count == 'false' ? 1 : 'false';
               await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
               store.loading = store.loading.filter(l => l != 'tickets-name');
             }}>
               Use usernames in ticket names
-            </Toggle>
+            </Checkbox>
             <p>
               Enabling and disabling this setting will reset the ticket counter to 1.
             </p>
@@ -527,14 +533,14 @@ export default component$(() => {
             </NumberInput>
           </Card>
           <Card>
-            <CardHeader id="ticketcategory" loading={store.loading.includes('ticketcategory')}>
+            <CardHeader id="mutecmd" loading={store.loading.includes('mutecmd')}>
               <NotificationsOffOutline width="32" class="fill-current" /> Mute Command
             </CardHeader>
-            <SelectInput id="ticketcategory-input" label="Select a role to give when muting or use Discord's timeout feature" onChange$={async (event: any) => {
-              store.loading.push('ticketcategory');
-              await updateSettingFn('ticketcategory', event.target.value);
+            <SelectInput id="mutecmd-input" label="Select a role to give when muting or use Discord's timeout feature" onChange$={async (event: any) => {
+              store.loading.push('mutecmd');
+              await updateSettingFn('mutecmd', event.target.value);
               event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
-              store.loading = store.loading.filter(l => l != 'ticketcategory');
+              store.loading = store.loading.filter(l => l != 'mutecmd');
             }} style={{
               color: '#' + (roles.find(r => r.id == srvconfig?.mutecmd)?.color ? roles.find(r => r.id == srvconfig?.mutecmd)?.color.toString(16) : 'ffffff'),
             }}>
@@ -670,7 +676,7 @@ export default component$(() => {
           <div class="flex flex-col md:flex-row gap-4">
             <Card>
               <CardHeader>
-                <SendOutline width="32" class="fill-current" /> Default Channel
+                <ChatboxOutline width="32" class="fill-current" /> Default Channel
               </CardHeader>
               <SelectInput id="auditlogs-channel" label="This is where logs will be sent if there is no specific channel set on them" onChange$={async (event: any) => {
                 store.loading.push('auditlogs');
@@ -838,89 +844,86 @@ export default component$(() => {
             }}>
               <LoadingIcon />
             </div>
-            <Button color="primary" onClick$={() => store.modal = 'create'}>
-              Create Reaction Role
-            </Button>
+            <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
+              store.modal = 'create';
+            }} />
           </div>
         </div>
         <div class="flex flex-col gap-4 py-10">
           {
             reactionroles.channels.map(channel => (
-              <Card key={channel.id}>
-                <div class="flex items-start flex-1">
+              <div key={channel.id}>
+                <div class="flex items-start flex-1 mb-4">
                   <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                     # {channel?.name ?? 'Channel Not Found.'}
                   </h1>
-                  <Button color="primary" small onClick$={() => {
+                  <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
                     const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
                     channelselect.value = channel.id;
                     store.modal = 'create';
-                  }}>
-                    Create Here
-                  </Button>
+                  }} />
                 </div>
                 <div class='flex flex-col gap-4'>
                   {
                     channel.messages.map((messageId: string) => (
-                      <Card darker key={messageId}>
-                        <div class="flex items-start flex-1">
-                          <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
-                            Message # {messageId}
-                          </h1>
-                          <Button color="primary" small onClick$={() => {
+                      <Card key={messageId}>
+                        <div class="flex items-center">
+                          <a target='_blank' href={`https://discord.com/channels/${guild.id}/${channel.id}/${messageId}`} class="flex flex-1 gap-3 justify-start font-bold text-gray-100 text-2xl">
+                            <Link width="30" />
+                            <span class="flex flex-col">
+                              <span>
+                                Go to message
+                              </span>
+                              <span class="text-xs font-normal text-gray-200">
+                                {messageId}
+                              </span>
+                            </span>
+                          </a>
+                          <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
                             const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
                             channelselect.value = channel.id;
                             const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
                             messageinput.value = messageId;
                             store.modal = 'create';
-                          }}>
-                            Create Here
-                          </Button>
+                          }} />
                         </div>
                         <div class='flex flex-wrap gap-4'>
                           {
                             reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
                               const role = roles.find(r => r.id == rr.roleId);
 
-                              return <Card key={rr.roleId} row fit>
-                                <div class="p-1">
+                              return <Card darker key={rr.roleId} row fit>
+                                <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
                                   {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12 h-auto" width={48} height={48}/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
                                 </div>
                                 <div class="flex-1">
-                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: role?.color }}>@ {role?.name ?? 'Role Not Found.'}</h1>
-                                  <p class="hidden sm:flex">
+                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: '#' + (role?.color ? role.color.toString(16) : 'ffffff') }}>@ {role?.name ?? 'Role Not Found.'}</h1>
+                                  <p class="flex">
                                     {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
                                     {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
                                   </p>
                                 </div>
-                                <EllipsisVertical width="24" class="fill-gray-400 cursor-pointer hidden sm:flex" onClick$={() => {
-                                  const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                                  const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
-                                  const roleinput = document.getElementById('rrcreaterole') as HTMLSelectElement;
-                                  const emojiinput = document.getElementById('rrcreateemoji') as HTMLButtonElement;
-                                  const typeinput = document.getElementById('rrcreateswitch') as HTMLSelectElement;
-                                  const silentinput = document.getElementById('rrcreatesilent') as HTMLInputElement;
-                                  channelselect.value = channel.id;
-                                  messageinput.value = messageId;
-                                  roleinput.value = role!.id;
-                                  emojiinput.setAttribute('value', rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId);
-                                  typeinput.value = rr.type;
-                                  silentinput.checked = rr.silent == 'true';
-                                  store.modal = 'edit';
-                                }} />
-                                <TrashOutline width="24" class="fill-red-400 text-red-400 cursor-pointer hidden sm:flex" onClick$={async () => {
-                                  await deleteReactionRoleFn({
-                                    emojiId: rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId,
-                                    messageId,
-                                  });
-                                  store.guildData = {
-                                    ...store.guildData,
-                                    reactionroles: {
-                                      ...(store.guildData as guildData).reactionroles,
-                                      raw: (store.guildData as guildData).reactionroles.raw.filter(r => r.emojiId != rr.emojiId || r.messageId != messageId),
-                                    },
-                                  };
-                                }} />
+                                <div class="flex flex-col justify-center gap-4">
+                                  <Checkbox nolabel id={`select-${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`} checked={store.rrselected.includes(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`)} onChange$={async (event: any) => {
+                                    if (event.target.checked) store.rrselected.push(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
+                                    else store.rrselected = store.rrselected.filter(s => s != `${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
+                                  }} />
+                                  <EllipsisVertical width="24" class="fill-gray-400 cursor-pointer flex" onClick$={() => {
+                                    const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                                    const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
+                                    const roleinput = document.getElementById('rrcreaterole') as HTMLSelectElement;
+                                    const emojiinput = document.getElementById('rrcreateemoji') as HTMLButtonElement;
+                                    const typeinput = document.getElementById('rrcreateswitch') as HTMLSelectElement;
+                                    const silentinput = document.getElementById('rrcreatesilent') as HTMLInputElement;
+                                    channelselect.value = channel.id;
+                                    messageinput.value = messageId;
+                                    roleinput.value = role!.id;
+                                    emojiinput.setAttribute('value', rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId);
+                                    typeinput.value = rr.type;
+                                    silentinput.checked = rr.silent == 'true';
+                                    store.modal = 'edit';
+                                  }} />
+                                </div>
                               </Card>;
                             })
                           }
@@ -929,7 +932,7 @@ export default component$(() => {
                     ))
                   }
                 </div>
-              </Card>
+              </div>
             ))
           }
         </div>
@@ -970,9 +973,9 @@ export default component$(() => {
                   <option value="switch">Add by reacting / Remove by unreacting</option>
                   <option value="toggle">Add / Remove by reacting</option>
                 </SelectInput>
-                <Toggle id="rrcreatesilent">
+                <Checkbox toggle id="rrcreatesilent">
                   Silent
-                </Toggle>
+                </Checkbox>
               </div>
               <div class="flex flex-row-reverse gap-3">
                 <Button color="primary" extraClass="flex-1 sm:flex-initial" onClick$={async () => {
@@ -1018,6 +1021,30 @@ export default component$(() => {
           </div>
         </div>
       </div>
+      {
+        !!store.rrselected.length &&
+        <div id="rrselected" class="fixed flex flex-col bottom-4 right-4 border border-gray-700 bg-gray-800 rounded-lg shadow-md p-6" style="cursor: auto;">
+          <p class="text-gray-200 text-lg mb-5 max-w-[17rem]">
+            {store.rrselected.length} Reaction Roles Selected
+          </p>
+          <div class="flex items-center gap-2 justify-evenly">
+            <Button onClick$={async () => {
+              store.rrselected = [];
+            }}>
+              Cancel
+            </Button>
+            <Button color="danger" onClick$={async () => {
+              store.rrselected.forEach(async rr => {
+                const emojiId = rr.split('-')[0];
+                const messageId = rr.split('-')[1];
+                await deleteReactionRoleFn({ emojiId, messageId }, store);
+              });
+            }}>
+              Delete
+            </Button>
+          </div>
+        </div>
+      }
 
       <EmojiPicker props={{
         custom: [

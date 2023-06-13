@@ -9,6 +9,7 @@ export default component$(({ extraClass, row, squish, fit, darker, contextMenu }
       'bg-gray-900/50': darker,
       'bg-gray-800': !darker,
       'flex-col': !row,
+      'items-center': row,
       'flex-1': !squish,
       'min-w-fit': fit,
       ...extraClass,
