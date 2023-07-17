@@ -700,16 +700,17 @@ export default component$(() => {
                 <RawSelectInput id="new-log">
                   {!srvconfig?.auditlogs.logs?.all && (
                     <>
-                      {(!srvconfig?.auditlogs.logs?.member && !srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave
+                      {(!srvconfig?.auditlogs.logs?.member && !srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave && !srvconfig?.auditlogs.logs?.membernameupdate && !srvconfig?.auditlogs.logs?.memberrolesupdate
                     && !srvconfig?.auditlogs.logs?.message && !srvconfig?.auditlogs.logs?.messagedelete && !srvconfig?.auditlogs.logs?.messagedeletebulk && !srvconfig?.auditlogs.logs?.messageupdate
                     && !srvconfig?.auditlogs.logs?.channel && !srvconfig?.auditlogs.logs?.channelcreate && !srvconfig?.auditlogs.logs?.channeldelete && !srvconfig?.auditlogs.logs?.channelupdate
+                    && !srvconfig?.auditlogs.logs?.role && !srvconfig?.auditlogs.logs?.rolereate && !srvconfig?.auditlogs.logs?.roledelete && !srvconfig?.auditlogs.logs?.roleupdate
                     && !srvconfig?.auditlogs.logs?.voice && !srvconfig?.auditlogs.logs?.voicejoin && !srvconfig?.auditlogs.logs?.voiceleave && !srvconfig?.auditlogs.logs?.voicemove && !srvconfig?.auditlogs.logs?.voicedeafen && !srvconfig?.auditlogs.logs?.voicemute
                       ) && (
                         <option value="all">All Logs</option>
                       )}
                       {!srvconfig?.auditlogs.logs?.member && (
                         <>
-                          {(!srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave) && (
+                          {(!srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave && !srvconfig?.auditlogs.logs?.membernameupdate && !srvconfig?.auditlogs.logs?.memberrolesupdate) && (
                             <option value="member">All Member-Related Logs</option>
                           )}
                           {!srvconfig?.auditlogs.logs?.memberjoin && (
@@ -717,6 +718,12 @@ export default component$(() => {
                           )}
                           {!srvconfig?.auditlogs.logs?.memberleave && (
                             <option value="memberleave">Member Left</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.membernameupdate && (
+                            <option value="memberleave">Member Name Updated</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.memberrolesupdate && (
+                            <option value="memberleave">Member Roles Updated</option>
                           )}
                         </>
                       )}
@@ -749,6 +756,22 @@ export default component$(() => {
                           )}
                           {!srvconfig?.auditlogs.logs?.channelupdate && (
                             <option value="channelupdate">Channel Updated</option>
+                          )}
+                        </>
+                      )}
+                      {!srvconfig?.auditlogs.logs?.role && (
+                        <>
+                          {(!srvconfig?.auditlogs.logs?.rolecreate && !srvconfig?.auditlogs.logs?.roledelete && !srvconfig?.auditlogs.logs?.roleupdate) && (
+                            <option value="role">All Role-Related Logs</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.rolecreate && (
+                            <option value="rolecreate">Role Created</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.roledelete && (
+                            <option value="roledelete">Role Deleted</option>
+                          )}
+                          {!srvconfig?.auditlogs.logs?.roleupdate && (
+                            <option value="roleupdate">Role Updated</option>
                           )}
                         </>
                       )}
