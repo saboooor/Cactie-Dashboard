@@ -166,7 +166,7 @@ export const updateReactionRoleFn = server$(async function(props: reactionroles)
   });
 });
 
-export const deleteReactionRoleFn = server$(async function(props: any, store: any) {
+export const deleteReactionRoleFn = server$(async function(props: { messageId: string, emojiId: string, channelId: string, guildId: string }) {
   let emojiId = props.emojiId.match(/(\d*)/)![0];
   if (emojiId != '') {
     const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
@@ -198,8 +198,6 @@ export const deleteReactionRoleFn = server$(async function(props: any, store: an
       emojiId: props.emojiId,
     } },
   });
-
-  (store.guildData as guildData).reactionroles.raw = (store.guildData as guildData).reactionroles.raw.filter((rr) => rr.messageId != props.messageId || rr.emojiId != props.emojiId);
 });
 
 export default component$(() => {
@@ -694,6 +692,7 @@ export default component$(() => {
               (srvconfig?.auditlogs.logs?.member || (srvconfig?.auditlogs.logs?.memberjoin && srvconfig?.auditlogs.logs?.memberleave))
               && (srvconfig?.auditlogs.logs?.message || (srvconfig?.auditlogs.logs?.messagedelete && srvconfig?.auditlogs.logs?.messagedeletebulk && srvconfig?.auditlogs.logs?.messageupdate))
               && (srvconfig?.auditlogs.logs?.channel || (srvconfig?.auditlogs.logs?.channelcreate && srvconfig?.auditlogs.logs?.channeldelete && srvconfig?.auditlogs.logs?.channelupdate))
+              && (srvconfig?.auditlogs.logs?.role || (srvconfig?.auditlogs.logs?.rolecreate && srvconfig?.auditlogs.logs?.roledelete && srvconfig?.auditlogs.logs?.roleupdate))
               && (srvconfig?.auditlogs.logs?.voice || (srvconfig?.auditlogs.logs?.voicejoin && srvconfig?.auditlogs.logs?.voiceleave && srvconfig?.auditlogs.logs?.voicemove && srvconfig?.auditlogs.logs?.voicedeafen && srvconfig?.auditlogs.logs?.voicemute))
             )) && (
               <Card squish>
@@ -963,13 +962,13 @@ export default component$(() => {
       <div class={`relative z-10 ${store.modal ? '' : 'pointer-events-none'}`}>
         <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
           <div class="flex min-h-full max-h-full items-start justify-center p-4 pt-24 text-center sm:items-center">
-            <div class="rounded-lg bg-gray-900/50 backdrop-blur-lg text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
+            <div class="rounded-lg bg-gray-800 border border-gray-700 text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
               <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                 {store.modal == 'edit' ? 'Edit' : 'Create'} Reaction Role
               </h1>
               <div class="flex flex-col my-4 gap-4">
                 <div class={{
-                  'hidden': store.modal == 'edit',
+                  'hidden': store.modal != 'create',
                 }}>
                   <EmojiInput id="rrcreateemoji">
                     The emoji to react with
@@ -986,7 +985,7 @@ export default component$(() => {
                   )}
                 </SelectInput>
                 <div class={{
-                  'hidden': store.modal == 'edit',
+                  'hidden': store.modal != 'create',
                 }}>
                   <TextInput id="rrcreatemessage" placeholder="1105427534889353317">
                     The Id of the message you want to create the reaction role in
@@ -1057,12 +1056,28 @@ export default component$(() => {
               Cancel
             </Button>
             <Button color="danger" onClick$={async () => {
-              store.rrselected.forEach(async rr => {
+              store.loading.push('rrdelete');
+              for (const rr of store.rrselected) {
                 const emojiId = rr.split('-')[0];
                 const messageId = rr.split('-')[1];
-                await deleteReactionRoleFn({ emojiId, messageId }, store);
-              });
+                const channelId = reactionroles.channels.find(c => c.messages.includes(messageId))?.id as string;
+                const guildId = guild.id;
+                await deleteReactionRoleFn({ emojiId, messageId, channelId, guildId });
+              }
+              store.rrselected = [];
+              store.guildData = {
+                ...store.guildData,
+                ...(await getSQLDataFn(channels)),
+              };
+              store.loading = store.loading.filter(l => l != 'rrdelete');
             }}>
+              <div class={{
+                'transition-all': true,
+                '-ml-10 opacity-0': !store.loading.includes('rrdelete'),
+                '-ml-1 opacity-100': store.loading.includes('rrdelete'),
+              }}>
+                <LoadingIcon />
+              </div>
               Delete
             </Button>
           </div>
