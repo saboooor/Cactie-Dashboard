@@ -373,7 +373,7 @@ export default component$(() => {
         <MenuItem href="#reactionroles">
           <HappyOutline width="24" class="fill-current" /> Reaction Roles
         </MenuItem>
-        <MenuItem href="#customcommands">
+        <MenuItem href="#customcmds">
           <TerminalOutline width="24" class="fill-current" /> Custom Commands
         </MenuItem>
       </Menu>
