@@ -3,7 +3,7 @@ import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import type { APIGuildChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ApplicationCommandType, ChannelType } from 'discord-api-types/v10';
-import type { reactionroles, settings } from '@prisma/client/edge';
+import type { customcmds, reactionroles, settings } from '@prisma/client/edge';
 import { PrismaClient } from '@prisma/client/edge';
 import Menu, { MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
 import TextInput from '~/components/elements/TextInput';
@@ -37,6 +37,7 @@ interface guildData {
     raw: reactionroles[];
     channels: any[];
   };
+  customcmds: (customcmds & { json: any })[] | null;
 }
 
 type AnyGuildChannel = APIGuildChannel<ChannelType>;
@@ -82,6 +83,17 @@ export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], 
     auditlogs: JSON.parse(srvconfigUnparsed.auditlogs),
   } : null;
 
+  const customcmdsUnparsed = await prisma.customcmds.findMany({
+    where: {
+      guildId: props.params.guildId,
+    },
+  });
+
+  const customcmds = customcmdsUnparsed ? customcmdsUnparsed.map(cmd => ({
+    ...cmd,
+    json: JSON.parse(cmd.json),
+  })) : null;
+
   const reactionroles = {
     raw: await prisma.reactionroles.findMany({ where: { guildId: props.params.guildId } }),
     channels: [] as any[],
@@ -104,7 +116,7 @@ export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], 
     reactionroles.channels.push(channelInfo);
   }
 
-  return { srvconfig, reactionroles };
+  return { srvconfig, reactionroles, customcmds };
 });
 
 export const getGuildDataFn = server$(async function(props?: RequestEventBase): Promise<guildData | Error> {
@@ -116,14 +128,15 @@ export const getGuildDataFn = server$(async function(props?: RequestEventBase): 
     fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props) as Promise<APIRole[]>,
   ]);
 
-  const { srvconfig, reactionroles } = await getSQLDataFn(channels, props);
+  const { srvconfig, reactionroles, customcmds } = await getSQLDataFn(channels, props);
   if (srvconfig instanceof Error) return srvconfig;
   if (reactionroles instanceof Error) return reactionroles;
+  if (customcmds instanceof Error) return customcmds;
 
   // Sort roles by position
   roles.sort((a, b) => b.position - a.position);
 
-  return { guild, channels, roles, srvconfig, reactionroles };
+  return { guild, channels, roles, srvconfig, reactionroles, customcmds };
 });
 
 export const useGetGuildData = routeLoader$(async (props) => await getGuildDataFn(props));
@@ -169,46 +182,6 @@ export const upsertReactionRoleFn = server$(async function(props: reactionroles)
   });
 });
 
-export const upsertCustomCommandFn = server$(async function(props: {
-  guildId: string;
-  name: string;
-  description: string;
-  ephemeral: boolean;
-  type: number;
-  json: any;
-}) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-
-  const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands`, {
-    method: 'POST',
-    headers: {
-      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: props.name,
-      description: props.description,
-      type: ApplicationCommandType.ChatInput,
-    }),
-  }).catch(() => null);
-  if (!res) return new Error('creating command failed');
-
-  await prisma.customcmds.upsert({
-    where: { guildId_name: {
-      guildId: props.guildId,
-      name: props.name,
-    } },
-    update: {
-      ...props,
-      json: JSON.stringify(props.json),
-    },
-    create: {
-      ...props,
-      json: JSON.stringify(props.json),
-    },
-  });
-});
-
 export const deleteReactionRoleFn = server$(async function(props: { messageId: string, emojiId: string, channelId: string, guildId: string }) {
   let emojiId = props.emojiId.match(/(\d*)/)![0];
   if (emojiId != '') {
@@ -243,6 +216,70 @@ export const deleteReactionRoleFn = server$(async function(props: { messageId: s
   });
 });
 
+export const upsertCustomCommandFn = server$(async function(props: {
+  guildId: string;
+  name: string;
+  description: string;
+  ephemeral: boolean;
+  type: number;
+  json: any;
+}) {
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: props.name,
+      description: props.description,
+      type: ApplicationCommandType.ChatInput,
+    }),
+  }).catch(() => null);
+  if (!res) return new Error('creating command failed');
+
+  const json = await res.json();
+
+  await prisma.customcmds.upsert({
+    where: { guildId_name: {
+      guildId: props.guildId,
+      name: props.name,
+    } },
+    update: {
+      ...props,
+      json: JSON.stringify(props.json),
+      id: json.id,
+    },
+    create: {
+      ...props,
+      json: JSON.stringify(props.json),
+      id: json.id,
+    },
+  });
+});
+
+export const deleteCustomCommandFn = server$(async function(props: {
+  id: string;
+  guildId: string;
+}) {
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands/${props.id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+      'Content-Type': 'application/json',
+    },
+  }).catch(() => null);
+  if (!res) return new Error('deleting command failed');
+
+  await prisma.customcmds.delete({
+    where: { id: props.id },
+  });
+});
+
 export default component$(() => {
   const guildData = useGetGuildData().value;
 
@@ -268,7 +305,7 @@ export default component$(() => {
     );
   }
 
-  const { guild, channels, roles, srvconfig, reactionroles } = store.guildData;
+  const { guild, channels, roles, srvconfig, reactionroles, customcmds } = store.guildData;
 
   useVisibleTask$(() => {
     store.dev = document.cookie.includes('branch=dev');
@@ -1038,7 +1075,51 @@ export default component$(() => {
             <LoadingIcon />
           </div>
         </div>
+        <p>
+          For the time being, in order to edit a custom command, you must delete it and create a new one.
+        </p>
         <div class="py-10 grid gap-4">
+          {
+            customcmds?.map((cmd, i) =>
+              <Card key={i}>
+                <div class="flex gap-2">
+                  <p class="text-2xl p-1 px-2">
+                    / {cmd.name}
+                  </p>
+                  <div class="flex-1">
+                    <TextInput nolabel placeholder="Command Description" value={cmd.description} />
+                  </div>
+                  <Checkbox toggle checked={cmd.ephemeral}>
+                    Ephemeral
+                  </Checkbox>
+                  <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                    store.loading.push('customcmds');
+                    await deleteCustomCommandFn({
+                      id: cmd.id,
+                      guildId: guild.id,
+                    });
+                    store.guildData = {
+                      ...store.guildData,
+                      ...(await getSQLDataFn(channels)),
+                    };
+                    store.loading = store.loading.filter(l => l != 'customcmds');
+                  }} />
+                </div>
+                {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
+                  <TextInput placeholder="Hello World!" value={cmd.json.content}>
+                    Text Content *Optional if embed is provided
+                  </TextInput>
+                  <TextInput big placeholder="{ ...JSON here }" value={cmd.json.embeds[0] ? JSON.stringify(cmd.json.embeds[0]) : ''}>
+                    Embed *Optional if text content is provided
+                  </TextInput>
+                </div>}
+                {store.customcmdtype != 1 && <div>
+                  <TextInput placeholder="...How'd you get here?" />
+                </div>}
+              </Card>,
+            )
+          }
+
           <Card>
             <CardHeader>
               <Add width="32" class="fill-current" /> Create
@@ -1112,6 +1193,10 @@ export default component$(() => {
                 type: store.customcmdtype,
                 json,
               });
+              store.guildData = {
+                ...store.guildData,
+                ...(await getSQLDataFn(channels)),
+              };
               store.loading = store.loading.filter(l => l != 'customcmds');
             }}>
               Create Command
