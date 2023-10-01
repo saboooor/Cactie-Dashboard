@@ -111,14 +111,17 @@ export const getGuildDataFn = server$(async function(props?: RequestEventBase): 
   props = props ?? this;
   const guildId = props.params.guildId;
   const [guild, channels, roles] = await Promise.all([
-    fetchData(`https://discord.com/api/v10/guilds/${guildId}`, props),
-    fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props),
-    fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props),
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}`, props) as Promise<Guild>,
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props) as Promise<AnyGuildChannel[]>,
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props) as Promise<APIRole[]>,
   ]);
 
   const { srvconfig, reactionroles } = await getSQLDataFn(channels, props);
   if (srvconfig instanceof Error) return srvconfig;
   if (reactionroles instanceof Error) return reactionroles;
+
+  // Sort roles by position
+  roles.sort((a, b) => b.position - a.position);
 
   return { guild, channels, roles, srvconfig, reactionroles };
 });
@@ -492,7 +495,7 @@ export default component$(() => {
             }} style={{
               color: '#' + (roles.find(r => r.id == srvconfig?.tickets.role)?.color ? roles.find(r => r.id == srvconfig?.tickets.role)?.color.toString(16) : 'ffffff'),
             }}>
-              <option value="false" selected={srvconfig?.tickets.role == 'false'} style={{ color: '#ffffff' }}>Only Administrators</option>
+              <option value="false" selected={srvconfig?.tickets.role == 'false'} style={{ color: '#ffffff' }}>Not Set</option>
               {roles.map(r =>
                 <option value={r.id} key={r.id} selected={srvconfig?.tickets.role == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
               )}
