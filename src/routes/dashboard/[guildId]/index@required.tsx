@@ -2,7 +2,7 @@ import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import type { APIGuildChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
-import { ChannelType } from 'discord-api-types/v10';
+import { ApplicationCommandType, ChannelType } from 'discord-api-types/v10';
 import type { reactionroles, settings } from '@prisma/client/edge';
 import { PrismaClient } from '@prisma/client/edge';
 import Menu, { MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
@@ -12,7 +12,7 @@ import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
 import EmojiInput, { EmojiPicker } from '~/components/elements/EmojiInput';
-import { Add, At, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, Ban, EllipsisVertical, ChatboxOutline, Checkmark, ToggleOutline, IdCardOutline, Link, ExitOutline, EnterOutline } from 'qwik-ionicons';
+import { Add, At, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, Ban, EllipsisVertical, ChatboxOutline, Checkmark, ToggleOutline, IdCardOutline, Link, ExitOutline, EnterOutline, TerminalOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -133,7 +133,7 @@ export const updateSettingFn = server$(async function(name: string, value: strin
   await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
 });
 
-export const updateReactionRoleFn = server$(async function(props: reactionroles) {
+export const upsertReactionRoleFn = server$(async function(props: reactionroles) {
   let emojiId = props.emojiId.match(/(\d*)/)![0];
   if (emojiId != '') {
     const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
@@ -166,6 +166,46 @@ export const updateReactionRoleFn = server$(async function(props: reactionroles)
     } },
     update: props,
     create: props,
+  });
+});
+
+export const upsertCustomCommandFn = server$(async function(props: {
+  guildId: string;
+  name: string;
+  description: string;
+  ephemeral: boolean;
+  type: number;
+  json: any;
+}) {
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: props.name,
+      description: props.description,
+      type: ApplicationCommandType.ChatInput,
+    }),
+  }).catch(() => null);
+  if (!res) return new Error('creating command failed');
+
+  await prisma.customcmds.upsert({
+    where: { guildId_name: {
+      guildId: props.guildId,
+      name: props.name,
+    } },
+    update: {
+      ...props,
+      json: JSON.stringify(props.json),
+    },
+    create: {
+      ...props,
+      json: JSON.stringify(props.json),
+    },
   });
 });
 
@@ -212,6 +252,8 @@ export default component$(() => {
     guildData,
     loading: [] as string[],
     rrselected: [] as string[],
+    customcmdtype: 1,
+    generateembed: false,
   });
 
   if (store.guildData instanceof Error) {
@@ -293,6 +335,9 @@ export default component$(() => {
         </MenuItem>
         <MenuItem href="#reactionroles">
           <HappyOutline width="24" class="fill-current" /> Reaction Roles
+        </MenuItem>
+        <MenuItem href="#customcommands">
+          <TerminalOutline width="24" class="fill-current" /> Custom Commands
         </MenuItem>
       </Menu>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
@@ -891,6 +936,11 @@ export default component$(() => {
           </div>
         </div>
         <div class="flex flex-col gap-4 py-10">
+          {reactionroles.channels.length == 0 &&
+            <Card>
+              You have no reaction roles set up. Click the + button to create one.
+            </Card>
+          }
           {
             reactionroles.channels.map(channel => (
               <div key={channel.id}>
@@ -977,6 +1027,97 @@ export default component$(() => {
             ))
           }
         </div>
+        <div class="flex mb-2">
+          <span id="customcmds" class="block h-32 -mt-32" />
+          <MenuTitle extraClass="flex-1">CUSTOM COMMANDS</MenuTitle>
+          <div class={{
+            'transition-all': true,
+            'opacity-0': !store.loading.includes('customcmds'),
+            'opacity-100': store.loading.includes('customcmds'),
+          }}>
+            <LoadingIcon />
+          </div>
+        </div>
+        <div class="py-10 grid gap-4">
+          <Card>
+            <CardHeader>
+              <Add width="32" class="fill-current" /> Create
+            </CardHeader>
+            <div class="flex gap-2">
+              <p class="text-2xl p-1 px-2">/</p>
+              <div class="flex-1">
+                <TextInput nolabel placeholder="Command Name" id="customcmd-create-name" />
+              </div>
+              <div class="flex-1">
+                <TextInput nolabel placeholder="Command Description" id="customcmd-create-description" />
+              </div>
+              <Checkbox toggle id="customcmd-create-ephemeral">
+                Ephemeral
+              </Checkbox>
+            </div>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <SelectInput id="customcmd-create-type" label="Type" onChange$={async (event: any) => {
+                  store.customcmdtype = event.target.value;
+                }}>
+                  <option value={1}>Canned Response</option>
+                  <option value={2} disabled>Role</option>
+                  <option value={3} disabled>Subcommands</option>
+                </SelectInput>
+              </div>
+            </div>
+            {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
+              <TextInput id="customcmd-create-content" placeholder="Hello World!">
+                Text Content *Optional if embed is provided
+              </TextInput>
+              <TextInput big id="customcmd-create-embed" placeholder="{ ...JSON here }">
+                Embed *Optional if text content is provided
+                <Button color="secondary" onClick$={async () => {
+                  store.generateembed = !store.generateembed;
+                }}>
+                  Don't know where to start? Click here to generate an embed!
+                </Button>
+                {store.generateembed && <div>
+                  <iframe src="https://zira.bot/embedbuilder/" class="w-full h-96 rounded-lg border border-gray-700" />
+                </div>}
+              </TextInput>
+            </div>}
+            {store.customcmdtype != 1 && <div>
+              <TextInput id="customcmd-create-what" placeholder="...How'd you get here?" />
+            </div>}
+            <Button color="primary" onClick$={async () => {
+              store.loading.push('customcmds');
+              const name = document.getElementById('customcmd-create-name')! as HTMLInputElement;
+              const description = document.getElementById('customcmd-create-description')! as HTMLInputElement;
+              const ephemeral = document.getElementById('customcmd-create-ephemeral')! as HTMLInputElement;
+
+              let json;
+
+              if (store.customcmdtype == 1) {
+                const content = document.getElementById('customcmd-create-content')! as HTMLInputElement;
+                const embed = document.getElementById('customcmd-create-embed')! as HTMLInputElement;
+                const embedJSON = embed.value ? JSON.parse(embed.value) : undefined;
+
+                json = {
+                  content: content.value,
+                  embeds: [embedJSON],
+                };
+              }
+
+              await upsertCustomCommandFn({
+                guildId: guild.id,
+                name: name.value,
+                description: description.value,
+                ephemeral: ephemeral.checked,
+                type: store.customcmdtype,
+                json,
+              });
+              store.loading = store.loading.filter(l => l != 'customcmds');
+            }}>
+              Create Command
+            </Button>
+          </Card>
+        </div>
       </div>
       <div class={`relative z-10 ${store.modal ? '' : 'pointer-events-none'}`}>
         <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
@@ -1028,7 +1169,7 @@ export default component$(() => {
                   const type = document.getElementById('rrcreateswitch')! as HTMLSelectElement;
                   const silent = document.getElementById('rrcreatesilent')! as HTMLInputElement;
 
-                  await updateReactionRoleFn({
+                  await upsertReactionRoleFn({
                     guildId: guild.id,
                     emojiId,
                     roleId: roleId.value,
