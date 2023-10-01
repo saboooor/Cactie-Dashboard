@@ -11,7 +11,7 @@ export default component$(({ guild, store, onSwitcherSwitch$ }: any) => {
     <aside class="w-full mt-28 align-middle sm:sticky sm:h-1 sm:top-28" aria-label="Sidebar">
       <div class="py-4 px-3 rounded-xl bg-gray-800 border border-gray-700 text-base font-bold mb-4 text-gray-200">
         <div class="flex items-center mb-4">
-          {guild.icon && <img class="w-10 h-10 rounded-full" src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
+          {guild.icon && <img class="w-10 h-10 rounded-full" width={40} height={40} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
           <p class="flex-1 ml-3 text-lg">{guild.name}</p>
         </div>
         <div class="flex">

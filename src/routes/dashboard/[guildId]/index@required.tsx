@@ -307,9 +307,17 @@ export default component$(() => {
             }}>
               The message when someone joins the server
             </TextInput>
-            <p class="mt-2 mb-4">
+            <p>
               Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
             </p>
+            <Checkbox toggle id="joinmessage-silent" checked={srvconfig?.joinmessage.silent} onChange$={async (event: any) => {
+              store.loading.push('joinmessage');
+              srvconfig!.joinmessage.silent = event.target.checked;
+              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
+              store.loading = store.loading.filter(l => l != 'joinmessage');
+            }}>
+              Silent
+            </Checkbox>
             <SelectInput id="joinmessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
               store.loading.push('joinmessage');
               srvconfig!.joinmessage.channel = event.target.value;
@@ -334,9 +342,17 @@ export default component$(() => {
             }}>
               The message when someone leaves the server
             </TextInput>
-            <p class="mt-2 mb-4">
+            <p>
               Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
             </p>
+            <Checkbox toggle id="leavemessage-silent" checked={srvconfig?.leavemessage.silent} onChange$={async (event: any) => {
+              store.loading.push('leavemessage');
+              srvconfig!.leavemessage.silent = event.target.checked;
+              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
+              store.loading = store.loading.filter(l => l != 'leavemessage');
+            }}>
+              Silent
+            </Checkbox>
             <SelectInput id="leavemessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
               store.loading.push('leavemessage');
               srvconfig!.leavemessage.channel = event.target.value;
@@ -512,7 +528,7 @@ export default component$(() => {
             </CardHeader>
             <NumberInput input value={(store.guildData as guildData).srvconfig!.msgshortener} id="msgshortener-input" onChange$={async (event: any) => {
               store.loading.push('msgshortener');
-              await updateSettingFn('msgshortener', event.target.value);
+              await updateSettingFn('msgshortener', parseInt(event.target.value));
               store.loading = store.loading.filter(l => l != 'msgshortener');
             }}
             onIncrement$={async () => {
