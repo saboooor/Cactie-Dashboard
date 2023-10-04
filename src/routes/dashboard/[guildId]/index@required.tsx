@@ -1120,6 +1120,9 @@ export default component$(() => {
                 {
                   cmd.actions.map((action: any, i2: any) =>
                     <Card darker key={i2}>
+                      <CardHeader>
+                        Action {i2 + 1} - {action.type == 1 ? 'Send Message' : 'Rename Channel'}
+                      </CardHeader>
                       {action.type == 1 && <div class="flex flex-col gap-2">
                         <TextInput placeholder="Hello World!" value={action.content} onChange$={async (event: any) => {
                           store.loading.push(`customcmds-${cmd.id}`);
@@ -1127,7 +1130,7 @@ export default component$(() => {
                             guildId: guild.id,
                             name: cmd.name,
                             actions: JSON.stringify([{
-                              ...cmd.actions[0],
+                              ...action,
                               content: event.target.value,
                             }]),
                           }, true);
@@ -1141,7 +1144,7 @@ export default component$(() => {
                             guildId: guild.id,
                             name: cmd.name,
                             actions: JSON.stringify([{
-                              ...cmd.actions[0],
+                              ...action,
                               embeds: [event.target.value != '' ? JSON.parse(event.target.value) : undefined],
                             }]),
                           }, true);
@@ -1149,10 +1152,80 @@ export default component$(() => {
                         }}>
                           Embed *Optional if text content is provided
                         </TextInput>
+                        <div class="mt-2">
+                          <Checkbox toggle checked={action.ephemeral} onChange$={async (event: any) => {
+                            store.loading.push(`customcmds-${cmd.id}`);
+                            action.ephemeral = event.target.checked;
+                            await upsertCustomCommandFn({
+                              guildId: guild.id,
+                              name: cmd.name,
+                              actions: JSON.stringify([{
+                                ...action,
+                                ephemeral: event.target.checked,
+                              }]),
+                            }, true);
+                            store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                          }}>
+                            Ephemeral
+                          </Checkbox>
+                        </div>
                       </div>}
                     </Card>,
                   )
                 }
+                <Card darker>
+                  <CardHeader>
+                    Add Action
+                  </CardHeader>
+                  <SelectInput id="customcmd-create-type" label="Type" value={store.customcmdtype} onChange$={async (event: any) => {
+                    store.customcmdtype = event.target.value;
+                  }}>
+                    <option value={1}>Send Message</option>
+                    <option value={2}>Rename Channel</option>
+                  </SelectInput>
+                  {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
+                    <TextInput placeholder="Hello World!" id={`customcmd-action-content-${cmd.id}`}>
+                      Text Content *Optional if embed is provided
+                    </TextInput>
+                    <TextInput big placeholder="{ ...JSON here }" id={`customcmd-action-embed-${cmd.id}`}>
+                      Embed *Optional if text content is provided
+                    </TextInput>
+                    <div class="my-2">
+                      <Checkbox toggle id={`customcmd-action-ephemeral-${cmd.id}`}>
+                        Ephemeral
+                      </Checkbox>
+                    </div>
+                  </div>}
+                  <Button color="primary" onClick$={async () => {
+                    store.loading.push(`customcmds-${cmd.id}`);
+
+                    const action: any = {
+                      type: store.customcmdtype,
+                    };
+
+                    if (action.type == 1) {
+                      const content = document.getElementById(`customcmd-action-content-${cmd.id}`) as HTMLInputElement;
+                      const embed = document.getElementById(`customcmd-action-embed-${cmd.id}`) as HTMLInputElement;
+                      const ephemeral = document.getElementById(`customcmd-action-ephemeral-${cmd.id}`) as HTMLInputElement;
+                      action.content = content.value;
+                      action.embeds = [embed.value != '' ? JSON.parse(embed.value) : undefined];
+                      action.ephemeral = ephemeral.checked;
+                    }
+
+                    await upsertCustomCommandFn({
+                      guildId: guild.id,
+                      name: cmd.name,
+                      actions: JSON.stringify([...cmd.actions, action]),
+                    }, true);
+                    store.guildData = {
+                      ...store.guildData,
+                      ...(await getSQLDataFn(channels)),
+                    };
+                    store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                  }}>
+                      Add Action
+                  </Button>
+                </Card>
               </Card>,
             )
           }
@@ -1181,13 +1254,6 @@ export default component$(() => {
                   guildId: guild.id,
                   name: name.value,
                   description: description.value,
-                  actions: JSON.stringify([
-                    {
-                      type: 1,
-                      content: 'Hello World!',
-                      embeds: [],
-                    },
-                  ]),
                 });
                 store.guildData = {
                   ...store.guildData,
