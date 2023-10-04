@@ -12,7 +12,7 @@ import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
 import NumberInput from '~/components/elements/NumberInput';
 import { Button } from '~/components/elements/Button';
 import EmojiInput, { EmojiPicker } from '~/components/elements/EmojiInput';
-import { Add, At, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, Ban, EllipsisVertical, ChatboxOutline, Checkmark, ToggleOutline, IdCardOutline, Link, ExitOutline, EnterOutline, TerminalOutline } from 'qwik-ionicons';
+import { Add, At, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, Ban, EllipsisVertical, ChatboxOutline, ToggleOutline, IdCardOutline, Link, ExitOutline, EnterOutline, TerminalOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import LoadingIcon from '~/components/icons/LoadingIcon';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -91,7 +91,7 @@ export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], 
 
   const customcmds = customcmdsUnparsed ? customcmdsUnparsed.map(cmd => ({
     ...cmd,
-    json: JSON.parse(cmd.json),
+    actions: JSON.parse(cmd.actions),
   })) : null;
 
   const reactionroles = {
@@ -217,14 +217,24 @@ export const deleteReactionRoleFn = server$(async function(props: { messageId: s
 });
 
 export const upsertCustomCommandFn = server$(async function(props: {
+  id?: string;
   guildId: string;
   name: string;
-  description: string;
-  ephemeral: boolean;
-  type: number;
-  json: any;
-}) {
+  description?: string;
+  actions?: any;
+}, skipPOST?: boolean) {
   const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  if (skipPOST) {
+    await prisma.customcmds.update({
+      where: { guildId_name: {
+        guildId: props.guildId,
+        name: props.name,
+      } },
+      data: props,
+    });
+    return;
+  }
 
   const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands`, {
     method: 'POST',
@@ -239,24 +249,16 @@ export const upsertCustomCommandFn = server$(async function(props: {
     }),
   }).catch(() => null);
   if (!res) return new Error('creating command failed');
-
   const json = await res.json();
+  props.id = json.id;
 
   await prisma.customcmds.upsert({
     where: { guildId_name: {
       guildId: props.guildId,
       name: props.name,
     } },
-    update: {
-      ...props,
-      json: JSON.stringify(props.json),
-      id: json.id,
-    },
-    create: {
-      ...props,
-      json: JSON.stringify(props.json),
-      id: json.id,
-    },
+    update: props,
+    create: props,
   });
 });
 
@@ -689,7 +691,7 @@ export default component$(() => {
           </div>
         </div>
         <p>
-          The Reactions feature uses regex to detect messages and react to them. You can use this to make your own custom reactions. In order to create a regex expression based on your needs, either ask AI to make one for you (for example: "Create a regex pattern that matches 'cactie' and 'stupid' in any order" will give you a regex pattern that matches "cactie is stupid" or "stupid cactie" etc.) or use a regex generator online (for example: https://regexr.com/)
+          The Reactions feature uses regex to detect messages and react to them. You can use this to make your own custom reactions. In order to create a regex expression based on your needs, either ask AI to make one for you (for example: "Create a regex pattern that matches 'cactie' and 'great' in any order" will give you a regex pattern that matches "cactie is great" or "great cactie" etc.) or use a regex generator online (for example: https://regexr.com/)
         </p>
         <div class="py-10 grid gap-4">
           {
@@ -747,7 +749,7 @@ export default component$(() => {
                 <TextInput nolabel placeholder="Regex Pattern" extraClass="font-mono" id="reaction-create-regex" />
               </div>
               <EmojiInput nolabel id="reaction-emoji-create" />
-              <Checkmark width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
+              <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
                 store.loading.push('reactions');
 
                 srvconfig?.reactions.push({
@@ -1067,17 +1069,7 @@ export default component$(() => {
         <div class="flex mb-2">
           <span id="customcmds" class="block h-32 -mt-32" />
           <MenuTitle extraClass="flex-1">CUSTOM COMMANDS</MenuTitle>
-          <div class={{
-            'transition-all': true,
-            'opacity-0': !store.loading.includes('customcmds'),
-            'opacity-100': store.loading.includes('customcmds'),
-          }}>
-            <LoadingIcon />
-          </div>
         </div>
-        <p>
-          For the time being, in order to edit a custom command, you must delete it and create a new one.
-        </p>
         <div class="py-10 grid gap-4">
           {
             customcmds?.map((cmd, i) =>
@@ -1087,43 +1079,91 @@ export default component$(() => {
                     / {cmd.name}
                   </p>
                   <div class="flex-1">
-                    <TextInput nolabel placeholder="Command Description" value={cmd.description} />
+                    <TextInput nolabel placeholder="Command Description" value={cmd.description} onChange$={async (event: any) => {
+                      store.loading.push(`customcmds-${cmd.id}`);
+                      await upsertCustomCommandFn({
+                        guildId: guild.id,
+                        name: cmd.name,
+                        description: event.target.value,
+                      });
+                      store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                    }} />
                   </div>
-                  <Checkbox toggle checked={cmd.ephemeral}>
-                    Ephemeral
-                  </Checkbox>
-                  <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                    store.loading.push('customcmds');
-                    await deleteCustomCommandFn({
-                      id: cmd.id,
-                      guildId: guild.id,
-                    });
-                    store.guildData = {
-                      ...store.guildData,
-                      ...(await getSQLDataFn(channels)),
-                    };
-                    store.loading = store.loading.filter(l => l != 'customcmds');
-                  }} />
+                  <div class="flex items-center">
+                    <div class={{
+                      'transition-all absolute': true,
+                      'opacity-0': !store.loading.includes(`customcmds-${cmd.id}`),
+                      'opacity-100': store.loading.includes(`customcmds-${cmd.id}`),
+                    }}>
+                      <LoadingIcon />
+                    </div>
+                    <div class={{
+                      'transition-all': true,
+                      'opacity-0': store.loading.includes(`customcmds-${cmd.id}`),
+                      'opacity-100': !store.loading.includes(`customcmds-${cmd.id}`),
+                    }}>
+                      <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
+                        store.loading.push(`customcmds-${cmd.id}`);
+                        await deleteCustomCommandFn({
+                          id: cmd.id,
+                          guildId: guild.id,
+                        });
+                        store.guildData = {
+                          ...store.guildData,
+                          ...(await getSQLDataFn(channels)),
+                        };
+                        store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                      }} />
+                    </div>
+                  </div>
                 </div>
-                {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
-                  <TextInput placeholder="Hello World!" value={cmd.json.content}>
-                    Text Content *Optional if embed is provided
-                  </TextInput>
-                  <TextInput big placeholder="{ ...JSON here }" value={cmd.json.embeds[0] ? JSON.stringify(cmd.json.embeds[0]) : ''}>
-                    Embed *Optional if text content is provided
-                  </TextInput>
-                </div>}
-                {store.customcmdtype != 1 && <div>
-                  <TextInput placeholder="...How'd you get here?" />
-                </div>}
+                {
+                  cmd.actions.map((action: any, i2: any) =>
+                    <Card darker key={i2}>
+                      {action.type == 1 && <div class="flex flex-col gap-2">
+                        <TextInput placeholder="Hello World!" value={action.content} onChange$={async (event: any) => {
+                          store.loading.push(`customcmds-${cmd.id}`);
+                          await upsertCustomCommandFn({
+                            guildId: guild.id,
+                            name: cmd.name,
+                            actions: JSON.stringify([{
+                              ...cmd.actions[0],
+                              content: event.target.value,
+                            }]),
+                          }, true);
+                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                        }}>
+                          Text Content *Optional if embed is provided
+                        </TextInput>
+                        <TextInput big placeholder="{ ...JSON here }" value={action.embeds[0] ? JSON.stringify(action.embeds[0]) : ''} onChange$={async (event: any) => {
+                          store.loading.push(`customcmds-${cmd.id}`);
+                          await upsertCustomCommandFn({
+                            guildId: guild.id,
+                            name: cmd.name,
+                            actions: JSON.stringify([{
+                              ...cmd.actions[0],
+                              embeds: [event.target.value != '' ? JSON.parse(event.target.value) : undefined],
+                            }]),
+                          }, true);
+                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                        }}>
+                          Embed *Optional if text content is provided
+                        </TextInput>
+                      </div>}
+                    </Card>,
+                  )
+                }
               </Card>,
             )
           }
 
           <Card>
-            <CardHeader>
+            <CardHeader loading={store.loading.includes('customcmds')}>
               <Add width="32" class="fill-current" /> Create
             </CardHeader>
+            <p>
+              You will be able to add the actions for this command once you create it.
+            </p>
             <div class="flex gap-2">
               <p class="text-2xl p-1 px-2">/</p>
               <div class="flex-1">
@@ -1132,75 +1172,30 @@ export default component$(() => {
               <div class="flex-1">
                 <TextInput nolabel placeholder="Command Description" id="customcmd-create-description" />
               </div>
-              <Checkbox toggle id="customcmd-create-ephemeral">
-                Ephemeral
-              </Checkbox>
-            </div>
-            <div class="flex gap-2">
-              <div class="flex-1">
-                <SelectInput id="customcmd-create-type" label="Type" onChange$={async (event: any) => {
-                  store.customcmdtype = event.target.value;
-                }}>
-                  <option value={1}>Canned Response</option>
-                  <option value={2} disabled>Role</option>
-                  <option value={3} disabled>Subcommands</option>
-                </SelectInput>
-              </div>
-            </div>
-            {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
-              <TextInput id="customcmd-create-content" placeholder="Hello World!">
-                Text Content *Optional if embed is provided
-              </TextInput>
-              <TextInput big id="customcmd-create-embed" placeholder="{ ...JSON here }">
-                Embed *Optional if text content is provided
-                <Button color="secondary" onClick$={async () => {
-                  store.generateembed = !store.generateembed;
-                }}>
-                  Don't know where to start? Click here to generate an embed!
-                </Button>
-                {store.generateembed && <div>
-                  <iframe src="https://zira.bot/embedbuilder/" class="w-full h-96 rounded-lg border border-gray-700" />
-                </div>}
-              </TextInput>
-            </div>}
-            {store.customcmdtype != 1 && <div>
-              <TextInput id="customcmd-create-what" placeholder="...How'd you get here?" />
-            </div>}
-            <Button color="primary" onClick$={async () => {
-              store.loading.push('customcmds');
-              const name = document.getElementById('customcmd-create-name')! as HTMLInputElement;
-              const description = document.getElementById('customcmd-create-description')! as HTMLInputElement;
-              const ephemeral = document.getElementById('customcmd-create-ephemeral')! as HTMLInputElement;
+              <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
+                store.loading.push('customcmds');
+                const name = document.getElementById('customcmd-create-name')! as HTMLInputElement;
+                const description = document.getElementById('customcmd-create-description')! as HTMLInputElement;
 
-              let json;
-
-              if (store.customcmdtype == 1) {
-                const content = document.getElementById('customcmd-create-content')! as HTMLInputElement;
-                const embed = document.getElementById('customcmd-create-embed')! as HTMLInputElement;
-                const embedJSON = embed.value ? JSON.parse(embed.value) : undefined;
-
-                json = {
-                  content: content.value,
-                  embeds: [embedJSON],
+                await upsertCustomCommandFn({
+                  guildId: guild.id,
+                  name: name.value,
+                  description: description.value,
+                  actions: JSON.stringify([
+                    {
+                      type: 1,
+                      content: 'Hello World!',
+                      embeds: [],
+                    },
+                  ]),
+                });
+                store.guildData = {
+                  ...store.guildData,
+                  ...(await getSQLDataFn(channels)),
                 };
-              }
-
-              await upsertCustomCommandFn({
-                guildId: guild.id,
-                name: name.value,
-                description: description.value,
-                ephemeral: ephemeral.checked,
-                type: store.customcmdtype,
-                json,
-              });
-              store.guildData = {
-                ...store.guildData,
-                ...(await getSQLDataFn(channels)),
-              };
-              store.loading = store.loading.filter(l => l != 'customcmds');
-            }}>
-              Create Command
-            </Button>
+                store.loading = store.loading.filter(l => l != 'customcmds');
+              }} />
+            </div>
           </Card>
         </div>
       </div>

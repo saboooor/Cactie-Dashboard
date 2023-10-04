@@ -1,6 +1,6 @@
 {
   "name": "cactie-dashboard",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "Cactie dashboard go brr",
   "engines": {
     "node": ">=15.0.0"
@@ -23,9 +23,10 @@
     "fmt": "prettier --write .",
     "fmt.check": "prettier --check .",
     "lint": "eslint \"src/**/*.ts*\"",
-    "postinstall": "prisma generate --data-proxy",
+    "postinstall": "prisma generate --accelerate",
     "preview": "qwik build preview && vite preview --open",
-    "prisma:generate": "prisma generate --data-proxy",
+    "prisma": "prisma generate --accelerate",
+    "prisma:generate": "prisma generate --accelerate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:prod": "prisma migrate deploy",
     "start": "vite --open --mode ssr",
