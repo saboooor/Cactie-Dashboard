@@ -19,7 +19,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const actionTypes = {
   1: 'Send Message',
   2: 'Wait',
-  3: 'Rename Channel',
+  3: 'Edit Channel',
 };
 
 interface Guild extends APIGuild {
@@ -140,6 +140,8 @@ export const getGuildDataFn = server$(async function(props?: RequestEventBase): 
 
   // Sort roles by position
   roles.sort((a, b) => b.position - a.position);
+  // Sort channels by position
+  channels.sort((a, b) => a.position - b.position);
 
   return { guild, channels, roles, srvconfig, reactionroles, customcmds };
 });
@@ -1186,7 +1188,7 @@ export default component$(() => {
                         </TextInput>
                       </div>}
                       {action.type == 3 && <div class="flex flex-col gap-2">
-                        <SelectInput label="Select the channel to rename" value={action.channel} onChange$={async (event: any) => {
+                        <SelectInput label="Select the channel to edit" value={action.channel} onChange$={async (event: any) => {
                           store.loading.push(`customcmds-${cmd.id}`);
                           cmd.actions[i2].channel = event.target.value;
                           await upsertCustomCommandFn({
@@ -1250,10 +1252,9 @@ export default component$(() => {
                   <SelectInput id="customcmd-create-type" label="Type" value={store.customcmdtype} onChange$={async (event: any) => {
                     store.customcmdtype = event.target.value;
                   }}>
-                    <option value={1}>Send Message</option>
-                    <option value={2}>Wait</option>
-                    <option value={3}>Edit Channel</option>
-                    <option value={4}>Add/Remove/Edit Role</option>
+                    {Object.keys(actionTypes).map((t, i) =>
+                      <option value={i + 1} key={i + 1}>{actionTypes[i + 1 as keyof typeof actionTypes]}</option>,
+                    )}
                   </SelectInput>
                   {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
                     <TextInput placeholder="Hello World!" id={`customcmd-action-content-${cmd.id}`}>
@@ -1274,7 +1275,7 @@ export default component$(() => {
                     </TextInput>
                   </div>}
                   {store.customcmdtype == 3 && <div class="flex flex-col gap-2">
-                    <SelectInput id={`customcmd-action-channel-${cmd.id}`} label="Select the channel to rename">
+                    <SelectInput id={`customcmd-action-channel-${cmd.id}`} label="Select the channel to edit">
                       {channels.map(c =>
                         <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
                       )}
