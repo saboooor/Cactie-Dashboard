@@ -1186,7 +1186,7 @@ export default component$(() => {
                         </TextInput>
                       </div>}
                       {action.type == 3 && <div class="flex flex-col gap-2">
-                        <SelectInput id={`customcmd-action-channel-${cmd.id}`} label="Select the channel to rename" value={action.channel} onChange$={async (event: any) => {
+                        <SelectInput label="Select the channel to rename" value={action.channel} onChange$={async (event: any) => {
                           store.loading.push(`customcmds-${cmd.id}`);
                           cmd.actions[i2].channel = event.target.value;
                           await upsertCustomCommandFn({
@@ -1200,7 +1200,7 @@ export default component$(() => {
                             <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
                           )}
                         </SelectInput>
-                        <TextInput placeholder="general" id={`customcmd-action-channel-name-${cmd.id}`} value={action.name} onChange$={async (event: any) => {
+                        <TextInput placeholder="general" value={action.name} onChange$={async (event: any) => {
                           store.loading.push(`customcmds-${cmd.id}`);
                           cmd.actions[i2].name = event.target.value;
                           await upsertCustomCommandFn({
@@ -1210,8 +1210,35 @@ export default component$(() => {
                           }, true);
                           store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
                         }}>
-                          New Channel Name
+                          Set Channel Name
                         </TextInput>
+                        <TextInput placeholder="This is the general channel" value={action.topic} onChange$={async (event: any) => {
+                          store.loading.push(`customcmds-${cmd.id}`);
+                          cmd.actions[i2].topic = event.target.value;
+                          await upsertCustomCommandFn({
+                            guildId: guild.id,
+                            name: cmd.name,
+                            actions: JSON.stringify(cmd.actions),
+                          }, true);
+                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                        }}>
+                          Set Channel Topic
+                        </TextInput>
+                        <SelectInput label="Set channel category" value={action.topic} onChange$={async (event: any) => {
+                          store.loading.push(`customcmds-${cmd.id}`);
+                          cmd.actions[i2].parentId = event.target.value;
+                          await upsertCustomCommandFn({
+                            guildId: guild.id,
+                            name: cmd.name,
+                            actions: JSON.stringify(cmd.actions),
+                          }, true);
+                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
+                        }}>
+                          <option value={undefined}>Don't change</option>
+                          {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
+                            <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                          )}
+                        </SelectInput>
                       </div>}
                     </Card>,
                   )
@@ -1225,7 +1252,8 @@ export default component$(() => {
                   }}>
                     <option value={1}>Send Message</option>
                     <option value={2}>Wait</option>
-                    <option value={3}>Rename Channel</option>
+                    <option value={3}>Edit Channel</option>
+                    <option value={4}>Add/Remove/Edit Role</option>
                   </SelectInput>
                   {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
                     <TextInput placeholder="Hello World!" id={`customcmd-action-content-${cmd.id}`}>
@@ -1252,8 +1280,17 @@ export default component$(() => {
                       )}
                     </SelectInput>
                     <TextInput placeholder="general" id={`customcmd-action-channel-name-${cmd.id}`}>
-                      New Channel Name
+                      Set Channel Name
                     </TextInput>
+                    <TextInput placeholder="This is the general channel" id={`customcmd-action-channel-topic-${cmd.id}`}>
+                      Set Channel Topic
+                    </TextInput>
+                    <SelectInput id={`customcmd-action-channel-category-${cmd.id}`} label="Set channel category">
+                      <option value={undefined}>Don't change</option>
+                      {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
+                        <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
+                      )}
+                    </SelectInput>
                   </div>}
                   <Button color="primary" onClick$={async () => {
                     store.loading.push(`customcmds-${cmd.id}`);
@@ -1275,10 +1312,14 @@ export default component$(() => {
                       action.ms = ms.value;
                     }
                     else if (action.type == 3) {
-                      const channel = document.getElementById(`customcmd-action-channel-${cmd.id}`) as HTMLSelectElement;
+                      const channelId = document.getElementById(`customcmd-action-channel-${cmd.id}`) as HTMLSelectElement;
                       const name = document.getElementById(`customcmd-action-channel-name-${cmd.id}`) as HTMLInputElement;
-                      action.channel = channel.value;
-                      action.name = name.value;
+                      const topic = document.getElementById(`customcmd-action-channel-topic-${cmd.id}`) as HTMLInputElement;
+                      const parentId = document.getElementById(`customcmd-action-channel-category-${cmd.id}`) as HTMLInputElement;
+                      action.channelId = channelId.value;
+                      action.name = name.value == '' ? undefined : name.value;
+                      action.topic = topic.value == '' ? undefined : topic.value;
+                      action.parentId = parentId.value == '' ? undefined : parentId.value;
                     }
 
                     await upsertCustomCommandFn({
