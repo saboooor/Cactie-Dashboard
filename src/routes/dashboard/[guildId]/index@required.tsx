@@ -1,53 +1,49 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
-import type { APIGuildChannel, APIGuild, APIRole, RESTError, RESTRateLimit } from 'discord-api-types/v10';
-import { ApplicationCommandType, ChannelType } from 'discord-api-types/v10';
-import type { customcmds, reactionroles, settings } from '@prisma/client/edge';
-import { PrismaClient } from '@prisma/client/edge';
-import Menu, { MenuCategory, MenuItem, MenuTitle } from '~/components/Menu';
-import TextInput from '~/components/elements/TextInput';
-import Checkbox from '~/components/elements/Checkbox';
-import SelectInput, { RawSelectInput } from '~/components/elements/SelectInput';
-import NumberInput from '~/components/elements/NumberInput';
+import { PrismaClient, type settings } from '@prisma/client/edge';
+import type { APIGuild, APIGuildChannel, APIRole, ChannelType, RESTError, RESTRateLimit } from 'discord-api-types/v10';
+import { ChatboxOutline, HappyOutline, NewspaperOutline, SettingsOutline, ShieldCheckmarkOutline, TerminalOutline, TicketOutline } from 'qwik-ionicons';
 import { Button } from '~/components/elements/Button';
-import EmojiInput, { EmojiPicker } from '~/components/elements/EmojiInput';
-import { Add, At, Close, CreateOutline, FileTrayFullOutline, FolderOutline, HappyOutline, InvertModeOutline, MailOpenOutline, NewspaperOutline, NotificationsOffOutline, Remove, Ban, EllipsisVertical, ChatboxOutline, ToggleOutline, IdCardOutline, Link, ExitOutline, EnterOutline, TerminalOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
-import LoadingIcon from '~/components/icons/LoadingIcon';
+import Switcher from '~/components/elements/Switcher';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const actionTypes = {
-  1: 'Send Message',
-  2: 'Wait',
-  3: 'Edit Channel',
-};
 
-interface Guild extends APIGuild {
-  id: string;
-  mutual: boolean;
-}
+export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
+  props = props ?? this;
 
-interface guildData {
-  guild: Guild;
-  channels: AnyGuildChannel[];
-  roles: APIRole[];
-  srvconfig: settings & {
+  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+
+  const srvconfigUnparsed = await prisma.settings.findUnique({
+    where: {
+      guildId: props.params.guildId,
+    },
+  });
+
+  const srvconfig = srvconfigUnparsed ? {
+    ...srvconfigUnparsed,
+    joinmessage: JSON.parse(srvconfigUnparsed.joinmessage),
+    leavemessage: JSON.parse(srvconfigUnparsed.leavemessage),
+    tickets: JSON.parse(srvconfigUnparsed.tickets),
+    reactions: JSON.parse(srvconfigUnparsed.reactions),
+    auditlogs: JSON.parse(srvconfigUnparsed.auditlogs),
+  } : null;
+
+  return srvconfig as settings & {
     joinmessage: any,
     leavemessage: any,
     tickets: any,
     reactions: any[],
     auditlogs: any,
   } | null;
-  reactionroles: {
-    raw: reactionroles[];
-    channels: any[];
-  };
-  customcmds: (customcmds & { actions: any })[] | null;
-}
+});
 
-type AnyGuildChannel = APIGuildChannel<ChannelType>;
+export const updateSettingFn = server$(async function(name: string, value: string | number | boolean | null | undefined) {
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
+});
 
-async function fetchData(url: string, props: RequestEventBase, user?: boolean, accessToken?: string): Promise<any> {
+export async function fetchData(url: string, props: RequestEventBase, user?: boolean, accessToken?: string): Promise<any> {
   const res = await fetch(url, {
     headers: {
       authorization: `${user ? `Bearer ${accessToken}` : `Bot ${props.env.get(`BOT_TOKEN${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`}`,
@@ -68,244 +64,31 @@ async function fetchData(url: string, props: RequestEventBase, user?: boolean, a
   return data;
 }
 
-export const getSQLDataFn = server$(async function(channels: AnyGuildChannel[], props?: RequestEventBase) {
-  props = props ?? this;
+export type AnyGuildChannel = APIGuildChannel<ChannelType>;
 
-  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-
-  const srvconfigUnparsed = await prisma.settings.findUnique({
-    where: {
-      guildId: props.params.guildId,
-    },
-  });
-
-  const srvconfig = srvconfigUnparsed ? {
-    ...srvconfigUnparsed,
-    joinmessage: JSON.parse(srvconfigUnparsed.joinmessage),
-    leavemessage: JSON.parse(srvconfigUnparsed.leavemessage),
-    tickets: JSON.parse(srvconfigUnparsed.tickets),
-    reactions: JSON.parse(srvconfigUnparsed.reactions),
-    auditlogs: JSON.parse(srvconfigUnparsed.auditlogs),
-  } : null;
-
-  const customcmdsUnparsed = await prisma.customcmds.findMany({
-    where: {
-      guildId: props.params.guildId,
-    },
-  });
-
-  const customcmds = customcmdsUnparsed ? customcmdsUnparsed.map(cmd => ({
-    ...cmd,
-    actions: JSON.parse(cmd.actions),
-  })) : null;
-
-  const reactionroles = {
-    raw: await prisma.reactionroles.findMany({ where: { guildId: props.params.guildId } }),
-    channels: [] as any[],
-  };
-
-  for (const i in reactionroles.raw) {
-    const emojiId = reactionroles.raw[i].emojiId.match(/(\d*)/)![0];
-    if (emojiId != '') reactionroles.raw[i].emojiId = `https://cdn.discordapp.com/emojis/${emojiId}`;
-    if (reactionroles.channels.find(c => c.id == reactionroles.raw[i].channelId)) continue;
-    const channelInfo = {
-      id: reactionroles.raw[i].channelId,
-      name: channels.find(c => c.id == reactionroles.raw[i].channelId)?.name,
-      messages: [] as any[],
-    };
-    const channelreactionroles = reactionroles.raw.filter(r => r.channelId == channelInfo.id);
-    for (const i2 in channelreactionroles) {
-      if (channelInfo.messages.includes(channelreactionroles[i2].messageId)) continue;
-      channelInfo.messages.push(channelreactionroles[i2].messageId);
-    }
-    reactionroles.channels.push(channelInfo);
-  }
-
-  return { srvconfig, reactionroles, customcmds };
-});
-
-export const getGuildDataFn = server$(async function(props?: RequestEventBase): Promise<guildData | Error> {
+export const getGuildFn = server$(async function(props?: RequestEventBase, noChannels?: boolean, noRoles?: boolean) {
   props = props ?? this;
   const guildId = props.params.guildId;
   const [guild, channels, roles] = await Promise.all([
-    fetchData(`https://discord.com/api/v10/guilds/${guildId}`, props) as Promise<Guild>,
-    fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props) as Promise<AnyGuildChannel[]>,
-    fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props) as Promise<APIRole[]>,
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, props) as Promise<APIGuild>,
+    !noChannels ? fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props) as Promise<AnyGuildChannel[]> : [],
+    !noRoles ? fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props) as Promise<APIRole[]> : [],
   ]);
-
-  const { srvconfig, reactionroles, customcmds } = await getSQLDataFn(channels, props);
-  if (srvconfig instanceof Error) return srvconfig;
-  if (reactionroles instanceof Error) return reactionroles;
-  if (customcmds instanceof Error) return customcmds;
 
   // Sort roles by position
   roles.sort((a, b) => b.position - a.position);
   // Sort channels by position
   channels.sort((a, b) => a.position - b.position);
 
-  return { guild, channels, roles, srvconfig, reactionroles, customcmds };
+  return { guild, channels, roles };
 });
 
-export const useGetGuildData = routeLoader$(async (props) => await getGuildDataFn(props));
-
-export const updateSettingFn = server$(async function(name: string, value: string | number | boolean | null | undefined) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-  await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
-});
-
-export const upsertReactionRoleFn = server$(async function(props: reactionroles) {
-  let emojiId = props.emojiId.match(/(\d*)/)![0];
-  if (emojiId != '') {
-    const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
-      headers: {
-        authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-      },
-    }).catch(() => null);
-    if (!res) return new Error('Fetching custom emoji failed');
-    const emoji = await res.json();
-    emojiId = `${emoji.name}:${emoji.id}`;
-  }
-  else {
-    emojiId = props.emojiId;
-  }
-
-  const res = await fetch(`https://discord.com/api/v10/channels/${props.channelId}/messages/${props.messageId}/reactions/${emojiId}/@me`, {
-    method: 'PUT',
-    headers: {
-      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  }).catch(() => null);
-  if (!res) return new Error('reaction failed');
-
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-
-  await prisma.reactionroles.upsert({
-    where: { messageId_emojiId: {
-      messageId: props.messageId,
-      emojiId: props.emojiId,
-    } },
-    update: props,
-    create: props,
-  });
-});
-
-export const deleteReactionRoleFn = server$(async function(props: { messageId: string, emojiId: string, channelId: string, guildId: string }) {
-  let emojiId = props.emojiId.match(/(\d*)/)![0];
-  if (emojiId != '') {
-    const res = await fetch(`https://discord.com/api/v10/guilds/${props.guildId}/emojis/${props.emojiId}`, {
-      headers: {
-        authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-      },
-    }).catch(() => null);
-    if (!res) return new Error('Fetching custom emoji failed');
-    const emoji = await res.json();
-    emojiId = `${emoji.name}:${emoji.id}`;
-  }
-  else {
-    emojiId = props.emojiId;
-  }
-
-  const res = await fetch(`https://discord.com/api/v10/channels/${props.channelId}/messages/${props.messageId}/reactions/${emojiId}/@me`, {
-    method: 'DELETE',
-    headers: {
-      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-    },
-  }).catch(() => null);
-  if (!res) return new Error('delete reaction failed');
-
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-
-  await prisma.reactionroles.delete({
-    where: { messageId_emojiId: {
-      messageId: props.messageId,
-      emojiId: props.emojiId,
-    } },
-  });
-});
-
-export const upsertCustomCommandFn = server$(async function(props: {
-  id?: string;
-  guildId: string;
-  name: string;
-  description?: string;
-  actions?: any;
-}, skipPOST?: boolean) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-
-  if (skipPOST) {
-    await prisma.customcmds.update({
-      where: { guildId_name: {
-        guildId: props.guildId,
-        name: props.name,
-      } },
-      data: props,
-    });
-    return;
-  }
-
-  const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands`, {
-    method: 'POST',
-    headers: {
-      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: props.name,
-      description: props.description,
-      type: ApplicationCommandType.ChatInput,
-    }),
-  }).catch(() => null);
-  if (!res) return new Error('creating command failed');
-  const json = await res.json();
-  props.id = json.id;
-
-  await prisma.customcmds.upsert({
-    where: { guildId_name: {
-      guildId: props.guildId,
-      name: props.name,
-    } },
-    update: props,
-    create: {
-      id: json.id,
-      ...props,
-    },
-  });
-});
-
-export const deleteCustomCommandFn = server$(async function(props: {
-  id: string;
-  guildId: string;
-}) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
-
-  const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands/${props.id}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: `Bot ${this.env.get(`BOT_TOKEN${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}`,
-      'Content-Type': 'application/json',
-    },
-  }).catch(() => null);
-  if (!res) return new Error('deleting command failed');
-
-  await prisma.customcmds.delete({
-    where: { id: props.id },
-  });
-});
+export const useGetGuild = routeLoader$(async (props) => await getGuildFn(props));
 
 export default component$(() => {
-  const guildData = useGetGuildData().value;
+  const guildData = useGetGuild().value;
 
-  const store = useStore({
-    dev: undefined as boolean | undefined,
-    modal: undefined as 'create' | 'edit' | undefined,
-    guildData,
-    loading: [] as string[],
-    rrselected: [] as string[],
-    customcmdtype: 1,
-    generateembed: false,
-  });
-
-  if (store.guildData instanceof Error) {
+  if (guildData instanceof Error) {
     return (
       <div class="flex flex-col gap-3 items-center justify-center h-full pt-24">
         <h1 class="text-4xl font-bold">Error</h1>
@@ -317,1208 +100,104 @@ export default component$(() => {
     );
   }
 
-  const { guild, channels, roles, srvconfig, reactionroles, customcmds } = store.guildData;
+  const { guild, channels, roles } = guildData;
+
+  const store = useStore({
+    dev: undefined as boolean | undefined,
+  });
 
   useVisibleTask$(() => {
     store.dev = document.cookie.includes('branch=dev');
   });
 
   return (
-    <section class="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 mx-auto max-w-screen-2xl px-4 sm:px-6 min-h-[calc(100lvh-80px)]">
-      <Menu guild={guild} store={store} onSwitcherSwitch$={async () => {
-        store.guildData = await getGuildDataFn();
-      }}>
-        <MenuCategory name="GENERAL SETTINGS">
-          <MenuItem href="#joinmessage">
-            <EnterOutline width="24" class="fill-current" /> Join Message
-          </MenuItem>
-          <MenuItem href="#leavemessage">
-            <ExitOutline width="24" class="fill-current" /> Leave Message
-          </MenuItem>
-          <MenuItem href="#suggestionpoll">
-            <MailOpenOutline width="24" class="fill-current" /> Suggestions & Polls
-          </MenuItem>
-        </MenuCategory>
-        <MenuCategory name="TICKET SYSTEM">
-          <MenuItem href="#tickets">
-            <ToggleOutline width="24" class="fill-current" /> Enabled
-          </MenuItem>
-          <MenuItem href="#tickets-type">
-            <InvertModeOutline width="24" class="fill-current" /> Type
-          </MenuItem>
-          <MenuItem href="#tickets-name">
-            <IdCardOutline width="24" class="fill-current" /> Name
-          </MenuItem>
-          <MenuItem href="#tickets-category">
-            <FolderOutline width="24" class="fill-current" /> Category
-          </MenuItem>
-          <MenuItem href="#tickets-logchannel">
-            <FileTrayFullOutline width="24" class="fill-current" /> Log Channel
-          </MenuItem>
-          <MenuItem href="#tickets-role">
-            <At width="24" class="fill-current" /> Access Role
-          </MenuItem>
-          <MenuItem href="#tickets-mention">
-            <At width="24" class="fill-current" /> Mention
-          </MenuItem>
-        </MenuCategory>
-        <MenuCategory name="MODERATION">
-          <MenuItem href="#msgshortener">
-            <CreateOutline width="24" class="fill-current" /> Message Shortener
-          </MenuItem>
-          <MenuItem href="#mutecmd">
-            <NotificationsOffOutline width="24" class="fill-current" /> Mute Command
-          </MenuItem>
-          <MenuItem href="#disabledcmds">
-            <Ban width="24" class="fill-current" /> Disabled Commands
-          </MenuItem>
-          <MenuItem href="#logchannel">
-            <FileTrayFullOutline width="24" class="fill-current" /> Log Channel
-          </MenuItem>
-        </MenuCategory>
-        <MenuItem href="#reactions">
-          <ChatboxOutline width="24" class="fill-current" /> Reactions
-        </MenuItem>
-        <MenuItem href="#auditlogs">
-          <NewspaperOutline width="24" class="fill-current" /> Audit Logs
-        </MenuItem>
-        <MenuItem href="#reactionroles">
-          <HappyOutline width="24" class="fill-current" /> Reaction Roles
-        </MenuItem>
-        <MenuItem href="#customcmds">
-          <TerminalOutline width="24" class="fill-current" /> Custom Commands
-        </MenuItem>
-      </Menu>
-      <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4 pt-22 sm:pt-28">
-        <MenuTitle>GENERAL SETTINGS</MenuTitle>
-        <div class="flex flex-wrap gap-4 py-10">
-          <Card fit>
-            <CardHeader id="joinmessage" loading={store.loading.includes('joinmessage')}>
-              <EnterOutline width="32" class="fill-current" /> Join Message
-            </CardHeader>
-            <TextInput big id="joinmessage-message" value={srvconfig?.joinmessage.message} placeholder="The content of the message sent when someone joins" onChange$={async (event: any) => {
-              store.loading.push('joinmessage');
-              srvconfig!.joinmessage.message = event.target.value;
-              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
-              store.loading = store.loading.filter(l => l != 'joinmessage');
-            }}>
-              The message when someone joins the server
-            </TextInput>
-            <p>
-              Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
-            </p>
-            <Checkbox toggle id="joinmessage-silent" checked={srvconfig?.joinmessage.silent} onChange$={async (event: any) => {
-              store.loading.push('joinmessage');
-              srvconfig!.joinmessage.silent = event.target.checked;
-              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
-              store.loading = store.loading.filter(l => l != 'joinmessage');
-            }}>
-              Silent
-            </Checkbox>
-            <SelectInput id="joinmessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
-              store.loading.push('joinmessage');
-              srvconfig!.joinmessage.channel = event.target.value;
-              await updateSettingFn('joinmessage', JSON.stringify(srvconfig?.joinmessage));
-              store.loading = store.loading.filter(l => l != 'joinmessage');
-            }}>
-              <option value="false" selected={srvconfig?.joinmessage.channel == 'false'}>System Channel</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.joinmessage.channel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card fit>
-            <CardHeader id="leavemessage" loading={store.loading.includes('leavemessage')}>
-              <ExitOutline width="32" class="fill-current" /> Leave Message
-            </CardHeader>
-            <TextInput big id="leavemessage-message" value={srvconfig?.leavemessage.message} placeholder="The content of the message sent when someone leaves" onChange$={async (event: any) => {
-              store.loading.push('leavemessage');
-              srvconfig!.leavemessage.message = event.target.value;
-              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
-              store.loading = store.loading.filter(l => l != 'leavemessage');
-            }}>
-              The message when someone leaves the server
-            </TextInput>
-            <p>
-              Placeholders: <code>{'{USER MENTION}'}</code> <code>{'{USERNAME}'}</code>
-            </p>
-            <Checkbox toggle id="leavemessage-silent" checked={srvconfig?.leavemessage.silent} onChange$={async (event: any) => {
-              store.loading.push('leavemessage');
-              srvconfig!.leavemessage.silent = event.target.checked;
-              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
-              store.loading = store.loading.filter(l => l != 'leavemessage');
-            }}>
-              Silent
-            </Checkbox>
-            <SelectInput id="leavemessage-channel" label="Channel to send the message in" onChange$={async (event: any) => {
-              store.loading.push('leavemessage');
-              srvconfig!.leavemessage.channel = event.target.value;
-              await updateSettingFn('leavemessage', JSON.stringify(srvconfig?.leavemessage));
-              store.loading = store.loading.filter(l => l != 'leavemessage');
-            }}>
-              <option value="false" selected={srvconfig?.leavemessage.channel == 'false'}>System Channel</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.leavemessage.channel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card fit extraClass={{ 'gap-5': true }}>
-            <CardHeader id="suggestionpoll" loading={store.loading.includes('suggestionpoll')}>
-              <MailOpenOutline width="32" class="fill-current" /> Suggestions & Polls
-            </CardHeader>
-            <SelectInput id="suggestionchannel" label="Channel to make suggestions in" onChange$={async (event: any) => {
-              store.loading.push('suggestionpoll');
-              await updateSettingFn('suggestionchannel', event.target.value);
-              store.loading = store.loading.filter(l => l != 'suggestionpoll');
-            }}>
-              <option value="false" selected={srvconfig?.suggestionchannel == 'false'}>Same channel as user</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.suggestionchannel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-            <Checkbox toggle id="suggestthreads" checked={srvconfig?.suggestthreads == 'true'} onChange$={async (event: any) => {
-              store.loading.push('suggestionpoll');
-              await updateSettingFn('suggestthreads', event.target.checked ? 'true' : 'false');
-              store.loading = store.loading.filter(l => l != 'suggestionpoll');
-            }}>
-              Create threads associated to suggestions for discussion
-            </Checkbox>
-            <SelectInput id="pollchannel" label="Channel to make polls in" onChange$={async (event: any) => {
-              store.loading.push('suggestionpoll');
-              await updateSettingFn('pollchannel', event.target.value);
-              store.loading = store.loading.filter(l => l != 'suggestionpoll');
-            }}>
-              <option value="false" selected={srvconfig?.pollchannel == 'false'}>Same channel as user</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.pollchannel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-        </div>
-        <div class="flex mb-2">
-          <span id="tickets" class="block h-32 -mt-32" />
-          <Checkbox toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
-            store.loading.push('tickets-enabled');
-            srvconfig!.tickets.enabled = event.target.checked;
-            await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-            store.loading = store.loading.filter(l => l != 'tickets-enabled');
-          }}>
-            <MenuTitle extraClass="flex-1">TICKET SYSTEM</MenuTitle>
-          </Checkbox>
-          <div class={{
-            'transition-all': true,
-            'opacity-0': !store.loading.includes('tickets-enabled'),
-            'opacity-100': store.loading.includes('tickets-enabled'),
-          }}>
-            <LoadingIcon />
-          </div>
-        </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
-          <Card fit>
-            <CardHeader id="tickets-type" loading={store.loading.includes('tickets-type')}>
-              <InvertModeOutline width="32" class="fill-current" /> Type
-            </CardHeader>
-            <SelectInput id="tickets-type-input" label="Whether to use buttons or reactions for ticket interactions" onChange$={async (event: any) => {
-              store.loading.push('tickets-type');
-              srvconfig!.tickets.type = event.target.value;
-              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-              store.loading = store.loading.filter(l => l != 'tickets-type');
-            }}>
-              <option value="buttons" selected={srvconfig?.tickets.type == 'buttons'}>Use buttons</option>
-              <option value="reactions" selected={srvconfig?.tickets.type == 'reactions'}>Use reactions</option>
-            </SelectInput>
-          </Card>
-          <Card fit>
-            <CardHeader id="tickets-name" loading={store.loading.includes('tickets-name')}>
-              <IdCardOutline width="32" class="fill-current" /> Name
-            </CardHeader>
-            <Checkbox toggle id="tickets-name-input" checked={srvconfig?.tickets.count == 'false'} onChange$={async () => {
-              store.loading.push('tickets-name');
-              srvconfig!.tickets.count = srvconfig?.tickets.count == 'false' ? 1 : 'false';
-              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-              store.loading = store.loading.filter(l => l != 'tickets-name');
-            }}>
-              Use usernames in ticket names
-            </Checkbox>
-            <p>
-              Enabling and disabling this setting will reset the ticket counter to 1.
-            </p>
-          </Card>
-          <Card fit>
-            <CardHeader id="tickets-category" loading={store.loading.includes('tickets-category')}>
-              <FolderOutline width="32" class="fill-current" /> Category
-            </CardHeader>
-            <SelectInput id="tickets-category-input" label="The category where tickets will appear" onChange$={async (event: any) => {
-              store.loading.push('tickets-category');
-              srvconfig!.tickets.category = event.target.value;
-              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-              store.loading = store.loading.filter(l => l != 'tickets-category');
-            }}>
-              <option value="false" selected={srvconfig?.tickets.category == 'false'}>No Category</option>
-              {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.tickets.category == c.id}>{`> ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card fit>
-            <CardHeader id="tickets-logchannel" loading={store.loading.includes('tickets-logchannel')}>
-              <FileTrayFullOutline width="32" class="fill-current" /> Log Channel
-            </CardHeader>
-            <SelectInput id="tickets-logchannel-input" label="The channel where transcripts will appear" onChange$={async (event: any) => {
-              store.loading.push('tickets-logchannel');
-              srvconfig!.tickets.logchannel = event.target.value;
-              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-              store.loading = store.loading.filter(l => l != 'tickets-logchannel');
-            }}>
-              <option value="false" selected={srvconfig?.tickets.logchannel == 'false'}>Don't send transcripts</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.tickets.logchannel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card fit>
-            <CardHeader id="tickets-role" loading={store.loading.includes('tickets-role')}>
-              <At width="32" class="fill-current" /> Access Role
-            </CardHeader>
-            <SelectInput id="tickets-role-input" label="The role that may access tickets" onChange$={async (event: any) => {
-              store.loading.push('tickets-role');
-              srvconfig!.tickets.role = event.target.value;
-              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-              event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
-              store.loading = store.loading.filter(l => l != 'tickets-role');
-            }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.tickets.role)?.color ? roles.find(r => r.id == srvconfig?.tickets.role)?.color.toString(16) : 'ffffff'),
-            }}>
-              <option value="false" selected={srvconfig?.tickets.role == 'false'} style={{ color: '#ffffff' }}>Not Set</option>
-              {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.tickets.role == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card fit>
-            <CardHeader id="tickets-mention" loading={store.loading.includes('tickets-mention')}>
-              <At width="32" class="fill-current" /> Mention
-            </CardHeader>
-            <SelectInput id="tickets-mention-input" label="Pings the specified role when a ticket is created" onChange$={async (event: any) => {
-              store.loading.push('tickets-mention');
-              srvconfig!.tickets.mention = event.target.value;
-              await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-              event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
-              store.loading = store.loading.filter(l => l != 'tickets-mention');
-            }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.tickets.mention)?.color ? roles.find(r => r.id == srvconfig?.tickets.mention)?.color.toString(16) : 'ffffff'),
-            }}>
-              <option value="false" selected={srvconfig?.tickets.mention == 'false'} style={{ color: '#ffffff' }}>No mention</option>
-              <option value="everyone" selected={srvconfig?.tickets.mention == 'everyone'} style={{ color: 'rgb(59 130 246)' }}>@ everyone</option>
-              <option value="here" selected={srvconfig?.tickets.mention == 'here'} style={{ color: 'rgb(59 130 246)' }}>@ here</option>
-              {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.tickets.mention == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-        </div>
-        <MenuTitle>MODERATION</MenuTitle>
-        <div class="flex flex-wrap gap-4 py-10">
-          <Card>
-            <CardHeader id="msgshortener" loading={store.loading.includes('msgshortener')}>
-              <CreateOutline width="32" class="fill-current" /> Message Shortener
-            </CardHeader>
-            <NumberInput input value={(store.guildData as guildData).srvconfig!.msgshortener} id="msgshortener-input" onChange$={async (event: any) => {
-              store.loading.push('msgshortener');
-              await updateSettingFn('msgshortener', parseInt(event.target.value));
-              store.loading = store.loading.filter(l => l != 'msgshortener');
-            }}
-            onIncrement$={async () => {
-              store.loading.push('msgshortener');
-              (store.guildData as guildData).srvconfig!.msgshortener++;
-              await updateSettingFn('msgshortener', (store.guildData as guildData).srvconfig!.msgshortener);
-              store.loading = store.loading.filter(l => l != 'msgshortener');
-            }}
-            onDecrement$={async () => {
-              store.loading.push('msgshortener');
-              (store.guildData as guildData).srvconfig!.msgshortener--;
-              await updateSettingFn('msgshortener', (store.guildData as guildData).srvconfig!.msgshortener);
-              store.loading = store.loading.filter(l => l != 'msgshortener');
-            }}>
-              The amount of lines in a message to shorten into a link. To disable, set to 0
-            </NumberInput>
-          </Card>
-          <Card>
-            <CardHeader id="mutecmd" loading={store.loading.includes('mutecmd')}>
-              <NotificationsOffOutline width="32" class="fill-current" /> Mute Command
-            </CardHeader>
-            <SelectInput id="mutecmd-input" label="Select a role to give when muting or use Discord's timeout feature" onChange$={async (event: any) => {
-              store.loading.push('mutecmd');
-              await updateSettingFn('mutecmd', event.target.value);
-              event.target.style.color = event.target.options[event.target.selectedIndex].style.color;
-              store.loading = store.loading.filter(l => l != 'mutecmd');
-            }} style={{
-              color: '#' + (roles.find(r => r.id == srvconfig?.mutecmd)?.color ? roles.find(r => r.id == srvconfig?.mutecmd)?.color.toString(16) : 'ffffff'),
-            }}>
-              <option value="timeout" selected={srvconfig?.mutecmd == 'timeout'} style={{ color: '#ffffff' }}>Use Discord's timeout feature</option>
-              {roles.map(r =>
-                <option value={r.id} key={r.id} selected={srvconfig?.mutecmd == r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-          <Card>
-            <CardHeader id="disabledcmds" loading={store.loading.includes('disabledcmds')}>
-              <Ban width="32" class="fill-current" />Disabled Commands
-            </CardHeader>
-            <TextInput id="disabledcmds-input" value={srvconfig?.disabledcmds == 'false' ? '' : srvconfig?.disabledcmds} placeholder="Specify commands to disable, no spaces" onChange$={async (event: any) => {
-              store.loading.push('disabledcmds');
-              await updateSettingFn('disabledcmds', event.target.value);
-              store.loading = store.loading.filter(l => l != 'disabledcmds');
-            }}>
-              Disable certain commands from Cactie separated by commas
-            </TextInput>
-          </Card>
-          <Card>
-            <CardHeader id="logchannel" loading={store.loading.includes('logchannel')}>
-              <FileTrayFullOutline width="32" class="fill-current" /> Log Channel
-            </CardHeader>
-            <SelectInput id="logchannel-value" label="The channel where moderation logs will appear (this is separate from audit logs for now)" onChange$={async (event: any) => {
-              store.loading.push('logchannel');
-              await updateSettingFn('logchannel', event.target.value);
-              store.loading = store.loading.filter(l => l != 'logchannel');
-            }}>
-              <option value="false" selected={srvconfig?.logchannel == 'false'}>No logs</option>
-              {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                <option value={c.id} key={c.id} selected={srvconfig?.logchannel == c.id}>{`# ${c.name}`}</option>,
-              )}
-            </SelectInput>
-          </Card>
-        </div>
-        <div class="flex mb-2">
-          <span id="reactions" class="block h-32 -mt-32" />
-          <MenuTitle extraClass="flex-1">REACTIONS</MenuTitle>
-          <div class={{
-            'transition-all': true,
-            'opacity-0': !store.loading.includes('reactions'),
-            'opacity-100': store.loading.includes('reactions'),
-          }}>
-            <LoadingIcon />
-          </div>
-        </div>
-        <p>
-          The Reactions feature uses regex to detect messages and react to them. You can use this to make your own custom reactions. In order to create a regex expression based on your needs, either ask AI to make one for you (for example: "Create a regex pattern that matches 'cactie' and 'great' in any order" will give you a regex pattern that matches "cactie is great" or "great cactie" etc.) or use a regex generator online (for example: https://regexr.com/)
-        </p>
-        <div class="py-10 grid gap-4">
-          {
-            srvconfig?.reactions.map((reaction, i) =>
-              <Card key={i}>
-                <TextInput placeholder="Regex Pattern" value={reaction.regex} onChange$={async (event: any) => {
-                  store.loading.push('reactions');
-                  (store.guildData as guildData).srvconfig!.reactions[i].regex = event.target.value;
-                  await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                  store.loading = store.loading.filter(l => l != 'reactions');
-                }} extraClass="font-mono" />
-                <div class="flex">
-                  <div class="flex flex-wrap gap-2 flex-1">
-                    <Button small disabled={reaction.emojis.length < 2} onClick$={async () => {
-                      store.loading.push('reactions');
-                      (store.guildData as guildData).srvconfig!.reactions[i].emojis.pop();
-                      await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                      store.loading = store.loading.filter(l => l != 'reactions');
-                    }}>
-                      <Remove width="24" class="fill-current" />
-                    </Button>
-                    {(reaction.emojis as any[]).map((emoji, i2) => {
-                      return <EmojiInput nolabel emoji={emoji} key={i2} id={`reaction-emoji-${i2}`} onChange$={async (event: any) => {
-                        store.loading.push('reactions');
-                        const reactions = JSON.parse(JSON.stringify(srvconfig?.reactions));
-                        reactions[i].emojis[i2] = event.target.getAttribute('value');
-                        await updateSettingFn('reactions', JSON.stringify(reactions));
-                        store.loading = store.loading.filter(l => l != 'reactions');
-                      }} />;
-                    })}
-                    <Button small onClick$={() => {
-                      store.loading.push('reactions');
-                      (store.guildData as guildData).srvconfig!.reactions[i].emojis.push('Select an Emoji');
-                      store.loading = store.loading.filter(l => l != 'reactions');
-                    }} disabled={srvconfig?.reactions[i].emojis.includes('Select an Emoji')}>
-                      <Add width="24" class="fill-current" />
-                    </Button>
-                  </div>
-                  <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                    store.loading.push('reactions');
-                    (store.guildData as guildData).srvconfig!.reactions.splice(i, 1);
-                    await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                    store.loading = store.loading.filter(l => l != 'reactions');
-                  }} />
-                </div>
-              </Card>,
-            )
-          }
-          <Card>
-            <CardHeader>
-              <Add width="32" class="fill-current" /> Create
-            </CardHeader>
-            <div class="flex gap-2">
-              <div class="flex-1">
-                <TextInput nolabel placeholder="Regex Pattern" extraClass="font-mono" id="reaction-create-regex" />
-              </div>
-              <EmojiInput nolabel id="reaction-emoji-create" />
-              <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
-                store.loading.push('reactions');
-
-                srvconfig?.reactions.push({
-                  regex: (document.getElementById('reaction-create-regex') as HTMLInputElement).value,
-                  emojis: [(document.getElementById('reaction-emoji-create') as HTMLInputElement).getAttribute('value')],
-                });
-                await updateSettingFn('reactions', JSON.stringify(srvconfig?.reactions));
-                store.loading = store.loading.filter(l => l != 'reactions');
-              }} />
-            </div>
-          </Card>
-        </div>
-        <div class="flex">
-          <span id="auditlogs" class="block h-32 -mt-32" />
-          <MenuTitle extraClass="flex-1">AUDIT LOGS</MenuTitle>
-          <div class={{
-            'transition-all': true,
-            'opacity-0': !store.loading.includes('auditlogs'),
-            'opacity-100': store.loading.includes('auditlogs'),
-          }}>
-            <LoadingIcon />
-          </div>
-        </div>
-        <div class="py-10 flex flex-col gap-4">
-          <div class="flex flex-col md:flex-row gap-4">
-            <Card>
-              <CardHeader>
-                <ChatboxOutline width="32" class="fill-current" /> Default Channel
-              </CardHeader>
-              <SelectInput id="auditlogs-channel" label="This is where logs will be sent if there is no specific channel set on them" onChange$={async (event: any) => {
-                store.loading.push('auditlogs');
-                srvconfig!.auditlogs.channel = event.target.value;
-                await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
-                store.loading = store.loading.filter(l => l != 'auditlogs');
-              }}>
-                <option value="false" selected={srvconfig?.auditlogs.channel == 'false'}>No channel specified.</option>
-                {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                  <option value={c.id} key={c.id} selected={srvconfig?.auditlogs.channel == c.id}>{`# ${c.name}`}</option>,
-                )}
-              </SelectInput>
-            </Card>
-            {!(srvconfig?.auditlogs.logs?.all || (
-              (srvconfig?.auditlogs.logs?.member || (srvconfig?.auditlogs.logs?.memberjoin && srvconfig?.auditlogs.logs?.memberleave))
-              && (srvconfig?.auditlogs.logs?.message || (srvconfig?.auditlogs.logs?.messagedelete && srvconfig?.auditlogs.logs?.messagedeletebulk && srvconfig?.auditlogs.logs?.messageupdate))
-              && (srvconfig?.auditlogs.logs?.channel || (srvconfig?.auditlogs.logs?.channelcreate && srvconfig?.auditlogs.logs?.channeldelete && srvconfig?.auditlogs.logs?.channelupdate))
-              && (srvconfig?.auditlogs.logs?.role || (srvconfig?.auditlogs.logs?.rolecreate && srvconfig?.auditlogs.logs?.roledelete && srvconfig?.auditlogs.logs?.roleupdate))
-              && (srvconfig?.auditlogs.logs?.voice || (srvconfig?.auditlogs.logs?.voicejoin && srvconfig?.auditlogs.logs?.voiceleave && srvconfig?.auditlogs.logs?.voicemove && srvconfig?.auditlogs.logs?.voicedeafen && srvconfig?.auditlogs.logs?.voicemute))
-            )) && (
-              <Card squish>
-                <RawSelectInput id="new-log">
-                  {!srvconfig?.auditlogs.logs?.all && (
-                    <>
-                      {(!srvconfig?.auditlogs.logs?.member && !srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave && !srvconfig?.auditlogs.logs?.membernameupdate && !srvconfig?.auditlogs.logs?.memberrolesupdate
-                    && !srvconfig?.auditlogs.logs?.message && !srvconfig?.auditlogs.logs?.messagedelete && !srvconfig?.auditlogs.logs?.messagedeletebulk && !srvconfig?.auditlogs.logs?.messageupdate
-                    && !srvconfig?.auditlogs.logs?.channel && !srvconfig?.auditlogs.logs?.channelcreate && !srvconfig?.auditlogs.logs?.channeldelete && !srvconfig?.auditlogs.logs?.channelupdate
-                    && !srvconfig?.auditlogs.logs?.role && !srvconfig?.auditlogs.logs?.rolereate && !srvconfig?.auditlogs.logs?.roledelete && !srvconfig?.auditlogs.logs?.roleupdate
-                    && !srvconfig?.auditlogs.logs?.voice && !srvconfig?.auditlogs.logs?.voicejoin && !srvconfig?.auditlogs.logs?.voiceleave && !srvconfig?.auditlogs.logs?.voicemove && !srvconfig?.auditlogs.logs?.voicedeafen && !srvconfig?.auditlogs.logs?.voicemute
-                      ) && (
-                        <option value="all">All Logs</option>
-                      )}
-                      {!srvconfig?.auditlogs.logs?.member && (
-                        <>
-                          {(!srvconfig?.auditlogs.logs?.memberjoin && !srvconfig?.auditlogs.logs?.memberleave && !srvconfig?.auditlogs.logs?.membernameupdate && !srvconfig?.auditlogs.logs?.memberrolesupdate) && (
-                            <option value="member">All Member-Related Logs</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.memberjoin && (
-                            <option value="memberjoin">Member Joined</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.memberleave && (
-                            <option value="memberleave">Member Left</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.membernameupdate && (
-                            <option value="memberleave">Member Name Updated</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.memberrolesupdate && (
-                            <option value="memberleave">Member Roles Updated</option>
-                          )}
-                        </>
-                      )}
-                      {!srvconfig?.auditlogs.logs?.message && (
-                        <>
-                          {(!srvconfig?.auditlogs.logs?.messagedelete && !srvconfig?.auditlogs.logs?.messagedeletebulk && !srvconfig?.auditlogs.logs?.messageupdate) && (
-                            <option value="message">All Message-Related Logs</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.messagedelete && (
-                            <option value="messagedelete">Message Deleted</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.messagedeletebulk && (
-                            <option value="messagedeletebulk">Messages Bulk-Deleted</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.messageupdate && (
-                            <option value="messageupdate">Message Edited</option>
-                          )}
-                        </>
-                      )}
-                      {!srvconfig?.auditlogs.logs?.channel && (
-                        <>
-                          {(!srvconfig?.auditlogs.logs?.channelcreate && !srvconfig?.auditlogs.logs?.channeldelete && !srvconfig?.auditlogs.logs?.channelupdate) && (
-                            <option value="channel">All Channel-Related Logs</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.channelcreate && (
-                            <option value="channelcreate">Channel Created</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.channeldelete && (
-                            <option value="channeldelete">Channel Deleted</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.channelupdate && (
-                            <option value="channelupdate">Channel Updated</option>
-                          )}
-                        </>
-                      )}
-                      {!srvconfig?.auditlogs.logs?.role && (
-                        <>
-                          {(!srvconfig?.auditlogs.logs?.rolecreate && !srvconfig?.auditlogs.logs?.roledelete && !srvconfig?.auditlogs.logs?.roleupdate) && (
-                            <option value="role">All Role-Related Logs</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.rolecreate && (
-                            <option value="rolecreate">Role Created</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.roledelete && (
-                            <option value="roledelete">Role Deleted</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.roleupdate && (
-                            <option value="roleupdate">Role Updated</option>
-                          )}
-                        </>
-                      )}
-                      {!srvconfig?.auditlogs.logs?.voice && (
-                        <>
-                          {(!srvconfig?.auditlogs.logs?.voicejoin && !srvconfig?.auditlogs.logs?.voiceleave && !srvconfig?.auditlogs.logs?.voicemove && !srvconfig?.auditlogs.logs?.voicedeafen && !srvconfig?.auditlogs.logs?.voicemute) && (
-                            <option value="voice">All Voice-Related Logs</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.voicejoin && (
-                            <option value="voicejoin">Joined Voice Channel</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.voiceleave && (
-                            <option value="voiceleave">Left Voice Channel</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.voicemove && (
-                            <option value="voicemove">Moved Voice Channels</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.voicedeafen && (
-                            <option value="voicedeafen">Voice Deafened</option>
-                          )}
-                          {!srvconfig?.auditlogs.logs?.voicemute && (
-                            <option value="voicemute">Voice Muted</option>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )}
-                </RawSelectInput>
-                <RawSelectInput id="new-log-channel" label="The channel to associate this log to">
-                  {srvconfig?.auditlogs.channel != 'false' &&
-                    <option value="false" selected>Default Channel</option>
-                  }
-                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                    <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                  )}
-                </RawSelectInput>
-                <Button color="primary" onClick$={async () => {
-                  store.loading.push('auditlogs');
-                  const log = (document.getElementById('new-log') as HTMLSelectElement).value;
-                  const channel = (document.getElementById('new-log-channel') as HTMLSelectElement).value;
-                  (store.guildData as guildData).srvconfig!.auditlogs.logs[log] = { channel };
-                  await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
-                  store.loading = store.loading.filter(l => l != 'auditlogs');
-                }}>
-                  Add Audit Log
-                </Button>
-              </Card>
-            )}
-          </div>
-          <div class="flex flex-wrap justify-center gap-4">
-            {
-              Object.keys(srvconfig?.auditlogs.logs).map((log, i) => {
-                return (
-                  <Card key={i}>
-                    <div class="flex items-start flex-1">
-                      <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
-                        {log}
-                      </h1>
-                      <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                        store.loading.push('auditlogs');
-                        delete (store.guildData as guildData).srvconfig!.auditlogs.logs[log];
-                        await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
-                        store.loading = store.loading.filter(l => l != 'auditlogs');
-                      }} />
-                    </div>
-                    <RawSelectInput id={`auditlogs-logs-${log}.channel`} name={`auditlogs.logs.${log}.channel`} onChange$={async (event: any) => {
-                      store.loading.push('auditlogs');
-                      srvconfig!.auditlogs.logs[log].channel = event.target.value;
-                      await updateSettingFn('auditlogs', JSON.stringify(srvconfig?.auditlogs));
-                      store.loading = store.loading.filter(l => l != 'auditlogs');
-                    }}>
-                      {srvconfig?.auditlogs.channel != 'false' &&
-                        <option value="false" selected={srvconfig?.auditlogs.logs[log].channel == 'false'}>Default Channel</option>
-                      }
-                      {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                        <option value={c.id} key={c.id} selected={srvconfig?.auditlogs.logs[log].channel == c.id}>{`# ${c.name}`}</option>,
-                      )}
-                    </RawSelectInput>
-                  </Card>
-                );
-              })
-            }
-          </div>
-        </div>
-        <div class="flex">
-          <span id="reactionroles" class="block h-32 -mt-32" />
-          <MenuTitle extraClass="flex-1">REACTION ROLES</MenuTitle>
-          <div class="flex items-center gap-3">
-            <div class={{
-              'transition-all': true,
-              'opacity-0': !store.loading.includes('reactionroles'),
-              'opacity-100': store.loading.includes('reactionroles'),
-            }}>
-              <LoadingIcon />
-            </div>
-            <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
-              store.modal = 'create';
-            }} />
-          </div>
-        </div>
-        <div class="flex flex-col gap-4 py-10">
-          {reactionroles.channels.length == 0 &&
-            <Card>
-              You have no reaction roles set up. Click the + button to create one.
-            </Card>
-          }
-          {
-            reactionroles.channels.map(channel => (
-              <div key={channel.id}>
-                <div class="flex items-start flex-1 mb-4">
-                  <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
-                    # {channel?.name ?? 'Channel Not Found.'}
-                  </h1>
-                  <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
-                    const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                    channelselect.value = channel.id;
-                    store.modal = 'create';
-                  }} />
-                </div>
-                <div class='flex flex-col gap-4'>
-                  {
-                    channel.messages.map((messageId: string) => (
-                      <Card key={messageId}>
-                        <div class="flex items-center">
-                          <a target='_blank' href={`https://discord.com/channels/${guild.id}/${channel.id}/${messageId}`} class="flex flex-1 gap-3 justify-start font-bold text-gray-100 text-2xl">
-                            <Link width="30" />
-                            <span class="flex flex-col">
-                              <span>
-                                Go to message
-                              </span>
-                              <span class="text-xs font-normal text-gray-200">
-                                {messageId}
-                              </span>
-                            </span>
-                          </a>
-                          <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
-                            const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                            channelselect.value = channel.id;
-                            const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
-                            messageinput.value = messageId;
-                            store.modal = 'create';
-                          }} />
-                        </div>
-                        <div class='flex flex-wrap gap-4'>
-                          {
-                            reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
-                              const role = roles.find(r => r.id == rr.roleId);
-
-                              return <Card darker key={rr.roleId} row fit>
-                                <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
-                                  {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12 h-auto" width={48} height={48}/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
-                                </div>
-                                <div class="flex-1">
-                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: '#' + (role?.color ? role.color.toString(16) : 'ffffff') }}>@ {role?.name ?? 'Role Not Found.'}</h1>
-                                  <p class="flex">
-                                    {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
-                                    {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
-                                  </p>
-                                </div>
-                                <div class="flex flex-col justify-center gap-4">
-                                  <Checkbox nolabel id={`select-${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`} checked={store.rrselected.includes(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`)} onChange$={async (event: any) => {
-                                    if (event.target.checked) store.rrselected.push(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
-                                    else store.rrselected = store.rrselected.filter(s => s != `${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
-                                  }} />
-                                  <EllipsisVertical width="24" class="fill-gray-400 cursor-pointer flex" onClick$={() => {
-                                    const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                                    const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
-                                    const roleinput = document.getElementById('rrcreaterole') as HTMLSelectElement;
-                                    const emojiinput = document.getElementById('rrcreateemoji') as HTMLButtonElement;
-                                    const typeinput = document.getElementById('rrcreateswitch') as HTMLSelectElement;
-                                    const silentinput = document.getElementById('rrcreatesilent') as HTMLInputElement;
-                                    channelselect.value = channel.id;
-                                    messageinput.value = messageId;
-                                    roleinput.value = role!.id;
-                                    emojiinput.setAttribute('value', rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId);
-                                    typeinput.value = rr.type;
-                                    silentinput.checked = rr.silent == 'true';
-                                    store.modal = 'edit';
-                                  }} />
-                                </div>
-                              </Card>;
-                            })
-                          }
-                        </div>
-                      </Card>
-                    ))
-                  }
-                </div>
-              </div>
-            ))
-          }
-        </div>
-        <div class="flex mb-2">
-          <span id="customcmds" class="block h-32 -mt-32" />
-          <MenuTitle extraClass="flex-1">CUSTOM COMMANDS</MenuTitle>
-        </div>
-        <div class="py-10 grid gap-4">
-          {
-            customcmds?.map((cmd, i) =>
-              <Card key={i}>
-                <div class="flex gap-2">
-                  <p class="text-2xl p-1 px-2">
-                    / {cmd.name}
-                  </p>
-                  <div class="flex-1">
-                    <TextInput nolabel placeholder="Command Description" value={cmd.description} onChange$={async (event: any) => {
-                      store.loading.push(`customcmds-${cmd.id}`);
-                      await upsertCustomCommandFn({
-                        guildId: guild.id,
-                        name: cmd.name,
-                        description: event.target.value,
-                      });
-                      store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                    }} />
-                  </div>
-                  <div class="flex items-center">
-                    <div class={{
-                      'transition-all absolute': true,
-                      'opacity-0': !store.loading.includes(`customcmds-${cmd.id}`),
-                      'opacity-100': store.loading.includes(`customcmds-${cmd.id}`),
-                    }}>
-                      <LoadingIcon />
-                    </div>
-                    <div class={{
-                      'transition-all': true,
-                      'opacity-0': store.loading.includes(`customcmds-${cmd.id}`),
-                      'opacity-100': !store.loading.includes(`customcmds-${cmd.id}`),
-                    }}>
-                      <Close width="36" class="fill-red-400 cursor-pointer" onClick$={async () => {
-                        store.loading.push(`customcmds-${cmd.id}`);
-                        await deleteCustomCommandFn({
-                          id: cmd.id,
-                          guildId: guild.id,
-                        });
-                        store.guildData = {
-                          ...store.guildData,
-                          ...(await getSQLDataFn(channels)),
-                        };
-                        store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                      }} />
-                    </div>
-                  </div>
-                </div>
-                {
-                  cmd.actions.map((action: any, i2: any) =>
-                    <Card darker key={i2}>
-                      <CardHeader>
-                        Action {i2 + 1} - {actionTypes[action.type as keyof typeof actionTypes]}
-                      </CardHeader>
-                      {action.type == 1 && <div class="flex flex-col gap-2">
-                        <TextInput placeholder="Hello World!" value={action.content} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].content = event.target.value;
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          Text Content *Optional if embed is provided
-                        </TextInput>
-                        <TextInput big placeholder="{ ...JSON here }" value={action.embeds[0] ? JSON.stringify(action.embeds[0]) : ''} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].embeds = [event.target.value != '' ? JSON.parse(event.target.value) : undefined];
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          Embed *Optional if text content is provided
-                        </TextInput>
-                        <div class="mt-2">
-                          <Checkbox toggle checked={action.ephemeral} onChange$={async (event: any) => {
-                            store.loading.push(`customcmds-${cmd.id}`);
-                            cmd.actions[i2].ephemeral = event.target.checked;
-                            await upsertCustomCommandFn({
-                              guildId: guild.id,
-                              name: cmd.name,
-                              actions: JSON.stringify(cmd.actions),
-                            }, true);
-                            store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                          }}>
-                            Ephemeral
-                          </Checkbox>
-                        </div>
-                      </div>}
-                      {action.type == 2 && <div class="flex flex-col gap-2">
-                        <TextInput placeholder="1000" value={action.ms} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].ms = event.target.value;
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          Time to wait in milliseconds
-                        </TextInput>
-                      </div>}
-                      {action.type == 3 && <div class="flex flex-col gap-2">
-                        <SelectInput label="Select the channel to edit" value={action.channel} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].channel = event.target.value;
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          {channels.map(c =>
-                            <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                          )}
-                        </SelectInput>
-                        <TextInput placeholder="general" value={action.name} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].name = event.target.value;
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          Set Channel Name
-                        </TextInput>
-                        <TextInput placeholder="This is the general channel" value={action.topic} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].topic = event.target.value;
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          Set Channel Topic
-                        </TextInput>
-                        <SelectInput label="Set channel category" value={action.topic} onChange$={async (event: any) => {
-                          store.loading.push(`customcmds-${cmd.id}`);
-                          cmd.actions[i2].parentId = event.target.value;
-                          await upsertCustomCommandFn({
-                            guildId: guild.id,
-                            name: cmd.name,
-                            actions: JSON.stringify(cmd.actions),
-                          }, true);
-                          store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          <option value={undefined}>Don't change</option>
-                          {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
-                            <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                          )}
-                        </SelectInput>
-                      </div>}
-                    </Card>,
-                  )
-                }
-                <Card darker>
-                  <CardHeader>
-                    Add Action
-                  </CardHeader>
-                  <SelectInput id="customcmd-create-type" label="Type" value={store.customcmdtype} onChange$={async (event: any) => {
-                    store.customcmdtype = event.target.value;
-                  }}>
-                    {Object.keys(actionTypes).map((t, i) =>
-                      <option value={i + 1} key={i + 1}>{actionTypes[i + 1 as keyof typeof actionTypes]}</option>,
-                    )}
-                  </SelectInput>
-                  {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
-                    <TextInput placeholder="Hello World!" id={`customcmd-action-content-${cmd.id}`}>
-                      Text Content *Optional if embed is provided
-                    </TextInput>
-                    <TextInput big placeholder="{ ...JSON here }" id={`customcmd-action-embed-${cmd.id}`}>
-                      Embed *Optional if text content is provided
-                    </TextInput>
-                    <div class="my-2">
-                      <Checkbox toggle id={`customcmd-action-ephemeral-${cmd.id}`}>
-                        Ephemeral
-                      </Checkbox>
-                    </div>
-                  </div>}
-                  {store.customcmdtype == 2 && <div class="flex flex-col gap-2">
-                    <TextInput placeholder="1000" id={`customcmd-action-ms-${cmd.id}`}>
-                      Time to wait in milliseconds
-                    </TextInput>
-                  </div>}
-                  {store.customcmdtype == 3 && <div class="flex flex-col gap-2">
-                    <SelectInput id={`customcmd-action-channel-${cmd.id}`} label="Select the channel to edit">
-                      {channels.map(c =>
-                        <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                      )}
-                    </SelectInput>
-                    <TextInput placeholder="general" id={`customcmd-action-channel-name-${cmd.id}`}>
-                      Set Channel Name
-                    </TextInput>
-                    <TextInput placeholder="This is the general channel" id={`customcmd-action-channel-topic-${cmd.id}`}>
-                      Set Channel Topic
-                    </TextInput>
-                    <SelectInput id={`customcmd-action-channel-category-${cmd.id}`} label="Set channel category">
-                      <option value={undefined}>Don't change</option>
-                      {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
-                        <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                      )}
-                    </SelectInput>
-                  </div>}
-                  <Button color="primary" onClick$={async () => {
-                    store.loading.push(`customcmds-${cmd.id}`);
-
-                    const action: any = {
-                      type: store.customcmdtype,
-                    };
-
-                    if (action.type == 1) {
-                      const content = document.getElementById(`customcmd-action-content-${cmd.id}`) as HTMLInputElement;
-                      const embed = document.getElementById(`customcmd-action-embed-${cmd.id}`) as HTMLInputElement;
-                      const ephemeral = document.getElementById(`customcmd-action-ephemeral-${cmd.id}`) as HTMLInputElement;
-                      action.content = content.value;
-                      action.embeds = [embed.value != '' ? JSON.parse(embed.value) : undefined];
-                      action.ephemeral = ephemeral.checked;
-                    }
-                    else if (action.type == 2) {
-                      const ms = document.getElementById(`customcmd-action-ms-${cmd.id}`) as HTMLInputElement;
-                      action.ms = ms.value;
-                    }
-                    else if (action.type == 3) {
-                      const channelId = document.getElementById(`customcmd-action-channel-${cmd.id}`) as HTMLSelectElement;
-                      const name = document.getElementById(`customcmd-action-channel-name-${cmd.id}`) as HTMLInputElement;
-                      const topic = document.getElementById(`customcmd-action-channel-topic-${cmd.id}`) as HTMLInputElement;
-                      const parentId = document.getElementById(`customcmd-action-channel-category-${cmd.id}`) as HTMLInputElement;
-                      action.channelId = channelId.value;
-                      action.name = name.value == '' ? undefined : name.value;
-                      action.topic = topic.value == '' ? undefined : topic.value;
-                      action.parentId = parentId.value == '' ? undefined : parentId.value;
-                    }
-
-                    await upsertCustomCommandFn({
-                      guildId: guild.id,
-                      name: cmd.name,
-                      actions: JSON.stringify([...cmd.actions, action]),
-                    }, true);
-                    store.guildData = {
-                      ...store.guildData,
-                      ...(await getSQLDataFn(channels)),
-                    };
-                    store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                  }}>
-                      Add Action
-                  </Button>
-                </Card>
-              </Card>,
-            )
-          }
-
-          <Card>
-            <CardHeader loading={store.loading.includes('customcmds')}>
-              <Add width="32" class="fill-current" /> Create
-            </CardHeader>
-            <p>
-              You will be able to add the actions for this command once you create it.
-            </p>
-            <div class="flex gap-2">
-              <p class="text-2xl p-1 px-2">/</p>
-              <div class="flex-1">
-                <TextInput nolabel placeholder="Command Name" id="customcmd-create-name" />
-              </div>
-              <div class="flex-1">
-                <TextInput nolabel placeholder="Command Description" id="customcmd-create-description" />
-              </div>
-              <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
-                store.loading.push('customcmds');
-                const name = document.getElementById('customcmd-create-name')! as HTMLInputElement;
-                const description = document.getElementById('customcmd-create-description')! as HTMLInputElement;
-
-                await upsertCustomCommandFn({
-                  guildId: guild.id,
-                  name: name.value,
-                  description: description.value,
-                });
-                store.guildData = {
-                  ...store.guildData,
-                  ...(await getSQLDataFn(channels)),
-                };
-                store.loading = store.loading.filter(l => l != 'customcmds');
-              }} />
-            </div>
-          </Card>
-        </div>
+    <section class="mx-auto max-w-5xl px-6 py-24 flex flex-col gap-4 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl">
+        {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
+        {guild.name}
+      </h1>
+      <div class="flex-1 my-4">
+        <Switcher store={store} label='Bot:' onSwitch$={() => {}} />
       </div>
-      <div class={`relative z-10 ${store.modal ? '' : 'pointer-events-none'}`}>
-        <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
-          <div class="flex min-h-full max-h-full items-start justify-center p-4 pt-24 text-center sm:items-center">
-            <div class="rounded-lg bg-gray-800 border border-gray-700 text-left transition-all sm:my-8 sm:w-full sm:max-w-lg p-6">
-              <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
-                {store.modal == 'edit' ? 'Edit' : 'Create'} Reaction Role
-              </h1>
-              <div class="flex flex-col my-4 gap-4">
-                <div class={{
-                  'hidden': store.modal != 'create',
-                }}>
-                  <EmojiInput id="rrcreateemoji">
-                    The emoji to react with
-                  </EmojiInput>
-                </div>
-                <SelectInput id="rrcreaterole" label="The role to be given">
-                  {roles.map(r =>
-                    <option value={r.id} key={r.id} style={{ color: '#' + (r.color ? r.color.toString(16) : 'ffffff') }}>{`@ ${r.name}`}</option>,
-                  )}
-                </SelectInput>
-                <SelectInput id="rrcreatechannel" label="Select the channel the reaction role will be in">
-                  {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
-                    <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                  )}
-                </SelectInput>
-                <div class={{
-                  'hidden': store.modal != 'create',
-                }}>
-                  <TextInput id="rrcreatemessage" placeholder="1105427534889353317">
-                    The Id of the message you want to create the reaction role in
-                  </TextInput>
-                </div>
-                <SelectInput id="rrcreateswitch" label="Reaction role behavior">
-                  <option value="switch">Add by reacting / Remove by unreacting</option>
-                  <option value="toggle">Add / Remove by reacting</option>
-                </SelectInput>
-                <Checkbox toggle id="rrcreatesilent">
-                  Silent
-                </Checkbox>
-              </div>
-              <div class="flex flex-row-reverse gap-3">
-                <Button color="primary" extraClass="flex-1 sm:flex-initial" onClick$={async () => {
-                  store.loading.push('rrcreate');
-                  const emojiId = document.getElementById('rrcreateemoji')!.getAttribute('value')!;
-                  const roleId = document.getElementById('rrcreaterole')!as HTMLSelectElement;
-                  const channelId = document.getElementById('rrcreatechannel')! as HTMLSelectElement;
-                  const messageId = document.getElementById('rrcreatemessage')! as HTMLInputElement;
-                  const type = document.getElementById('rrcreateswitch')! as HTMLSelectElement;
-                  const silent = document.getElementById('rrcreatesilent')! as HTMLInputElement;
-
-                  await upsertReactionRoleFn({
-                    guildId: guild.id,
-                    emojiId,
-                    roleId: roleId.value,
-                    channelId: channelId.value,
-                    messageId: messageId.value,
-                    type: type.value,
-                    silent: silent.checked ? 'true' : 'false',
-                  });
-
-                  store.guildData = {
-                    ...store.guildData,
-                    ...(await getSQLDataFn(channels)),
-                  };
-                  store.loading = store.loading.filter(l => l != 'rrcreate');
-                  store.modal = undefined;
-                }}>
-                  {store.modal == 'edit' ? 'Edit' : 'Create'}
-                  <div class={{
-                    'transition-all': true,
-                    '-ml-10 opacity-0': !store.loading.includes('rrcreate'),
-                    '-ml-1 opacity-100': store.loading.includes('rrcreate'),
-                  }}>
-                    <LoadingIcon />
-                  </div>
-                </Button>
-                <Button extraClass="flex-1 sm:flex-initial" onClick$={() => store.modal = undefined}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
+      <div class="w-full">
+        <Card darker>
+          <CardHeader>
+            Server Info
+          </CardHeader>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <p>
+              Id: {guild.id}
+            </p>
+            <p>
+              Channels: {channels.length}
+            </p>
+            <p>
+              Online Members: {guild.approximate_presence_count} / {guild.approximate_member_count}
+            </p>
+            <p>
+              Roles: {roles.length}
+            </p>
           </div>
-        </div>
+        </Card>
       </div>
-      {
-        !!store.rrselected.length &&
-        <div id="rrselected" class="fixed flex flex-col bottom-4 right-4 border border-gray-700 bg-gray-800 rounded-lg shadow-md p-6" style="cursor: auto;">
-          <p class="text-gray-200 text-lg mb-5 max-w-[17rem]">
-            {store.rrselected.length} Reaction Roles Selected
-          </p>
-          <div class="flex items-center gap-2 justify-evenly">
-            <Button onClick$={async () => {
-              store.rrselected = [];
-            }}>
-              Cancel
-            </Button>
-            <Button color="danger" onClick$={async () => {
-              store.loading.push('rrdelete');
-              for (const rr of store.rrselected) {
-                const emojiId = rr.split('-')[0];
-                const messageId = rr.split('-')[1];
-                const channelId = reactionroles.channels.find(c => c.messages.includes(messageId))?.id as string;
-                const guildId = guild.id;
-                await deleteReactionRoleFn({ emojiId, messageId, channelId, guildId });
-              }
-              store.rrselected = [];
-              store.guildData = {
-                ...store.guildData,
-                ...(await getSQLDataFn(channels)),
-              };
-              store.loading = store.loading.filter(l => l != 'rrdelete');
-            }}>
-              <div class={{
-                'transition-all': true,
-                '-ml-10 opacity-0': !store.loading.includes('rrdelete'),
-                '-ml-1 opacity-100': store.loading.includes('rrdelete'),
-              }}>
-                <LoadingIcon />
-              </div>
-              Delete
-            </Button>
-          </div>
-        </div>
-      }
-
-      <EmojiPicker props={{
-        custom: [
-          {
-            id: 'custom',
-            name: guild.name,
-            emojis: guild.emojis.map(e => ({
-              id: e.id,
-              name: e.name,
-              skins: [{ src: `https://cdn.discordapp.com/emojis/${e.id}` }],
-            })),
-          },
-        ],
-        categoryIcons: {
-          custom: {
-            src: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`,
-          },
-        },
-      }}/>
+      <div class="w-full grid md:grid-cols-6 gap-4 fill-current">
+        <Card extraClass={{ 'md:col-span-2': true }} color="red" link={`/dashboard/${guild.id}/general`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <SettingsOutline width='48' />
+              General
+            </div>
+          </CardHeader>
+        </Card>
+        <Card extraClass={{ 'md:col-span-2': true }} color="orange" link={`/dashboard/${guild.id}/tickets`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <TicketOutline width='48' />
+              Ticket System
+            </div>
+          </CardHeader>
+        </Card>
+        <Card extraClass={{ 'md:col-span-2': true }} color="yellow" link={`/dashboard/${guild.id}/moderation`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <ShieldCheckmarkOutline width='48' />
+              Moderation
+            </div>
+          </CardHeader>
+        </Card>
+        <Card extraClass={{ 'md:col-span-3': true }} color="green" bloblong link={`/dashboard/${guild.id}/reactions`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <ChatboxOutline width='48' />
+              Reactions
+            </div>
+          </CardHeader>
+        </Card>
+        <Card extraClass={{ 'md:col-span-3': true }} color="blue" bloblong link={`/dashboard/${guild.id}/auditlogs`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <NewspaperOutline width='48' />
+              Audit Logs
+            </div>
+          </CardHeader>
+        </Card>
+        <Card extraClass={{ 'md:col-span-3': true }} color="purple" bloblong link={`/dashboard/${guild.id}/reactionroles`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <HappyOutline width='48' />
+              Reaction Roles
+            </div>
+          </CardHeader>
+        </Card>
+        <Card extraClass={{ 'md:col-span-3': true }} color="pink" bloblong link={`/dashboard/${guild.id}/customcmds`}>
+          <CardHeader>
+            <div class="flex flex-col items-center w-full gap-4 py-10">
+              <TerminalOutline width='48' />
+              Custom Commands
+            </div>
+          </CardHeader>
+        </Card>
+      </div>
     </section>
   );
 });

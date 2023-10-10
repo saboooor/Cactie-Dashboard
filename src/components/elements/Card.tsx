@@ -1,27 +1,109 @@
 
 import { Slot, component$ } from '@builder.io/qwik';
 import LoadingIcon from '../icons/LoadingIcon';
+import { Link } from '@builder.io/qwik-city';
 
-export default component$(({ extraClass, row, squish, fit, darker, contextMenu }: any) => {
+export default component$(({ color, darker, bloblong, link, extraClass, row }: any) => {
+  const blob = Math.round(Math.random() * 2);
+
   return (
     <div class={{
-      'flex gap-3 border border-gray-700 rounded-xl p-6': true,
-      'bg-gray-900/50': darker,
-      'bg-gray-800': !darker,
-      'flex-col': !row,
-      'items-center': row,
-      'flex-1': !squish,
-      'min-w-fit': fit,
+      'flex-1 relative border rounded-lg group transition-all': true,
+      'border-purple-400/10': color === 'purple',
+      'border-orange-400/10': color === 'orange',
+      'border-pink-400/10': color === 'pink',
+      'border-red-400/10': color === 'red',
+      'border-blue-400/10': color === 'blue',
+      'border-yellow-400/10': color === 'yellow',
+      'border-green-400/10': color === 'green',
+      'hover:bg-purple-400/10': color === 'purple' && link,
+      'hover:bg-orange-400/10': color === 'orange' && link,
+      'hover:bg-pink-400/10': color === 'pink' && link,
+      'hover:bg-red-400/10': color === 'red' && link,
+      'hover:bg-blue-400/10': color === 'blue' && link,
+      'hover:bg-yellow-400/10': color === 'yellow' && link,
+      'hover:bg-green-400/10': color === 'green' && link,
+      'hover:shadow-lg': link,
+      'bg-gray-800 border-gray-700': !color && !darker,
+      'bg-gray-800/50': color,
+      'bg-gray-850 border-gray-800': !!darker,
       ...extraClass,
-    }} onContextMenu$={(event) => contextMenu ? contextMenu.func(event, ...contextMenu.args) : ''} preventdefault:contextmenu={contextMenu}>
-      <Slot />
+    }}>
+      <div class={{
+        'p-8': true,
+      }}>
+        {link && (
+          <Link href={link} class="absolute inset-0 z-10" />
+        )}
+        <div class={{
+          'flex gap-4': true,
+          'flex-col': !row,
+          'flex-row items-center': row,
+        }}>
+          <Slot />
+        </div>
+        {color && (
+          <div class="rounded-xl absolute -z-10 top-0 w-full h-full transition-all">
+            <div class={{
+              'absolute bottom-5 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
+              'animate-blob': blob === 0 && !bloblong,
+              'animate-blob1': blob === 1 && !bloblong,
+              'animate-blob2': blob === 2 && !bloblong,
+              'animate-bloblong': blob === 0 && bloblong,
+              'animate-bloblong1': blob === 1 && bloblong,
+              'animate-bloblong2': blob === 2 && bloblong,
+              'bg-purple-400': color === 'purple',
+              'bg-orange-400': color === 'orange',
+              'bg-pink-400': color === 'pink',
+              'bg-red-400': color === 'red',
+              'bg-blue-400': color === 'blue',
+              'bg-yellow-400': color === 'yellow',
+              'bg-green-400': color === 'green',
+            }}></div>
+            <div class={{
+              'absolute bottom-5 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
+              'animate-blob': blob === 0 && !bloblong,
+              'animate-blob1': blob === 1 && !bloblong,
+              'animate-blob2': blob === 2 && !bloblong,
+              'animate-bloblong': blob === 0 && bloblong,
+              'animate-bloblong1': blob === 1 && bloblong,
+              'animate-bloblong2': blob === 2 && bloblong,
+              'animation-delay-5': true,
+              'bg-purple-500': color === 'purple',
+              'bg-orange-500': color === 'orange',
+              'bg-pink-500': color === 'pink',
+              'bg-red-500': color === 'red',
+              'bg-blue-500': color === 'blue',
+              'bg-yellow-500': color === 'yellow',
+              'bg-green-500': color === 'green',
+            }}></div>
+            <div class={{
+              'absolute bottom-5 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
+              'animate-blob': blob === 0 && !bloblong,
+              'animate-blob1': blob === 1 && !bloblong,
+              'animate-blob2': blob === 2 && !bloblong,
+              'animate-bloblong': blob === 0 && bloblong,
+              'animate-bloblong1': blob === 1 && bloblong,
+              'animate-bloblong2': blob === 2 && bloblong,
+              'animation-delay-10': true,
+              'bg-purple-600': color === 'purple',
+              'bg-orange-600': color === 'orange',
+              'bg-pink-600': color === 'pink',
+              'bg-red-600': color === 'red',
+              'bg-blue-600': color === 'blue',
+              'bg-yellow-600': color === 'yellow',
+              'bg-green-600': color === 'green',
+            }}></div>
+          </div>
+        )}
+      </div>
     </div>
   );
 });
 
 export const CardHeader = component$(({ loading, id }: any) => {
   return (
-    <h1 class="flex font-bold text-gray-100 text-2xl mb-2">
+    <h1 class="flex font-bold text-gray-100 text-2xl">
       <span id={id} class="block h-32 -mt-32" />
       <div class="flex flex-1 items-center gap-3 whitespace-nowrap">
         <Slot />

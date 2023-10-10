@@ -7,7 +7,7 @@ import getAuth from '~/components/functions/auth';
 import Nav from '~/components/Nav';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-interface Guild extends APIGuild {
+export interface Guild extends APIGuild {
   id: string;
   mutual: boolean;
 }

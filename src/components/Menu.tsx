@@ -1,9 +1,8 @@
 import { component$, Slot, useStore } from '@builder.io/qwik';
-import Switcher from './elements/Switcher';
 import { Menu } from 'qwik-ionicons';
 import { Button } from './elements/Button';
 
-export default component$(({ guild, store, onSwitcherSwitch$ }: any) => {
+export default component$(({ guild }: any) => {
   const menuStore = useStore({
     menu: false,
   });
@@ -15,9 +14,6 @@ export default component$(({ guild, store, onSwitcherSwitch$ }: any) => {
           <p class="flex-1 ml-3 text-lg">{guild.name}</p>
         </div>
         <div class="flex">
-          <div class="flex-1">
-            <Switcher store={store} label='Bot:' lighter onSwitch$={onSwitcherSwitch$} />
-          </div>
           <Button extraClass="sm:hidden" onClick$={() => menuStore.menu = !menuStore.menu}>
             <Menu width="24"/>
           </Button>

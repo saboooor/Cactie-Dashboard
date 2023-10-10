@@ -18,9 +18,9 @@ export default component$(() => {
     <section class="flex mx-auto max-w-6xl px-6 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div>
         <div class="flex sm:hidden relative justify-center align-center sm:ml-auto mb-10" style="width: 100%;">
-          <div class="absolute top-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl" style={{ left: '45%' }}></div>
-          <div class="absolute top-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-2000" style={{ right: '50%' }}></div>
-          <div class="absolute bottom-5 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-4000" style={{ left: '40%' }}></div>
+          <div class="absolute bottom-0 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl"></div>
+          <div class="absolute bottom-0 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-5"></div>
+          <div class="absolute bottom-0 w-32 h-32 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-xl animation-delay-10"></div>
           <picture>
             <source srcSet={iconAVIF} type="image/avif" />
             <source srcSet={iconWEBP} type="image/webp" />
@@ -75,9 +75,9 @@ export default component$(() => {
         </div>
       </div>
       <div class="hidden sm:flex relative justify-end align-center sm:ml-auto" style={{ maxWidth: '50%' }}>
-        <div class="absolute top-8 left-8 w-48 h-48 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
-        <div class="absolute top-10 right-8 w-48 h-48 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-2000"></div>
-        <div class="absolute bottom-10 left-32 w-48 h-48 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-4000"></div>
+        <div class="absolute bottom-5 left-5 w-48 h-48 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
+        <div class="absolute bottom-5 left-5 w-48 h-48 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-5"></div>
+        <div class="absolute bottom-5 left-5 w-48 h-48 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-10"></div>
         <picture>
           <source srcSet={iconAVIF} type="image/avif" />
           <source srcSet={iconWEBP} type="image/webp" />
