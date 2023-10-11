@@ -4,7 +4,7 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import TextInput from '~/components/elements/TextInput';
 import Checkbox from '~/components/elements/Checkbox';
 import SelectInput from '~/components/elements/SelectInput';
-import { MailOpenOutline, ExitOutline, EnterOutline, SettingsOutline } from 'qwik-ionicons';
+import { MailOpenOutline, ExitOutline, EnterOutline, SettingsOutline, MicOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import { ChannelType } from 'discord-api-types/v10';
 
@@ -135,6 +135,34 @@ export default component$(() => {
             {channels.filter(c => c.type == ChannelType.GuildText).map(c =>
               <option value={c.id} key={c.id} selected={srvconfig?.pollchannel == c.id}>{`# ${c.name}`}</option>,
             )}
+          </SelectInput>
+        </Card>
+        <Card fit extraClass={{ 'gap-5': true }}>
+          <CardHeader id="voicechats" loading={store.loading.includes('voicechats')}>
+            <MicOutline width="32" class="fill-current" /> Custom Voice Chats
+          </CardHeader>
+          <p>
+            To disable custom voice chats, you can disable the /voicechat command in your server settings.
+          </p>
+          <SelectInput id="voicechatscategory" label="Category to make voice chats in" onChange$={async (event: any) => {
+            store.loading.push('voicechats');
+            srvconfig!.voicechats.category = event.target.value;
+            await updateSettingFn('voicechats', JSON.stringify(srvconfig!.voicechats));
+            store.loading = store.loading.filter(l => l != 'voicechats');
+          }}>
+            <option value="false" selected={srvconfig?.voicechats.category == 'false'}>No Category</option>
+            {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
+              <option value={c.id} key={c.id} selected={srvconfig?.voicechats.category == c.id}>{`> ${c.name}`}</option>,
+            )}
+          </SelectInput>
+          <SelectInput id="voicechatstype" label="Make voice chats public or private" onChange$={async (event: any) => {
+            store.loading.push('voicechats');
+            srvconfig!.voicechats.type = event.target.value;
+            await updateSettingFn('voicechats', JSON.stringify(srvconfig!.voicechats));
+            store.loading = store.loading.filter(l => l != 'voicechats');
+          }}>
+            <option value="private" selected={srvconfig?.voicechats.type == 'private'}>Private</option>
+            <option value="public" selected={srvconfig?.voicechats.type == 'public'}>Public</option>
           </SelectInput>
         </Card>
       </div>
