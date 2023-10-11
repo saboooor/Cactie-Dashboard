@@ -10,7 +10,7 @@ import LoadingIcon from '~/components/icons/LoadingIcon';
 
 import { getGuildFn, getSrvConfigFn, updateSettingFn } from '../index@required';
 import MenuBar from '~/components/MenuBar';
-export const useGetGuild = routeLoader$(async (props) => await getGuildFn(props, true, true));
+export const useGetGuild = routeLoader$(async (props) => await getGuildFn(props));
 export const useGetSrvConfig = routeLoader$(async (props) => await getSrvConfigFn(props));
 
 export default component$(() => {
@@ -23,22 +23,24 @@ export default component$(() => {
 
   return (
     <section class="mx-auto max-w-6xl px-6 py-24 flex flex-col gap-4 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
-      <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
-        {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
-        {guild.name}
-      </h1>
-      <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
-        <ChatboxOutline width="32" />
-        Reactions
-        <div class={{
-          'transition-all': true,
-          'opacity-0 -ml-12': !store.loading.includes('reactionroles'),
-          'opacity-100 -ml-2': store.loading.includes('reactionroles'),
-        }}>
-          <LoadingIcon />
-        </div>
-      </h2>
-      <MenuBar guild={guild} />
+      <div class="menubar flex flex-col gap-4 items-center">
+        <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
+          {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
+          {guild.name}
+        </h1>
+        <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
+          <ChatboxOutline width="32" />
+          Reactions
+          <div class={{
+            'transition-all': true,
+            'opacity-0 -ml-12': !store.loading.includes('reactionroles'),
+            'opacity-100 -ml-2': store.loading.includes('reactionroles'),
+          }}>
+            <LoadingIcon />
+          </div>
+        </h2>
+        <MenuBar guild={guild} />
+      </div>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4">
         <p>
           The Reactions feature uses regex to detect messages and react to them. You can use this to make your own custom reactions. In order to create a regex expression based on your needs, either ask AI to make one for you (for example: "Create a regex pattern that matches 'cactie' and 'great' in any order" will give you a regex pattern that matches "cactie is great" or "great cactie" etc.) or use a regex generator online (for example: https://regexr.com/)
@@ -112,7 +114,7 @@ export default component$(() => {
             </div>
           </Card>
         </div>
-      </div>
+      Add</div>
 
       <EmojiPicker props={{
         custom: [

@@ -4,7 +4,6 @@ import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { PrismaClient, type settings } from '@prisma/client/edge';
 import type { APIGuild, APIGuildChannel, APIRole, ChannelType, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChatboxOutline, HappyOutline, NewspaperOutline, SettingsOutline, ShieldCheckmarkOutline, TerminalOutline, TicketOutline } from 'qwik-ionicons';
-import { Button } from '~/components/elements/Button';
 import Card, { CardHeader } from '~/components/elements/Card';
 import Switcher from '~/components/elements/Switcher';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -66,19 +65,33 @@ export async function fetchData(url: string, props: RequestEventBase, user?: boo
 
 export type AnyGuildChannel = APIGuildChannel<ChannelType>;
 
-export const getGuildFn = server$(async function(props?: RequestEventBase, noChannels?: boolean, noRoles?: boolean) {
+interface guildData {
+  guild: APIGuild,
+  channels: AnyGuildChannel[],
+  roles: APIRole[],
+}
+
+const guildCache = new Map<string, guildData>();
+
+export const getGuildFn = server$(async function(props?: RequestEventBase, noCache?: boolean) {
   props = props ?? this;
   const guildId = props.params.guildId;
+  if (!noCache && guildCache.has(guildId)) return guildCache.get(guildId)!;
+
+  console.log('Fetching guild data for', guildId);
+
   const [guild, channels, roles] = await Promise.all([
     fetchData(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, props) as Promise<APIGuild>,
-    !noChannels ? fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props) as Promise<AnyGuildChannel[]> : [],
-    !noRoles ? fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props) as Promise<APIRole[]> : [],
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}/channels`, props) as Promise<AnyGuildChannel[]>,
+    fetchData(`https://discord.com/api/v10/guilds/${guildId}/roles`, props) as Promise<APIRole[]>,
   ]);
 
   // Sort roles by position
   roles.sort((a, b) => b.position - a.position);
   // Sort channels by position
   channels.sort((a, b) => a.position - b.position);
+
+  guildCache.set(guildId, { guild, channels, roles });
 
   return { guild, channels, roles };
 });
@@ -87,19 +100,6 @@ export const useGetGuild = routeLoader$(async (props) => await getGuildFn(props)
 
 export default component$(() => {
   const guildData = useGetGuild().value;
-
-  if (guildData instanceof Error) {
-    return (
-      <div class="flex flex-col gap-3 items-center justify-center h-full pt-24">
-        <h1 class="text-4xl font-bold">Error</h1>
-        <p class="text-xl">{(guildData as Error).message}</p>
-        <Button onClick$={() => location.reload()} color="danger">
-          Reload
-        </Button>
-      </div>
-    );
-  }
-
   const { guild, channels, roles } = guildData;
 
   const store = useStore({
@@ -153,7 +153,7 @@ export default component$(() => {
           <CardHeader>
             <div class="flex flex-col items-center w-full gap-4 py-10">
               <TicketOutline width='48' />
-              Ticket System
+              Tickets
             </div>
           </CardHeader>
         </Card>

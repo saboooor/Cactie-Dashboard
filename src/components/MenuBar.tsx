@@ -11,7 +11,7 @@ export default component$(({ guild }: any) => {
       </Link>
       <Link href={`/dashboard/${guild.id}/tickets`} class="col-span-4 flex flex-1 gap-4 justify-center bg-gray-850 border border-orange-400/10 hover:bg-orange-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
         <TicketOutline width='24' />
-        Ticket System
+        Tickets
       </Link>
       <Link href={`/dashboard/${guild.id}/moderation`} class="col-span-4 flex flex-1 gap-4 justify-center bg-gray-850 border border-yellow-400/10 hover:bg-yellow-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
         <ShieldCheckmarkOutline width='24' />

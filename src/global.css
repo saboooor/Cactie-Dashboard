@@ -42,6 +42,11 @@ html {
   border-radius: 2px;
 }
 
+/* MENUBAR TRANSITION */
+.menubar {
+  view-transition-name: menubar;
+}
+
 /* NAVBAR TRANSITION */
 nav {
   view-transition-name: nav;
@@ -73,25 +78,6 @@ main {
   width: 100%;
 }
 
-/* SIDEBAR TRANSITION */
-
-aside {
-  view-transition-name: sidebar;
-}
-
-/* sm */
-@media (min-width: 640px) {
-  /* Entry transition */
-  ::view-transition-new(sidebar):only-child {
-    animation: 300ms cubic-bezier(0, 0, 0.2, 1) both fade-in,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
-  }
-  /* Exit transition */
-  ::view-transition-old(sidebar):only-child {
-    animation: 150ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
-  }
-}
 
 @media (prefers-reduced-motion) {
   ::view-transition-group(*),

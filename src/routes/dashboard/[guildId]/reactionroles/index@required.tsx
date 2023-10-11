@@ -138,115 +138,115 @@ export default component$(() => {
 
   return (
     <section class="mx-auto max-w-6xl px-6 py-24 flex flex-col gap-4 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
-      <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
-        {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
-        {guild.name}
-      </h1>
-      <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
-        <HappyOutline width="32" />
-        Reaction Roles
-        <div class={{
-          'transition-all': true,
-          'opacity-0 -ml-12': !store.loading.includes('reactionroles'),
-          'opacity-100 -ml-2': store.loading.includes('reactionroles'),
-        }}>
-          <LoadingIcon />
-        </div>
-      </h2>
-      <MenuBar guild={guild} />
-      <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4">
-        <div class="flex flex-col gap-4 py-10">
-          {reactionroles.channels.length == 0 &&
-            <Card>
-              You have no reaction roles set up. Click the + button to create one.
-            </Card>
-          }
-          {
-            reactionroles.channels.map(channel => (
-              <div key={channel.id}>
-                <div class="flex items-start flex-1 mb-4">
-                  <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
+      <div class="menubar flex flex-col gap-4 items-center">
+        <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
+          {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
+          {guild.name}
+        </h1>
+        <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
+          <HappyOutline width="32" />
+          Reaction Roles
+          <div class={{
+            'transition-all': true,
+            'opacity-0 -ml-12': !store.loading.includes('reactionroles'),
+            'opacity-100 -ml-2': store.loading.includes('reactionroles'),
+          }}>
+            <LoadingIcon />
+          </div>
+          <Add width="32" class="text-green-400 cursor-pointer" onClick$={async () => {
+            store.modal = 'create';
+          }} />
+        </h2>
+        <MenuBar guild={guild} />
+      </div>
+      <div class="grid gap-4 py-10">
+        {reactionroles.channels.length == 0 &&
+          <Card>
+            You have no reaction roles set up. Click the + button to create one.
+          </Card>
+        }
+        {
+          reactionroles.channels.map(channel => (
+            <div key={channel.id}>
+              <div class="flex items-start flex-1 mb-4">
+                <h1 class="flex-1 justify-start font-bold text-gray-100 text-2xl">
                     # {channel?.name ?? 'Channel Not Found.'}
-                  </h1>
-                  <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
-                    const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                    channelselect.value = channel.id;
-                    store.modal = 'create';
-                  }} />
-                </div>
-                <div class='flex flex-col gap-4'>
-                  {
-                    channel.messages.map((messageId: string) => (
-                      <Card key={messageId}>
-                        <div class="flex items-center">
-                          <a target='_blank' href={`https://discord.com/channels/${guild.id}/${channel.id}/${messageId}`} class="flex flex-1 gap-3 justify-start font-bold text-gray-100 text-2xl">
-                            <Link width="30" />
-                            <span class="flex flex-col">
-                              <span>
-                                Go to message
-                              </span>
-                              <span class="text-xs font-normal text-gray-200">
-                                {messageId}
-                              </span>
-                            </span>
-                          </a>
-                          <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
-                            const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                            channelselect.value = channel.id;
-                            const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
-                            messageinput.value = messageId;
-                            store.modal = 'create';
-                          }} />
-                        </div>
-                        <div class='flex flex-wrap gap-4'>
-                          {
-                            reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
-                              const role = roles.find(r => r.id == rr.roleId);
-
-                              return <Card darker key={rr.roleId} extraClass={{ 'min-w-fit': true }} row>
-                                <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
-                                  {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12 h-auto" width={48} height={48}/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
-                                </div>
-                                <div class="flex-1">
-                                  <h1 class="font-bold text-gray-100 text-md" style={{ color: '#' + (role?.color ? role.color.toString(16) : 'ffffff') }}>@ {role?.name ?? 'Role Not Found.'}</h1>
-                                  <p class="flex">
-                                    {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
-                                    {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
-                                  </p>
-                                </div>
-                                <div class="flex flex-col justify-center gap-4">
-                                  <Checkbox nolabel id={`select-${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`} checked={store.rrselected.includes(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`)} onChange$={async (event: any) => {
-                                    if (event.target.checked) store.rrselected.push(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
-                                    else store.rrselected = store.rrselected.filter(s => s != `${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
-                                  }} />
-                                  <EllipsisVertical width="24" class="fill-gray-400 cursor-pointer flex" onClick$={() => {
-                                    const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
-                                    const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
-                                    const roleinput = document.getElementById('rrcreaterole') as HTMLSelectElement;
-                                    const emojiinput = document.getElementById('rrcreateemoji') as HTMLButtonElement;
-                                    const typeinput = document.getElementById('rrcreateswitch') as HTMLSelectElement;
-                                    const silentinput = document.getElementById('rrcreatesilent') as HTMLInputElement;
-                                    channelselect.value = channel.id;
-                                    messageinput.value = messageId;
-                                    roleinput.value = role!.id;
-                                    emojiinput.setAttribute('value', rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId);
-                                    typeinput.value = rr.type;
-                                    silentinput.checked = rr.silent == 'true';
-                                    store.modal = 'edit';
-                                  }} />
-                                </div>
-                              </Card>;
-                            })
-                          }
-                        </div>
-                      </Card>
-                    ))
-                  }
-                </div>
+                </h1>
+                <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
+                  const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                  channelselect.value = channel.id;
+                  store.modal = 'create';
+                }} />
               </div>
-            ))
-          }
-        </div>
+              <div class='flex flex-col gap-4'>
+                {channel.messages.map((messageId: string) => (
+                  <Card key={messageId}>
+                    <div class="flex items-center">
+                      <a target='_blank' href={`https://discord.com/channels/${guild.id}/${channel.id}/${messageId}`} class="flex flex-1 gap-3 justify-start font-bold text-gray-100 text-2xl">
+                        <Link width="30" />
+                        <span class="flex flex-col">
+                          <span>
+                              Go to message
+                          </span>
+                          <span class="text-xs font-normal text-gray-200">
+                            {messageId}
+                          </span>
+                        </span>
+                      </a>
+                      <Add width="36" class="text-green-400 cursor-pointer" onClick$={() => {
+                        const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                        channelselect.value = channel.id;
+                        const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
+                        messageinput.value = messageId;
+                        store.modal = 'create';
+                      }} />
+                    </div>
+                    <div class='flex flex-wrap gap-4'>
+                      {
+                        reactionroles.raw.filter(r => r.messageId == messageId).map(rr => {
+                          const role = roles.find(r => r.id == rr.roleId);
+                          return <Card darker key={rr.roleId} extraClass={{ 'min-w-fit': true }} row>
+                            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
+                              {rr.emojiId.startsWith('https') ? <img src={rr.emojiId} class="w-12 h-auto" width={48} height={48}/> : <p class="text-4xl py-1">{rr.emojiId}</p>}
+                            </div>
+                            <div class="flex-1">
+                              <h1 class="font-bold text-gray-100 text-md" style={{ color: '#' + (role?.color ? role.color.toString(16) : 'ffffff') }}>@ {role?.name ?? 'Role Not Found.'}</h1>
+                              <p class="flex">
+                                {rr.type == 'switch' ? 'Add by reacting / Remove by unreacting' : 'Add / Remove by reacting'}<br />
+                                {rr.silent == 'true' && 'Keep quiet when reacting / unreacting'}
+                              </p>
+                            </div>
+                            <div class="flex flex-col justify-center gap-4">
+                              <Checkbox nolabel id={`select-${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`} checked={store.rrselected.includes(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`)} onChange$={async (event: any) => {
+                                if (event.target.checked) store.rrselected.push(`${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
+                                else store.rrselected = store.rrselected.filter(s => s != `${rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId}-${rr.messageId}`);
+                              }} />
+                              <EllipsisVertical width="24" class="fill-gray-400 cursor-pointer flex" onClick$={() => {
+                                const channelselect = document.getElementById('rrcreatechannel') as HTMLSelectElement;
+                                const messageinput = document.getElementById('rrcreatemessage') as HTMLInputElement;
+                                const roleinput = document.getElementById('rrcreaterole') as HTMLSelectElement;
+                                const emojiinput = document.getElementById('rrcreateemoji') as HTMLButtonElement;
+                                const typeinput = document.getElementById('rrcreateswitch') as HTMLSelectElement;
+                                const silentinput = document.getElementById('rrcreatesilent') as HTMLInputElement;
+                                channelselect.value = channel.id;
+                                messageinput.value = messageId;
+                                roleinput.value = role!.id;
+                                emojiinput.setAttribute('value', rr.emojiId.startsWith('https') ? rr.emojiId.split('emojis/')[1] : rr.emojiId);
+                                typeinput.value = rr.type;
+                                silentinput.checked = rr.silent == 'true';
+                                store.modal = 'edit';
+                              }} />
+                            </div>
+                          </Card>;
+                        })
+                      }
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ))
+        }
       </div>
       <div class={`relative z-10 ${store.modal ? '' : 'pointer-events-none'}`}>
         <div class={`fixed inset-0 z-10 ${store.modal ? 'bg-gray-900/30' : 'opacity-0'} transition overflow-y-auto`}>
@@ -390,7 +390,7 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: 'Dashboard',
+  title: 'Dashboard - Reaction Roles',
   meta: [
     {
       name: 'description',

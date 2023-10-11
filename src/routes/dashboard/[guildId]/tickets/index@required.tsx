@@ -27,29 +27,31 @@ export default component$(() => {
 
   return (
     <section class="mx-auto max-w-6xl px-6 py-24 flex flex-col gap-4 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
-      <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
-        {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
-        {guild.name}
-      </h1>
-      <Checkbox toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
-        store.loading.push('tickets-enabled');
-        srvconfig!.tickets.enabled = event.target.checked;
-        await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
-        store.loading = store.loading.filter(l => l != 'tickets-enabled');
-      }}>
-        <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
-          <TicketOutline width="32" />
-          Ticket System
-          <div class={{
-            'transition-all': true,
-            'opacity-0 -ml-12': !store.loading.includes('tickets'),
-            'opacity-100 -ml-1': store.loading.includes('tickets'),
-          }}>
-            <LoadingIcon />
-          </div>
-        </h2>
-      </Checkbox>
-      <MenuBar guild={guild} />
+      <div class="menubar flex flex-col gap-4 items-center">
+        <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
+          {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
+          {guild.name}
+        </h1>
+        <Checkbox toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
+          store.loading.push('tickets-enabled');
+          srvconfig!.tickets.enabled = event.target.checked;
+          await updateSettingFn('tickets', JSON.stringify(srvconfig!.tickets));
+          store.loading = store.loading.filter(l => l != 'tickets-enabled');
+        }}>
+          <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
+            <TicketOutline width="32" />
+            Tickets
+            <div class={{
+              'transition-all': true,
+              'opacity-0 -ml-12': !store.loading.includes('tickets'),
+              'opacity-100 -ml-1': store.loading.includes('tickets'),
+            }}>
+              <LoadingIcon />
+            </div>
+          </h2>
+        </Checkbox>
+        <MenuBar guild={guild} />
+      </div>
       <div class="sm:col-span-2 lg:col-span-3 2xl:col-span-4">
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
           <Card fit>
