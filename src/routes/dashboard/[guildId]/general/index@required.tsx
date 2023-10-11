@@ -4,7 +4,7 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import TextInput from '~/components/elements/TextInput';
 import Checkbox from '~/components/elements/Checkbox';
 import SelectInput from '~/components/elements/SelectInput';
-import { MailOpenOutline, ExitOutline, EnterOutline, SettingsOutline } from 'qwik-ionicons';
+import { MailOpenOutline, ExitOutline, EnterOutline, SettingsOutline, MicOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
 import { ChannelType } from 'discord-api-types/v10';
 
