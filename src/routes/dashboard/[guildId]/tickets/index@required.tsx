@@ -32,6 +32,7 @@ export default component$(() => {
           {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
           {guild.name}
         </h1>
+        <div class="bg-orange-400/20 w-64 h-16 -mb-16 -z-10 blur-xl rounded-full" />
         <Checkbox toggle id="tickets-enabled" checked={srvconfig?.tickets.enabled} onChange$={async (event: any) => {
           store.loading.push('tickets-enabled');
           srvconfig!.tickets.enabled = event.target.checked;

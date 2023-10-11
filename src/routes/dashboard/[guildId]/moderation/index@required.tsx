@@ -34,6 +34,7 @@ export default component$(() => {
           {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
           {guild.name}
         </h1>
+        <div class="bg-yellow-400/20 w-64 h-16 -mb-16 -z-10 blur-xl rounded-full" />
         <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
           <ShieldCheckmarkOutline width="32" /> Moderation
         </h2>

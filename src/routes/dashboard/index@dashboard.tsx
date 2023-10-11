@@ -19,7 +19,7 @@ export default component$(() => {
   });
 
   return (
-    <section class="mx-auto max-w-screen-2xl px-6 pt-12 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+    <section class="mx-auto max-w-6xl px-6 pt-12 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
       <div class="text-center">
         <h1 class="font-bold text-white text-4xl sm:text-5xl md:text-6xl">
           Select a <span class="text-luminescent-400" style={{ filter: 'drop-shadow(0 0 2rem #CB6CE6);' }}>Server</span>.
