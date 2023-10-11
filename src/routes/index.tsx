@@ -75,9 +75,9 @@ export default component$(() => {
         </div>
       </div>
       <div class="hidden sm:flex relative justify-end align-center sm:ml-auto" style={{ maxWidth: '50%' }}>
-        <div class="absolute bottom-5 left-5 w-48 h-48 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
-        <div class="absolute bottom-5 left-5 w-48 h-48 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-5"></div>
-        <div class="absolute bottom-5 left-5 w-48 h-48 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-10"></div>
+        <div class="absolute left-0 right-0 mx-auto bottom-5 w-48 h-48 bg-pink-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl"></div>
+        <div class="absolute left-0 right-0 mx-auto bottom-5 w-48 h-48 bg-green-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-5"></div>
+        <div class="absolute left-0 right-0 mx-auto bottom-5 w-48 h-48 bg-yellow-200 rounded-full opacity-20 animate-blob ease-in-out filter blur-2xl animation-delay-10"></div>
         <picture>
           <source srcSet={iconAVIF} type="image/avif" />
           <source srcSet={iconWEBP} type="image/webp" />

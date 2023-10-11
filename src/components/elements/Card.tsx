@@ -3,8 +3,8 @@ import { Slot, component$ } from '@builder.io/qwik';
 import LoadingIcon from '../icons/LoadingIcon';
 import { Link } from '@builder.io/qwik-city';
 
-export default component$(({ color, darker, bloblong, link, extraClass, row }: any) => {
-  const blob = Math.round(Math.random() * 2);
+export default component$(({ color, darker, link, extraClass, row }: any) => {
+  const blob = Math.round(Math.random() * 6);
 
   return (
     <div class={{
@@ -43,15 +43,16 @@ export default component$(({ color, darker, bloblong, link, extraClass, row }: a
           <Slot />
         </div>
         {color && (
-          <div class="rounded-xl absolute -z-10 top-0 w-full h-full transition-all">
+          <div class="rounded-xl absolute -z-10 top-0 left-0 w-full h-full transition-all">
             <div class={{
-              'absolute bottom-5 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
-              'animate-blob': blob === 0 && !bloblong,
-              'animate-blob1': blob === 1 && !bloblong,
-              'animate-blob2': blob === 2 && !bloblong,
-              'animate-bloblong': blob === 0 && bloblong,
-              'animate-bloblong1': blob === 1 && bloblong,
-              'animate-bloblong2': blob === 2 && bloblong,
+              'absolute left-0 right-0 mx-auto bottom-0 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
+              'animate-blob': blob === 0,
+              'animate-blob1': blob === 1,
+              'animate-blob2': blob === 2,
+              'animate-blob3': blob === 3,
+              'animate-blob4': blob === 4,
+              'animate-blob5': blob === 5,
+              'animate-blob6': blob === 6,
               'bg-purple-400': color === 'purple',
               'bg-orange-400': color === 'orange',
               'bg-pink-400': color === 'pink',
@@ -61,14 +62,15 @@ export default component$(({ color, darker, bloblong, link, extraClass, row }: a
               'bg-green-400': color === 'green',
             }}></div>
             <div class={{
-              'absolute bottom-5 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
-              'animate-blob': blob === 0 && !bloblong,
-              'animate-blob1': blob === 1 && !bloblong,
-              'animate-blob2': blob === 2 && !bloblong,
-              'animate-bloblong': blob === 0 && bloblong,
-              'animate-bloblong1': blob === 1 && bloblong,
-              'animate-bloblong2': blob === 2 && bloblong,
+              'absolute left-0 right-0 mx-auto bottom-0 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
               'animation-delay-5': true,
+              'animate-blob': blob === 0,
+              'animate-blob1': blob === 1,
+              'animate-blob2': blob === 2,
+              'animate-blob3': blob === 3,
+              'animate-blob4': blob === 4,
+              'animate-blob5': blob === 5,
+              'animate-blob6': blob === 6,
               'bg-purple-500': color === 'purple',
               'bg-orange-500': color === 'orange',
               'bg-pink-500': color === 'pink',
@@ -78,14 +80,15 @@ export default component$(({ color, darker, bloblong, link, extraClass, row }: a
               'bg-green-500': color === 'green',
             }}></div>
             <div class={{
-              'absolute bottom-5 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
-              'animate-blob': blob === 0 && !bloblong,
-              'animate-blob1': blob === 1 && !bloblong,
-              'animate-blob2': blob === 2 && !bloblong,
-              'animate-bloblong': blob === 0 && bloblong,
-              'animate-bloblong1': blob === 1 && bloblong,
-              'animate-bloblong2': blob === 2 && bloblong,
+              'absolute left-0 right-0 mx-auto bottom-0 w-32 h-32 rounded-full opacity-20 ease-in-out filter blur-xl': true,
               'animation-delay-10': true,
+              'animate-blob': blob === 0,
+              'animate-blob1': blob === 1,
+              'animate-blob2': blob === 2,
+              'animate-blob3': blob === 3,
+              'animate-blob4': blob === 4,
+              'animate-blob5': blob === 5,
+              'animate-blob6': blob === 6,
               'bg-purple-600': color === 'purple',
               'bg-orange-600': color === 'orange',
               'bg-pink-600': color === 'pink',

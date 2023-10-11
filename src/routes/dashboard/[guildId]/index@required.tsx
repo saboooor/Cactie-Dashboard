@@ -167,7 +167,7 @@ export default component$(() => {
             </div>
           </CardHeader>
         </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="green" bloblong link={`/dashboard/${guild.id}/reactions`}>
+        <Card extraClass={{ 'md:col-span-3': true }} color="green" link={`/dashboard/${guild.id}/reactions`}>
           <CardHeader>
             <div class="flex flex-col items-center w-full gap-4 py-10">
               <ChatboxOutline width='48' />
@@ -175,7 +175,7 @@ export default component$(() => {
             </div>
           </CardHeader>
         </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="blue" bloblong link={`/dashboard/${guild.id}/auditlogs`}>
+        <Card extraClass={{ 'md:col-span-3': true }} color="blue" link={`/dashboard/${guild.id}/auditlogs`}>
           <CardHeader>
             <div class="flex flex-col items-center w-full gap-4 py-10">
               <NewspaperOutline width='48' />
@@ -183,7 +183,7 @@ export default component$(() => {
             </div>
           </CardHeader>
         </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="purple" bloblong link={`/dashboard/${guild.id}/reactionroles`}>
+        <Card extraClass={{ 'md:col-span-3': true }} color="purple" link={`/dashboard/${guild.id}/reactionroles`}>
           <CardHeader>
             <div class="flex flex-col items-center w-full gap-4 py-10">
               <HappyOutline width='48' />
@@ -191,7 +191,7 @@ export default component$(() => {
             </div>
           </CardHeader>
         </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="pink" bloblong link={`/dashboard/${guild.id}/customcmds`}>
+        <Card extraClass={{ 'md:col-span-3': true }} color="pink" link={`/dashboard/${guild.id}/customcmds`}>
           <CardHeader>
             <div class="flex flex-col items-center w-full gap-4 py-10">
               <TerminalOutline width='48' />
