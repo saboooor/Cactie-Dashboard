@@ -137,7 +137,7 @@ export default component$(() => {
             )}
           </SelectInput>
         </Card>
-        {/* <Card fit extraClass={{ 'gap-5': true }}>
+        <Card fit extraClass={{ 'gap-5': true }}>
           <CardHeader id="voicechats" loading={store.loading.includes('voicechats')}>
             <MicOutline width="32" class="fill-current" /> Custom Voice Chats
           </CardHeader>
@@ -165,7 +165,7 @@ export default component$(() => {
             <option value="public" selected={srvconfig?.voicechats.type == 'public'}>Public</option>
           </SelectInput>
         </Card>
- */}      </div>
+      </div>
     </section>
   );
 });

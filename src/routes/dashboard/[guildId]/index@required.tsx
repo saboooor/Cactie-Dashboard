@@ -26,6 +26,7 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
     joinmessage: JSON.parse(srvconfigUnparsed.joinmessage),
     leavemessage: JSON.parse(srvconfigUnparsed.leavemessage),
     tickets: JSON.parse(srvconfigUnparsed.tickets),
+    voicechats: JSON.parse(srvconfigUnparsed.voicechats),
     reactions: JSON.parse(srvconfigUnparsed.reactions),
     auditlogs: JSON.parse(srvconfigUnparsed.auditlogs),
   } : null;
@@ -34,6 +35,7 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
     joinmessage: any,
     leavemessage: any,
     tickets: any,
+    voicechats: any,
     reactions: any[],
     auditlogs: any,
   } | null;
