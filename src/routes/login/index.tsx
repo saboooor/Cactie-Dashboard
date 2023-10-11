@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@builder.io/qwik-city';
 import { v4 } from 'uuid';
 import { PrismaClient } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate'
+import { withAccelerate } from '@prisma/extension-accelerate';
 
 export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
   const code = url.searchParams.get('code');

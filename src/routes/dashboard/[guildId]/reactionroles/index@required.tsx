@@ -4,7 +4,7 @@ import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { ChannelType } from 'discord-api-types/v10';
 import type { reactionroles } from '@prisma/client/edge';
 import { PrismaClient } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate'
+import { withAccelerate } from '@prisma/extension-accelerate';
 import TextInput from '~/components/elements/TextInput';
 import Checkbox from '~/components/elements/Checkbox';
 import SelectInput from '~/components/elements/SelectInput';

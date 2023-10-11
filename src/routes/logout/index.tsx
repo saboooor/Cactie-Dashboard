@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@builder.io/qwik-city';
 import { PrismaClient } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate'
+import { withAccelerate } from '@prisma/extension-accelerate';
 import getAuth from '~/components/functions/auth';
 
 export const onGet: RequestHandler = async ({ redirect, cookie, env }) => {

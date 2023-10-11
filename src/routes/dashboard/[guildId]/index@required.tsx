@@ -2,7 +2,7 @@ import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { PrismaClient, type settings } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate'
+import { withAccelerate } from '@prisma/extension-accelerate';
 import type { APIGuild, APIGuildChannel, APIRole, ChannelType, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChatboxOutline, HappyOutline, NewspaperOutline, SettingsOutline, ShieldCheckmarkOutline, TerminalOutline, TicketOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
