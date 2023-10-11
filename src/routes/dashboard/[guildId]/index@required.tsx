@@ -2,6 +2,7 @@ import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { PrismaClient, type settings } from '@prisma/client/edge';
+import { withAccelerate } from '@prisma/extension-accelerate'
 import type { APIGuild, APIGuildChannel, APIRole, ChannelType, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChatboxOutline, HappyOutline, NewspaperOutline, SettingsOutline, ShieldCheckmarkOutline, TerminalOutline, TicketOutline } from 'qwik-ionicons';
 import Card, { CardHeader } from '~/components/elements/Card';
@@ -11,12 +12,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
   props = props ?? this;
 
-  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   const srvconfigUnparsed = await prisma.settings.findUnique({
     where: {
       guildId: props.params.guildId,
     },
+    cacheStrategy: { ttl: 15 },
   });
 
   const srvconfig = srvconfigUnparsed ? {
@@ -38,7 +40,7 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
 });
 
 export const updateSettingFn = server$(async function(name: string, value: string | number | boolean | null | undefined) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
   await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
 });
 

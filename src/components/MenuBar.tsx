@@ -17,19 +17,19 @@ export default component$(({ guild }: any) => {
         <ShieldCheckmarkOutline width='24' />
         Moderation
       </Link>
-      <Link href={`/dashboard/${guild.id}/reactions`} class="col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-green-400/10 hover:bg-green-400/10 transition-all rounded-lg py-3 px-4 text-cente fill-currentr">
+      <Link href={`/dashboard/${guild.id}/reactions`} class="col-span-6 md:col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-green-400/10 hover:bg-green-400/10 transition-all rounded-lg py-3 px-4 text-cente fill-currentr">
         <ChatboxOutline width='24' />
         Reactions
       </Link>
-      <Link href={`/dashboard/${guild.id}/auditlogs`} class="col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-blue-400/10 hover:bg-blue-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
+      <Link href={`/dashboard/${guild.id}/auditlogs`} class="col-span-6 md:col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-blue-400/10 hover:bg-blue-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
         <NewspaperOutline width='24' />
         Audit Logs
       </Link>
-      <Link href={`/dashboard/${guild.id}/reactionroles`} class="col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-purple-400/10 hover:bg-purple-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
+      <Link href={`/dashboard/${guild.id}/reactionroles`} class="col-span-6 md:col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-purple-400/10 hover:bg-purple-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
         <HappyOutline width='24' />
         Reaction Roles
       </Link>
-      <Link href={`/dashboard/${guild.id}/customcmds`} class="col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-pink-400/10 hover:bg-pink-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
+      <Link href={`/dashboard/${guild.id}/customcmds`} class="col-span-6 md:col-span-3 flex flex-1 gap-4 justify-center bg-gray-850 border border-pink-400/10 hover:bg-pink-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
         <TerminalOutline width='24' />
         Custom Commands
       </Link>

@@ -39,7 +39,7 @@ export default component$(() => {
         </h2>
         <MenuBar guild={guild} />
       </div>
-      <div class="grid grid-cols-2 gap-4 py-10">
+      <div class="grid md:grid-cols-2 gap-4 py-10">
         <Card>
           <CardHeader id="msgshortener" loading={store.loading.includes('msgshortener')}>
             <CreateOutline width="32" class="fill-current" /> Message Shortener

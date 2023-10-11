@@ -3,6 +3,7 @@ import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
 import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { ApplicationCommandType, ChannelType } from 'discord-api-types/v10';
 import { PrismaClient } from '@prisma/client/edge';
+import { withAccelerate } from '@prisma/extension-accelerate';
 import TextInput from '~/components/elements/TextInput';
 import Checkbox from '~/components/elements/Checkbox';
 import SelectInput from '~/components/elements/SelectInput';
@@ -22,12 +23,13 @@ import MenuBar from '~/components/MenuBar';
 export const getCustomCmdsFn = server$(async function(props?: RequestEventBase) {
   props = props ?? this;
 
-  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   const customcmdsUnparsed = await prisma.customcmds.findMany({
     where: {
       guildId: props.params.guildId,
     },
+    cacheStrategy: { ttl: 15 },
   });
 
   const customcmds = customcmdsUnparsed ? customcmdsUnparsed.map(cmd => ({
@@ -53,7 +55,7 @@ export const upsertCustomCommandFn = server$(async function(props: {
   description?: string;
   actions?: any;
 }, skipPOST?: boolean) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   if (skipPOST) {
     await prisma.customcmds.update({
@@ -101,7 +103,7 @@ export const deleteCustomCommandFn = server$(async function(props: {
   id: string;
   guildId: string;
 }) {
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   const res = await fetch(`https://discord.com/api/v10/applications/${this.env.get(`CLIENT_ID${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)}/guilds/${props.guildId}/commands/${props.id}`, {
     method: 'DELETE',

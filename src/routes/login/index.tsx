@@ -1,6 +1,7 @@
 import type { RequestHandler } from '@builder.io/qwik-city';
 import { v4 } from 'uuid';
 import { PrismaClient } from '@prisma/client/edge';
+import { withAccelerate } from '@prisma/extension-accelerate'
 
 export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
   const code = url.searchParams.get('code');
@@ -30,7 +31,7 @@ export const onGet: RequestHandler = async ({ url, redirect, cookie, env }) => {
       const sid = v4();
       const res = await fetch('https://discord.com/api/v10/users/@me', { headers: { authorization: `${oauthData.token_type} ${oauthData.access_token}` } });
       const userdata = await res.json();
-      const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } });
+      const prisma = new PrismaClient({ datasources: { db: { url: env.get('DATABASE_URL') } } }).$extends(withAccelerate());
       const session = await prisma.sessions.findUnique({
         where: {
           accessToken: oauthData.access_token,

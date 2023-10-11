@@ -4,6 +4,7 @@ import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { ChannelType } from 'discord-api-types/v10';
 import type { reactionroles } from '@prisma/client/edge';
 import { PrismaClient } from '@prisma/client/edge';
+import { withAccelerate } from '@prisma/extension-accelerate'
 import TextInput from '~/components/elements/TextInput';
 import Checkbox from '~/components/elements/Checkbox';
 import SelectInput from '~/components/elements/SelectInput';
@@ -19,7 +20,7 @@ import MenuBar from '~/components/MenuBar';
 export const getReactionRolesFn = server$(async function(channels: AnyGuildChannel[], props?: RequestEventBase) {
   props = props ?? this;
 
-  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   const reactionroles = {
     raw: await prisma.reactionroles.findMany({ where: { guildId: props.params.guildId } }),
@@ -77,7 +78,7 @@ export const upsertReactionRoleFn = server$(async function(props: reactionroles)
   }).catch(() => null);
   if (!res) return new Error('reaction failed');
 
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   await prisma.reactionroles.upsert({
     where: { messageId_emojiId: {
@@ -113,7 +114,7 @@ export const deleteReactionRoleFn = server$(async function(props: { messageId: s
   }).catch(() => null);
   if (!res) return new Error('delete reaction failed');
 
-  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } });
+  const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   await prisma.reactionroles.delete({
     where: { messageId_emojiId: {
