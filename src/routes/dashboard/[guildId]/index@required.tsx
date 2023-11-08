@@ -35,6 +35,7 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
     joinmessage: any,
     leavemessage: any,
     tickets: any,
+    voicechats: any,
     reactions: any[],
     auditlogs: any,
   } | null;
