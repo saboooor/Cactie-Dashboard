@@ -35,7 +35,6 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
     joinmessage: any,
     leavemessage: any,
     tickets: any,
-    voicechats: any,
     reactions: any[],
     auditlogs: any,
   } | null;
@@ -44,6 +43,16 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
 export const updateSettingFn = server$(async function(name: string, value: string | number | boolean | null | undefined) {
   const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
   await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
+  const webhookurl = this.env.get(`WEBHOOK_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)!;
+  await fetch(webhookurl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      guildId: `${this.params.guildId}`,
+    }),
+  });
 });
 
 export async function fetchData(url: string, props: RequestEventBase, user?: boolean, accessToken?: string): Promise<any> {
