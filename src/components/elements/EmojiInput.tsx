@@ -1,12 +1,12 @@
 import { Picker } from 'emoji-mart';
 import { Slot, component$, useVisibleTask$ } from '@builder.io/qwik';
-import { Button } from './Button';
+import { Button } from '@luminescent/ui';
 
 export default component$(({ id, emoji, nolabel, onChange$ }: any) => {
   return <>
     <div class="flex items-center">
       {!nolabel && <label for={id} class="mr-2 text-xl"><Slot /></label>}
-      <Button id={id} onClick$={(event: any) => {
+      <Button square id={id} onClick$={(event: any) => {
         const picker = document.getElementById('emoji-picker');
         if (picker) {
           document.getElementById('emoji-picker')?.classList.remove('hidden');

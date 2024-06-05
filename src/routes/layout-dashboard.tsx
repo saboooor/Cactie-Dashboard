@@ -27,9 +27,7 @@ export async function fetchGuilds(headers: Record<string, string>): Promise<Guil
   return GuildList;
 }
 
-export const getGuildsFn = server$(async function(accessToken, props?: RequestEventBase, dev?: boolean): Promise<Guild[] | Error> {
-  props = props ?? this;
-
+export async function getGuilds(accessToken: string, props: RequestEventBase, dev?: boolean): Promise<Guild[] | Error> {
   let GuildList = await fetchGuilds({
     authorization: `Bearer ${accessToken}`,
   });
@@ -44,6 +42,10 @@ export const getGuildsFn = server$(async function(accessToken, props?: RequestEv
   GuildList.forEach(guild => guild.mutual = BotGuildList.some(botguild => botguild.id == guild.id));
   if (dev) return BotGuildList.map(guild => ({ ...guild, mutual: true }));
   return GuildList;
+}
+
+export const getGuildsFn = server$(async function(accessToken: string, dev?: boolean): Promise<Guild[] | Error> {
+  return await getGuilds(accessToken, this, dev);
 });
 
 export const useGetAuth = routeLoader$(async (props) => {
@@ -52,18 +54,16 @@ export const useGetAuth = routeLoader$(async (props) => {
     props.cookie.set('redirecturl', props.url.href, { path: '/' });
     throw props.redirect(302, '/login');
   }
-  const guilds = await getGuildsFn(auth.accessToken, props, auth.pfp?.includes('249638347306303499'));
+  const guilds = await getGuilds(auth.accessToken, props, auth.pfp?.includes('249638347306303499'));
   return { auth, guilds };
 });
 
 export default component$(() => {
   const auth = useGetAuth();
   return (
-    <>
+    <main>
       <Nav auth={auth.value.auth} />
-      <main class="mt-16">
-        <Slot />
-      </main>
-    </>
+      <Slot />
+    </main>
   );
 });

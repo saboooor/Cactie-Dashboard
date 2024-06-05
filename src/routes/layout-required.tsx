@@ -1,12 +1,12 @@
 import { component$, Slot } from '@builder.io/qwik';
-import { routeLoader$, server$ } from '@builder.io/qwik-city';
+import { routeLoader$ } from '@builder.io/qwik-city';
 import type { APIGuild } from 'discord-api-types/v10';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 import getAuth from '~/components/functions/auth';
 import Nav from '~/components/Nav';
 import { fetchGuilds } from './layout-dashboard';
 
-export const getUserGuildFn = server$(async function(accessToken: string, guildId: string): Promise<APIGuild | Error> {
+export async function getUserGuild(accessToken: string, guildId: string): Promise<APIGuild | Error> {
   const guild = await fetchGuilds({
     authorization: `Bearer ${accessToken}`,
   });
@@ -18,7 +18,7 @@ export const getUserGuildFn = server$(async function(accessToken: string, guildI
   if ((BigInt(guildInfo.permissions!) & PermissionFlagsBits.ManageGuild) !== PermissionFlagsBits.ManageGuild) return new Error('User does not have permission to manage guild');
 
   return guildInfo;
-});
+}
 
 export const useGetAuth = routeLoader$(async ({ cookie, env, params, redirect }) => {
   const auth = await getAuth(cookie, env);
@@ -30,7 +30,7 @@ export const useGetAuth = routeLoader$(async ({ cookie, env, params, redirect })
 
   if (auth.pfp?.includes('249638347306303499')) return auth;
 
-  const userGuild = await getUserGuildFn(auth.accessToken, params.guildId);
+  const userGuild = await getUserGuild(auth.accessToken, params.guildId);
   if (userGuild instanceof Error) throw userGuild;
 
   return auth;
@@ -39,11 +39,9 @@ export const useGetAuth = routeLoader$(async ({ cookie, env, params, redirect })
 export default component$(() => {
   const auth = useGetAuth();
   return (
-    <>
+    <main>
       <Nav auth={auth.value} />
-      <main>
-        <Slot />
-      </main>
-    </>
+      <Slot />
+    </main>
   );
 });

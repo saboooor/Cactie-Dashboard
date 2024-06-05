@@ -4,25 +4,18 @@ import { routeLoader$, server$ } from '@builder.io/qwik-city';
 import { ApplicationCommandType, ChannelType } from 'discord-api-types/v10';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
-import TextInput from '~/components/elements/TextInput';
-import Checkbox from '~/components/elements/Checkbox';
-import SelectInput from '~/components/elements/SelectInput';
-import { Button } from '~/components/elements/Button';
 import { Add, Close, TerminalOutline } from 'qwik-ionicons';
-import Card, { CardHeader } from '~/components/elements/Card';
-import LoadingIcon from '~/components/icons/LoadingIcon';
 const actionTypes = {
   1: 'Send Message',
   2: 'Wait',
   3: 'Edit Channel',
 };
 
-import { getGuildFn } from '../index@required';
+import { getGuild } from '../index@required';
 import MenuBar from '~/components/MenuBar';
+import { Button, Card, Dropdown, Header, LoadingIcon, TextArea, TextInput, TextInputRaw, Toggle } from '@luminescent/ui';
 
-export const getCustomCmdsFn = server$(async function(props?: RequestEventBase) {
-  props = props ?? this;
-
+export async function getCustomCmds(props: RequestEventBase) {
   const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   const customcmdsUnparsed = await prisma.customcmds.findMany({
@@ -38,12 +31,12 @@ export const getCustomCmdsFn = server$(async function(props?: RequestEventBase) 
   })) : null;
 
   return customcmds;
-});
+}
 
 export const useGetData = routeLoader$(async (props) => {
   const [customcmds, guild] = await Promise.all([
-    getCustomCmdsFn(props),
-    getGuildFn(props),
+    getCustomCmds(props),
+    getGuild(props),
   ]);
   return { customcmds, ...guild };
 });
@@ -133,14 +126,14 @@ export default component$(() => {
   const customcmds = store.customcmds;
 
   return (
-    <section class="mx-auto max-w-6xl px-6 py-24 flex flex-col gap-4 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+    <section class="mx-auto max-w-6xl px-6 flex flex-col gap-4 items-center min-h-[100svh] pt-32">
       <div class="menubar flex flex-col gap-4 items-center">
         <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl mb-2">
           {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
           {guild.name}
         </h1>
-        <div class="bg-pink-400/20 w-64 h-16 -mb-16 -z-10 blur-xl rounded-full" />
-        <h2 class="text-xl text-gray-300 font-semibold fill-current flex items-center gap-3">
+        <div class="bg-pink-400/40 w-64 h-8 -mb-12 -z-10 blur-2xl rounded-full" />
+        <h2 class="text-xl text-slate-300 font-semibold fill-current flex items-center gap-3">
           <TerminalOutline width="32" />
           Custom Commands
           <div class={{
@@ -148,12 +141,12 @@ export default component$(() => {
             'opacity-0 -ml-12': !store.loading.includes('customcmds'),
             'opacity-100 -ml-2': store.loading.includes('customcmds'),
           }}>
-            <LoadingIcon />
+            <LoadingIcon width={24} />
           </div>
         </h2>
         <MenuBar guild={guild} />
       </div>
-      <div class="py-10 grid gap-4">
+      <div class="py-10 flex flex-col w-full gap-4">
         {
           customcmds?.map((cmd, i) =>
             <Card key={i}>
@@ -162,7 +155,9 @@ export default component$(() => {
                   / {cmd.name}
                 </p>
                 <div class="flex-1">
-                  <TextInput nolabel placeholder="Command Description" value={cmd.description} onChange$={async (event: any) => {
+                  <TextInputRaw class={{
+                    'w-full': true,
+                  }} placeholder="Command Description" value={cmd.description} onChange$={async (event: any) => {
                     store.loading.push(`customcmds-${cmd.id}`);
                     await upsertCustomCommandFn({
                       guildId: guild.id,
@@ -178,7 +173,7 @@ export default component$(() => {
                     'opacity-0': !store.loading.includes(`customcmds-${cmd.id}`),
                     'opacity-100': store.loading.includes(`customcmds-${cmd.id}`),
                   }}>
-                    <LoadingIcon />
+                    <LoadingIcon width={24} />
                   </div>
                   <div class={{
                     'transition-all': true,
@@ -199,12 +194,12 @@ export default component$(() => {
               </div>
               {
                 cmd.actions.map((action: any, i2: any) =>
-                  <Card darker key={i2}>
-                    <CardHeader>
+                  <Card color="darkergray" key={i2}>
+                    <Header>
                       Action {i2 + 1} - {actionTypes[action.type as keyof typeof actionTypes]}
-                    </CardHeader>
+                    </Header>
                     {action.type == 1 && <div class="flex flex-col gap-2">
-                      <TextInput placeholder="Hello World!" value={action.content} onChange$={async (event: any) => {
+                      <TextInput id={`textcontent-${i}-${i2}`} placeholder="Hello World!" value={action.content} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].content = event.target.value;
                         await upsertCustomCommandFn({
@@ -216,7 +211,7 @@ export default component$(() => {
                       }}>
                         Text Content *Optional if embed is provided
                       </TextInput>
-                      <TextInput big placeholder="{ ...JSON here }" value={action.embeds[0] ? JSON.stringify(action.embeds[0]) : ''} onChange$={async (event: any) => {
+                      <TextArea id={`embed-${i}-${i2}`} placeholder="{ ...JSON here }" value={action.embeds[0] ? JSON.stringify(action.embeds[0]) : ''} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].embeds = [event.target.value != '' ? JSON.parse(event.target.value) : undefined];
                         await upsertCustomCommandFn({
@@ -227,9 +222,9 @@ export default component$(() => {
                         store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
                       }}>
                         Embed *Optional if text content is provided
-                      </TextInput>
+                      </TextArea>
                       <div class="mt-2">
-                        <Checkbox toggle checked={action.ephemeral} onChange$={async (event: any) => {
+                        <Toggle onColor='pink' label="Ephemeral" checked={action.ephemeral} onChange$={async (event: any) => {
                           store.loading.push(`customcmds-${cmd.id}`);
                           cmd.actions[i2].ephemeral = event.target.checked;
                           await upsertCustomCommandFn({
@@ -238,13 +233,11 @@ export default component$(() => {
                             actions: JSON.stringify(cmd.actions),
                           }, true);
                           store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                        }}>
-                          Ephemeral
-                        </Checkbox>
+                        }}/>
                       </div>
                     </div>}
                     {action.type == 2 && <div class="flex flex-col gap-2">
-                      <TextInput placeholder="1000" value={action.ms} onChange$={async (event: any) => {
+                      <TextInput id={`ms-${i}-${i2}`} placeholder="1000" value={action.ms} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].ms = event.target.value;
                         await upsertCustomCommandFn({
@@ -258,7 +251,7 @@ export default component$(() => {
                       </TextInput>
                     </div>}
                     {action.type == 3 && <div class="flex flex-col gap-2">
-                      <SelectInput label="Select the channel to edit" value={action.channel} onChange$={async (event: any) => {
+                      <Dropdown id={`channel-${i}-${i2}`} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].channel = event.target.value;
                         await upsertCustomCommandFn({
@@ -267,12 +260,10 @@ export default component$(() => {
                           actions: JSON.stringify(cmd.actions),
                         }, true);
                         store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                      }}>
-                        {channels.map(c =>
-                          <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                        )}
-                      </SelectInput>
-                      <TextInput placeholder="general" value={action.name} onChange$={async (event: any) => {
+                      }} value={action.channel} values={channels.map(c => ({ name: `# ${c.name}`, value: c.id }))}>
+                        Select the channel to edit
+                      </Dropdown>
+                      <TextInput id={`channel-name-${i}-${i2}`} placeholder="general" value={action.name} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].name = event.target.value;
                         await upsertCustomCommandFn({
@@ -284,7 +275,7 @@ export default component$(() => {
                       }}>
                         Set Channel Name
                       </TextInput>
-                      <TextInput placeholder="This is the general channel" value={action.topic} onChange$={async (event: any) => {
+                      <TextInput id={`channel-topic-${i}-${i2}`} placeholder="This is the general channel" value={action.topic} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].topic = event.target.value;
                         await upsertCustomCommandFn({
@@ -296,7 +287,7 @@ export default component$(() => {
                       }}>
                         Set Channel Topic
                       </TextInput>
-                      <SelectInput label="Set channel category" value={action.topic} onChange$={async (event: any) => {
+                      <Dropdown id={`channel-category-${i}-${i2}`} onChange$={async (event: any) => {
                         store.loading.push(`customcmds-${cmd.id}`);
                         cmd.actions[i2].parentId = event.target.value;
                         await upsertCustomCommandFn({
@@ -305,38 +296,34 @@ export default component$(() => {
                           actions: JSON.stringify(cmd.actions),
                         }, true);
                         store.loading = store.loading.filter(l => l != `customcmds-${cmd.id}`);
-                      }}>
-                        <option value={undefined}>Don't change</option>
-                        {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
-                          <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                        )}
-                      </SelectInput>
+                      }} values={[
+                        { name: 'Don\'t change', value: 0 },
+                        ...channels.filter(c => c.type == ChannelType.GuildCategory).map(c => ({ name: `# ${c.name}`, value: c.id })),
+                      ]}>
+                        Set channel category
+                      </Dropdown>
                     </div>}
                   </Card>,
                 )
               }
-              <Card darker>
-                <CardHeader>
+              <Card color="darkergray">
+                <Header>
                   Add Action
-                </CardHeader>
-                <SelectInput id="customcmd-create-type" label="Type" value={store.customcmdtype} onChange$={async (event: any) => {
+                </Header>
+                <Dropdown id="customcmd-create-type" onChange$={async (event: any) => {
                   store.customcmdtype = event.target.value;
-                }}>
-                  {Object.keys(actionTypes).map((t, i) =>
-                    <option value={i + 1} key={i + 1}>{actionTypes[i + 1 as keyof typeof actionTypes]}</option>,
-                  )}
-                </SelectInput>
+                }} value={store.customcmdtype} values={Object.keys(actionTypes).map((t, i) => ({ name: actionTypes[i + 1 as keyof typeof actionTypes], value: i + 1 }))}>
+                  Type
+                </Dropdown>
                 {store.customcmdtype == 1 && <div class="flex flex-col gap-2">
                   <TextInput placeholder="Hello World!" id={`customcmd-action-content-${cmd.id}`}>
                     Text Content *Optional if embed is provided
                   </TextInput>
-                  <TextInput big placeholder="{ ...JSON here }" id={`customcmd-action-embed-${cmd.id}`}>
+                  <TextArea placeholder="{ ...JSON here }" id={`customcmd-action-embed-${cmd.id}`}>
                     Embed *Optional if text content is provided
-                  </TextInput>
+                  </TextArea>
                   <div class="my-2">
-                    <Checkbox toggle id={`customcmd-action-ephemeral-${cmd.id}`}>
-                      Ephemeral
-                    </Checkbox>
+                    <Toggle onColor='pink' label="Ephemeral" id={`customcmd-action-ephemeral-${cmd.id}`}/>
                   </div>
                 </div>}
                 {store.customcmdtype == 2 && <div class="flex flex-col gap-2">
@@ -345,25 +332,23 @@ export default component$(() => {
                   </TextInput>
                 </div>}
                 {store.customcmdtype == 3 && <div class="flex flex-col gap-2">
-                  <SelectInput id={`customcmd-action-channel-${cmd.id}`} label="Select the channel to edit">
-                    {channels.map(c =>
-                      <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                    )}
-                  </SelectInput>
+                  <Dropdown id={`customcmd-action-channel-${cmd.id}`} values={channels.map(c => ({ name: `# ${c.name}`, value: c.id }))}>
+                    Select the channel to edit
+                  </Dropdown>
                   <TextInput placeholder="general" id={`customcmd-action-channel-name-${cmd.id}`}>
                     Set Channel Name
                   </TextInput>
                   <TextInput placeholder="This is the general channel" id={`customcmd-action-channel-topic-${cmd.id}`}>
                     Set Channel Topic
                   </TextInput>
-                  <SelectInput id={`customcmd-action-channel-category-${cmd.id}`} label="Set channel category">
-                    <option value={undefined}>Don't change</option>
-                    {channels.filter(c => c.type == ChannelType.GuildCategory).map(c =>
-                      <option value={c.id} key={c.id}>{`# ${c.name}`}</option>,
-                    )}
-                  </SelectInput>
+                  <Dropdown id={`customcmd-action-channel-category-${cmd.id}`} values={[
+                    { name: 'Don\'t change', value: 0 },
+                    ...channels.filter(c => c.type == ChannelType.GuildCategory).map(c => ({ name: `# ${c.name}`, value: c.id })),
+                  ]}>
+                    Set channel category
+                  </Dropdown>
                 </div>}
-                <Button color="primary" onClick$={async () => {
+                <Button color="pink" onClick$={async () => {
                   store.loading.push(`customcmds-${cmd.id}`);
                   const action: any = {
                     type: store.customcmdtype,
@@ -405,20 +390,18 @@ export default component$(() => {
           )
         }
         <Card>
-          <CardHeader loading={store.loading.includes('customcmds')}>
+          <Header loading={store.loading.includes('customcmds')}>
             <Add width="32" class="fill-current" /> Create
-          </CardHeader>
+          </Header>
           <p>
             You will be able to add the actions for this command once you create it.
           </p>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             <p class="text-2xl p-1 px-2">/</p>
-            <div class="flex-1">
-              <TextInput nolabel placeholder="Command Name" id="customcmd-create-name" />
-            </div>
-            <div class="flex-1">
-              <TextInput nolabel placeholder="Command Description" id="customcmd-create-description" />
-            </div>
+            <TextInputRaw placeholder="Command Name" id="customcmd-create-name" />
+            <TextInputRaw class={{
+              'flex-1': true,
+            }} placeholder="Command Description" id="customcmd-create-description" />
             <Add width="36" class="text-green-400 cursor-pointer" onClick$={async () => {
               store.loading.push('customcmds');
               const name = document.getElementById('customcmd-create-name')! as HTMLInputElement;

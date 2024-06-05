@@ -1,17 +1,15 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead, RequestEventBase } from '@builder.io/qwik-city';
-import { routeLoader$, server$ } from '@builder.io/qwik-city';
+import { Link, routeLoader$, server$ } from '@builder.io/qwik-city';
 import { PrismaClient, type settings } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
 import type { APIGuild, APIGuildChannel, APIRole, ChannelType, RESTError, RESTRateLimit } from 'discord-api-types/v10';
 import { ChatboxOutline, HappyOutline, NewspaperOutline, SettingsOutline, ShieldCheckmarkOutline, TerminalOutline, TicketOutline } from 'qwik-ionicons';
-import Card, { CardHeader } from '~/components/elements/Card';
+import { Card, Header } from '@luminescent/ui';
 import Switcher from '~/components/elements/Switcher';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
-  props = props ?? this;
-
+export async function getSrvConfig(props: RequestEventBase) {
   const prisma = new PrismaClient({ datasources: { db: { url: props.env.get(`DATABASE_URL${props.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
 
   const srvconfigUnparsed = await prisma.settings.findUnique({
@@ -39,21 +37,11 @@ export const getSrvConfigFn = server$(async function(props?: RequestEventBase) {
     reactions: any[],
     auditlogs: any,
   } | null;
-});
+}
 
 export const updateSettingFn = server$(async function(name: string, value: string | number | boolean | null | undefined) {
   const prisma = new PrismaClient({ datasources: { db: { url: this.env.get(`DATABASE_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`) } } }).$extends(withAccelerate());
   await prisma.settings.update({ where: { guildId: this.params.guildId }, data: { [name]: value } });
-  const webhookurl = this.env.get(`WEBHOOK_URL${this.cookie.get('branch')?.value == 'dev' ? '_DEV' : ''}`)!;
-  await fetch(webhookurl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      guildId: `${this.params.guildId}`,
-    }),
-  });
 });
 
 export async function fetchData(url: string, props: RequestEventBase, user?: boolean, accessToken?: string): Promise<any> {
@@ -87,8 +75,7 @@ interface guildData {
 
 const guildCache = new Map<string, guildData>();
 
-export const getGuildFn = server$(async function(props?: RequestEventBase, noCache?: boolean) {
-  props = props ?? this;
+export async function getGuild(props: RequestEventBase, noCache?: boolean) {
   const guildId = props.params.guildId;
   if (!noCache && guildCache.has(guildId)) return guildCache.get(guildId)!;
 
@@ -108,9 +95,9 @@ export const getGuildFn = server$(async function(props?: RequestEventBase, noCac
   guildCache.set(guildId, { guild, channels, roles });
 
   return { guild, channels, roles };
-});
+}
 
-export const useGetGuild = routeLoader$(async (props) => await getGuildFn(props));
+export const useGetGuild = routeLoader$(async (props) => await getGuild(props));
 
 export default component$(() => {
   const guildData = useGetGuild().value;
@@ -120,24 +107,23 @@ export default component$(() => {
     dev: undefined as boolean | undefined,
   });
 
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     store.dev = document.cookie.includes('branch=dev');
   });
 
   return (
-    <section class="mx-auto max-w-5xl px-6 py-24 flex flex-col gap-4 items-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+    <section class="mx-auto max-w-5xl px-6 flex flex-col gap-4 items-center min-h-[100svh] pt-32">
       <h1 class="flex items-center gap-5 font-bold text-white text-2xl sm:text-3xl md:text-4xl">
         {guild.icon && <img class="w-16 h-16 rounded-full" width={64} height={64} src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`} alt={guild.name} style={{ 'view-transition-name': 'picture' }} />}
         {guild.name}
       </h1>
-      <div class="flex-1 my-4">
-        <Switcher store={store} label='Bot:' onSwitch$={() => {}} />
-      </div>
+      <Switcher store={store} label='Bot:' onSwitch$={() => {}} />
       <div class="w-full">
-        <Card darker>
-          <CardHeader>
+        <Card>
+          <Header>
             Server Info
-          </CardHeader>
+          </Header>
           <div class="grid sm:grid-cols-2 gap-4">
             <p>
               Id: {guild.id}
@@ -155,62 +141,76 @@ export default component$(() => {
         </Card>
       </div>
       <div class="w-full grid md:grid-cols-6 gap-4 fill-current">
-        <Card extraClass={{ 'md:col-span-2': true }} color="red" link={`/dashboard/${guild.id}/general`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <SettingsOutline width='48' />
-              General
-            </div>
-          </CardHeader>
-        </Card>
-        <Card extraClass={{ 'md:col-span-2': true }} color="orange" link={`/dashboard/${guild.id}/tickets`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <TicketOutline width='48' />
-              Tickets
-            </div>
-          </CardHeader>
-        </Card>
-        <Card extraClass={{ 'md:col-span-2': true }} color="yellow" link={`/dashboard/${guild.id}/moderation`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <ShieldCheckmarkOutline width='48' />
-              Moderation
-            </div>
-          </CardHeader>
-        </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="green" link={`/dashboard/${guild.id}/reactions`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <ChatboxOutline width='48' />
-              Reactions
-            </div>
-          </CardHeader>
-        </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="blue" link={`/dashboard/${guild.id}/auditlogs`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <NewspaperOutline width='48' />
-              Audit Logs
-            </div>
-          </CardHeader>
-        </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="purple" link={`/dashboard/${guild.id}/reactionroles`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <HappyOutline width='48' />
-              Reaction Roles
-            </div>
-          </CardHeader>
-        </Card>
-        <Card extraClass={{ 'md:col-span-3': true }} color="pink" link={`/dashboard/${guild.id}/customcmds`}>
-          <CardHeader>
-            <div class="flex flex-col items-center w-full gap-4 py-10">
-              <TerminalOutline width='48' />
-              Custom Commands
-            </div>
-          </CardHeader>
-        </Card>
+        <Link href={`/dashboard/${guild.id}/general`} class={{ 'md:col-span-2': true }} >
+          <Card blobs color="red" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10">
+                <SettingsOutline width='48' />
+                General
+              </div>
+            </Header>
+          </Card>
+        </Link>
+        <Link href={`/dashboard/${guild.id}/tickets`} class={{ 'md:col-span-2': true }} >
+          <Card blobs color="orange" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10">
+                <TicketOutline width='48' />
+                Tickets
+              </div>
+            </Header>
+          </Card>
+        </Link>
+        <Link href={`/dashboard/${guild.id}/moderation`} class={{ 'md:col-span-2': true }} >
+          <Card blobs color="yellow" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10">
+                <ShieldCheckmarkOutline width='48' />
+                Moderation
+              </div>
+            </Header>
+          </Card>
+        </Link>
+        <Link href={`/dashboard/${guild.id}/reactions`} class={{ 'md:col-span-3': true }} >
+          <Card blobs color="green" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10">
+                <ChatboxOutline width='48' />
+                Reactions
+              </div>
+            </Header>
+          </Card>
+        </Link>
+        <Link href={`/dashboard/${guild.id}/auditlogs`} class={{ 'md:col-span-3': true }} >
+          <Card blobs color="blue" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10">
+                <NewspaperOutline width='48' />
+                Audit Logs
+              </div>
+            </Header>
+          </Card>
+        </Link>
+        <Link href={`/dashboard/${guild.id}/reactionroles`} class={{ 'md:col-span-3': true }} >
+          <Card blobs color="purple" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10 fill-white">
+                <HappyOutline width='48' />
+                Reaction Roles
+              </div>
+            </Header>
+          </Card>
+        </Link>
+        <Link href={`/dashboard/${guild.id}/customcmds`} class={{ 'md:col-span-3': true }} >
+          <Card blobs color="pink" hover="clickable">
+            <Header>
+              <div class="flex flex-col items-center w-full gap-4 py-10">
+                <TerminalOutline width='48' />
+                Custom Commands
+              </div>
+            </Header>
+          </Card>
+        </Link>
       </div>
     </section>
   );

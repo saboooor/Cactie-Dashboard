@@ -3,8 +3,8 @@ import { ChatboxOutline, HappyOutline, NewspaperOutline, SettingsOutline, Shield
 import { Link } from '@builder.io/qwik-city';
 
 export default component$(({ guild }: any) => {
-  return (
-    <div class="grid grid-cols-12 items-center gap-3 my-4 whitespace-nowrap fill-current">
+  return <>
+    <div class={{ 'grid grid-cols-12 items-center gap-3 my-4 whitespace-nowrap fill-current': true }}>
       <Link href={`/dashboard/${guild.id}/general`} class="col-span-4 flex flex-1 gap-4 justify-center bg-gray-850 border border-red-400/10 hover:bg-red-400/10 transition-all rounded-lg py-3 px-4 text-center fill-current">
         <SettingsOutline width='24' />
         General
@@ -34,5 +34,5 @@ export default component$(({ guild }: any) => {
         Custom Commands
       </Link>
     </div>
-  );
+  </>;
 });
