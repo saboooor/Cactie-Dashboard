@@ -1,6 +1,6 @@
 import { component$, useStyles$ } from '@qwik.dev/core';
 
-export default component$<any>(({ size = 24, animated = false, ...props }) => {
+export default component$<any>(({ size = 24, animated = false, noblur = false, ...props }) => {
   
   if (animated) {
     useStyles$(`
@@ -26,17 +26,19 @@ export default component$<any>(({ size = 24, animated = false, ...props }) => {
               style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:20px;"/>
           </mask>
           <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(470,447.039045,-447.039045,470,480,72.960955)"><stop offset="0" style="stop-color:rgb(96,165,250);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(167,139,250);stop-opacity:1"/></linearGradient>
-          <filter id="blurGlow">
-              <feGaussianBlur stdDeviation="10" result="blur"/>
-              <feMerge>
-                  <feMergeNode in="blur"/>
-                  <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-          </filter>
+          {!noblur && (
+            <filter id="blurGlow">
+                <feGaussianBlur stdDeviation="10" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+          )}
       </defs>
       <g id="sPath" transform="matrix(1,0,0,1,-415,0)" mask="url(#eMask)">
         <path d="M950,80C650,40 520,180 720,260C920,340 820,460 480,520" style="fill:none;fill-rule:nonzero;stroke:url(#_Linear1);stroke-width:50px;"
-          filter="url(#blurGlow)"/>
+          filter={noblur ? undefined : "url(#blurGlow)"}/>
       </g>
     </svg>
   );

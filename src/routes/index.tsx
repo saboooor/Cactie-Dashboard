@@ -1,7 +1,6 @@
 import { component$ } from '@qwik.dev/core';
-import { Link, type DocumentHead } from '@qwik.dev/router';
+import { type DocumentHead } from '@qwik.dev/router';
 
-import Sova from '~/components/images/Sova';
 import { Sparkles } from 'lucide-icons-qwik';
 import { SiDiscord } from 'simple-icons-qwik';
 
