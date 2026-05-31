@@ -1,4 +1,4 @@
-import type { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
+import type { DocumentHead, RequestHandler } from '@qwik.dev/router';
 
 export const onGet: RequestHandler = async ({ url, redirect, env }) => {
   const dev = url.searchParams.get('dev');
