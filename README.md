@@ -1,10 +1,7 @@
 # Cactie Dashboard
 
-<p align="center">
-  <img src="https://cactie.smhsmh.club/assets/images/Cactie.webp" width="20%" alt="Cactie">
-</p>
-
 This is source code for Cactie's Dashboard
+This has been archived and moved to [Sova](https://github.com/saboooor/Sova)
 
 [![Discord](https://discord.com/api/guilds/811354612547190794/widget.png)](https://discord.gg/Bsefgbaedz)
 [![CodeFactor](https://www.codefactor.io/repository/github/saboooor/cactie-dashboard/badge/master)](https://www.codefactor.io/repository/github/saboooor/cactie-dashboard/overview/master)
