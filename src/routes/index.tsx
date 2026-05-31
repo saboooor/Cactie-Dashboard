@@ -1,8 +1,8 @@
 import { component$ } from '@qwik.dev/core';
 import { type DocumentHead } from '@qwik.dev/router';
 
-import { Sparkles } from 'lucide-icons-qwik';
-import { SiDiscord } from 'simple-icons-qwik';
+import Sparkles from 'lucide-icons-qwik/icons/Sparkles';
+import SiDiscord from 'simple-icons-qwik/icons/SiDiscord';
 
 export default component$(() => {
   return (

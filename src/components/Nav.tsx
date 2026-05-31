@@ -1,8 +1,10 @@
 import { component$ } from '@qwik.dev/core';
 import { Link } from '@qwik.dev/router';
 import { Nav } from '@luminescent/ui-qwik';
-import { SiGithub, SiDiscord } from 'simple-icons-qwik';
-import { AppWindow, Sparkles } from 'lucide-icons-qwik';
+import SiGithub from 'simple-icons-qwik/icons/SiGithub';
+import SiDiscord from 'simple-icons-qwik/icons/SiDiscord';
+import AppWindow from 'lucide-icons-qwik/icons/AppWindow';
+import Sparkles from 'lucide-icons-qwik/icons/Sparkles';
 import Sova from './images/Sova';
 
 export default component$(() => {
