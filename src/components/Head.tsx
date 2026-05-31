@@ -2,17 +2,17 @@ import { component$ } from '@builder.io/qwik';
 import { useDocumentHead, useLocation } from '@builder.io/qwik-city';
 
 // @ts-ignore
-import iconPNG16 from '~/components/images/Cactie.png?width=16&height=16';
+import iconPNG16 from '~/components/images/Sova.png?width=16&height=16';
 // @ts-ignore
-import iconPNG32 from '~/components/images/Cactie.png?width=32&height=32';
+import iconPNG32 from '~/components/images/Sova.png?width=32&height=32';
 // @ts-ignore
-import iconPNG96 from '~/components/images/Cactie.png?width=96&height=96';
+import iconPNG96 from '~/components/images/Sova.png?width=96&height=96';
 // @ts-ignore
-import iconJPG16 from '~/components/images/Cactie.png?jpeg&width=16&height=16';
+import iconJPG16 from '~/components/images/Sova.png?jpeg&width=16&height=16';
 // @ts-ignore
-import iconJPG32 from '~/components/images/Cactie.png?jpeg&width=32&height=32';
+import iconJPG32 from '~/components/images/Sova.png?jpeg&width=32&height=32';
 // @ts-ignore
-import iconJPG96 from '~/components/images/Cactie.png?jpeg&width=96&height=96';
+import iconJPG96 from '~/components/images/Sova.png?jpeg&width=96&height=96';
 
 /**
  * The RouterHead component is placed inside of the document `<head>` element.
@@ -23,8 +23,8 @@ export const RouterHead = component$(() => {
 
   return (
     <>
-      <title>{`Cactie: ${head.title}`}</title>
-      <meta content={`Cactie: ${head.title}`} property="og:title"/>
+      <title>{`Sova - ${head.title}`}</title>
+      <meta content={`Sova - ${head.title}`} property="og:title"/>
       <meta content="#0D0D0D" name="theme-color"/>
       <meta content={iconPNG96} property="og:image"/>
 
